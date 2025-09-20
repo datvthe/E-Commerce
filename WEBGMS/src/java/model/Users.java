@@ -1,0 +1,173 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package model;
+
+import java.sql.Date;
+
+public class Users {
+
+    private long user_id;
+    private String full_name;
+    private String email;
+    private String password_hash;
+    private String phone_number;
+    private String gender;          // male, female, other
+    private Date date_of_birth;
+    private String address;
+    private String avatar_url;
+    private String status;          // active, inactive, banned, pending
+    private boolean email_verified;
+    private Date last_login_at;
+    private Date created_at;
+    private Date updated_at;
+    private Date deleted_at;
+
+    public Users() {
+    }
+
+    public Users(long user_id, String full_name, String email, String password_hash, String phone_number, String gender, Date date_of_birth, String address, String avatar_url, String status, boolean email_verified, Date last_login_at, Date created_at, Date updated_at, Date deleted_at) {
+        this.user_id = user_id;
+        this.full_name = full_name;
+        this.email = email;
+        this.password_hash = password_hash;
+        this.phone_number = phone_number;
+        this.gender = gender;
+        this.date_of_birth = date_of_birth;
+        this.address = address;
+        this.avatar_url = avatar_url;
+        this.status = status;
+        this.email_verified = email_verified;
+        this.last_login_at = last_login_at;
+        this.created_at = created_at;
+        this.updated_at = updated_at;
+        this.deleted_at = deleted_at;
+    }
+
+    public long getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(long user_id) {
+        this.user_id = user_id;
+    }
+
+    public String getFull_name() {
+        return full_name;
+    }
+
+    public void setFull_name(String full_name) {
+        this.full_name = full_name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword_hash() {
+        return password_hash;
+    }
+
+    public void setPassword_hash(String password_hash) {
+        this.password_hash = password_hash;
+    }
+
+    public String getPhone_number() {
+        return phone_number;
+    }
+
+    public void setPhone_number(String phone_number) {
+        this.phone_number = phone_number;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public Date getDate_of_birth() {
+        return date_of_birth;
+    }
+
+    public void setDate_of_birth(Date date_of_birth) {
+        this.date_of_birth = date_of_birth;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getAvatar_url() {
+        return avatar_url;
+    }
+
+    public void setAvatar_url(String avatar_url) {
+        this.avatar_url = avatar_url;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public boolean isEmail_verified() {
+        return email_verified;
+    }
+
+    public void setEmail_verified(boolean email_verified) {
+        this.email_verified = email_verified;
+    }
+
+    public Date getLast_login_at() {
+        return last_login_at;
+    }
+
+    public void setLast_login_at(Date last_login_at) {
+        this.last_login_at = last_login_at;
+    }
+
+    public Date getCreated_at() {
+        return created_at;
+    }
+
+    public void setCreated_at(Date created_at) {
+        this.created_at = created_at;
+    }
+
+    public Date getUpdated_at() {
+        return updated_at;
+    }
+
+    public void setUpdated_at(Date updated_at) {
+        this.updated_at = updated_at;
+    }
+
+    public Date getDeleted_at() {
+        return deleted_at;
+    }
+
+    public void setDeleted_at(Date deleted_at) {
+        this.deleted_at = deleted_at;
+    }
+
+    @Override
+    public String toString() {
+        return "Users{" + "user_id=" + user_id + ", full_name=" + full_name + ", email=" + email + ", password_hash=" + password_hash + ", phone_number=" + phone_number + ", gender=" + gender + ", date_of_birth=" + date_of_birth + ", address=" + address + ", avatar_url=" + avatar_url + ", status=" + status + ", email_verified=" + email_verified + ", last_login_at=" + last_login_at + ", created_at=" + created_at + ", updated_at=" + updated_at + ", deleted_at=" + deleted_at + '}';
+    }
+
+}
