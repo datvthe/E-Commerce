@@ -1,37 +1,24 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller.common;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.UUID;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.UUID;
+import model.user.UserRoles;
 import model.user.Users;
 
 @WebServlet(name = "CommonLoginController", urlPatterns = {"/login"})
 public class CommonLoginController extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
@@ -44,31 +31,36 @@ public class CommonLoginController extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
             if (request.getSession().getAttribute("user") != null) {
                 request.getSession().setAttribute("message", "Đăng nhập thành công!");
-                response.sendRedirect(request.getContextPath() + "/home");
+
+                dao.UsersDAO userDAO = new dao.UsersDAO();
+                Users user = (Users) request.getSession().getAttribute("user");
+                UserRoles userRole = userDAO.getRoleByUserId((int) user.getUser_id());
+
+                if (userRole != null) {
+                    int roleId = userRole.getRole_id().getRole_id();
+                    String path = getRedirectPathByRole(roleId);
+                    response.sendRedirect(request.getContextPath() + path);
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/home");
+                }
                 return;
             }
 
             String token = null;
+            String roleCookieVal = null;
+
             if (request.getCookies() != null) {
                 for (Cookie c : request.getCookies()) {
                     if ("remember_token".equals(c.getName())) {
                         token = c.getValue();
-                        break;
+                    } else if ("role_id".equals(c.getName())) {
+                        roleCookieVal = c.getValue();
                     }
                 }
             }
@@ -80,6 +72,14 @@ public class CommonLoginController extends HttpServlet {
                 if (user != null) {
                     request.getSession().setAttribute("user", user);
                     request.getSession().setAttribute("message", "Đăng nhập thành công!");
+
+                    if (roleCookieVal != null) {
+                        int roleId = Integer.parseInt(roleCookieVal);
+                        String path = getRedirectPathByRole(roleId);
+                        response.sendRedirect(request.getContextPath() + path);
+                        return;
+                    }
+
                     response.sendRedirect(request.getContextPath() + "/home");
                     return;
                 }
@@ -93,14 +93,6 @@ public class CommonLoginController extends HttpServlet {
         }
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -122,17 +114,32 @@ public class CommonLoginController extends HttpServlet {
                 request.getSession().setAttribute("user", user);
                 request.getSession().setAttribute("message", "Đăng nhập thành công!");
 
-                if ("on".equals(remember)) {
-                    String token = UUID.randomUUID().toString();
-                    Cookie cookie = new Cookie("remember_token", token);
-                    cookie.setMaxAge(60 * 60 * 24 * 3);
-                    cookie.setPath(request.getContextPath());
-                    response.addCookie(cookie);
+                UserRoles userRole = userDAO.getRoleByUserId((int) user.getUser_id());
+                if (userRole != null) {
+                    int roleId = userRole.getRole_id().getRole_id();
 
-                    userDAO.saveUserToken(user.getUser_id(), token, 3);
+                    if ("on".equals(remember)) {
+                        String token = UUID.randomUUID().toString();
+                        Cookie cookie = new Cookie("remember_token", token);
+                        cookie.setMaxAge(60 * 60 * 24 * 3); // 3 ngày
+                        cookie.setPath(request.getContextPath());
+                        response.addCookie(cookie);
+
+                        Cookie roleCookie = new Cookie("role_id", String.valueOf(roleId));
+                        roleCookie.setMaxAge(60 * 60 * 24 * 3); // 3 ngày
+                        roleCookie.setPath(request.getContextPath());
+                        response.addCookie(roleCookie);
+
+                        userDAO.saveUserToken(user.getUser_id(), token, 3);
+                    }
+
+                    String path = getRedirectPathByRole(roleId);
+                    response.sendRedirect(request.getContextPath() + path);
+                    return;
                 }
 
                 response.sendRedirect(request.getContextPath() + "/home");
+
             } else {
                 request.getSession().setAttribute("error", "Sai email/số điện thoại hoặc mật khẩu!");
                 response.sendRedirect(request.getContextPath() + "/login");
@@ -145,14 +152,23 @@ public class CommonLoginController extends HttpServlet {
         }
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+        return "Common login controller";
+    }
 
+    private String getRedirectPathByRole(int roleId) {
+        switch (roleId) {
+            case 1:
+                return "/admin/admin-dashboard";
+            case 2:
+                return "/seller/seller-dashboard";
+            case 3:
+                return "/home";
+            case 4:
+                return "/manager/manager-dashboard";
+            default:
+                return "/home";
+        }
+    }
 }
