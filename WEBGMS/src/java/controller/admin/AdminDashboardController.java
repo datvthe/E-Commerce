@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-
 @WebServlet(name = "AdminDashboardController", urlPatterns = {"/admin/admin-dashboard"})
 public class AdminDashboardController extends HttpServlet {
 
@@ -33,7 +32,7 @@ public class AdminDashboardController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet AdminDashboardController</title>");            
+            out.println("<title>Servlet AdminDashboardController</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet AdminDashboardController at " + request.getContextPath() + "</h1>");
@@ -54,7 +53,8 @@ public class AdminDashboardController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+
+        request.getRequestDispatcher("/views/admin/admin-dashboard.jsp").forward(request, response);
     }
 
     /**
