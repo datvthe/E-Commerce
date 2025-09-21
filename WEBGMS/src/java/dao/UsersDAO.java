@@ -4,6 +4,8 @@ import model.user.Users;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import model.user.Roles;
+import model.user.UserRoles;
 
 public class UsersDAO extends DBConnection {
 
@@ -23,7 +25,7 @@ public class UsersDAO extends DBConnection {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 user = new Users();
-                user.setUser_id(rs.getLong("user_id"));
+                user.setUser_id(rs.getInt("user_id"));
                 user.setFull_name(rs.getString("full_name"));
                 user.setEmail(rs.getString("email"));
                 user.setPassword_hash(rs.getString("password_hash"));
@@ -68,7 +70,7 @@ public class UsersDAO extends DBConnection {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 user = new Users();
-                user.setUser_id(rs.getLong("user_id"));
+                user.setUser_id(rs.getInt("user_id"));
                 user.setFull_name(rs.getString("full_name"));
                 user.setEmail(rs.getString("email"));
                 user.setPhone_number(rs.getString("phone_number"));
@@ -77,6 +79,69 @@ public class UsersDAO extends DBConnection {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return user;
+    }
+
+    public UserRoles getRoleByUserId(int user_id) {
+        UserRoles userRole = null;
+        String sql = "SELECT * FROM User_Roles "
+                + "WHERE user_id = ?";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, user_id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                UsersDAO userDao = new UsersDAO();
+                Users user = userDao.getUserById(rs.getInt("user_id"));
+
+                RoleDAO roleDao = new RoleDAO();
+                Roles role = roleDao.getRoleById(rs.getInt("role_id"));
+
+                userRole = new UserRoles();
+                userRole.setUser_role_id(rs.getInt("user_role_id"));
+                userRole.setUser_id(user);
+                userRole.setRole_id(role);
+                userRole.setAssigned_at(rs.getTimestamp("assigned_at"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return userRole;
+    }
+
+    public Users getUserById(int userId) {
+        Users user = null;
+        String sql = "SELECT * FROM Users WHERE user_id = ?";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                user = new Users();
+                user.setUser_id(rs.getInt("user_id"));
+                user.setFull_name(rs.getString("full_name"));
+                user.setEmail(rs.getString("email"));
+                user.setPassword_hash(rs.getString("password_hash"));
+                user.setPhone_number(rs.getString("phone_number"));
+                user.setGender(rs.getString("gender"));
+                user.setDate_of_birth(rs.getDate("date_of_birth"));
+                user.setAddress(rs.getString("address"));
+                user.setAvatar_url(rs.getString("avatar_url"));
+                user.setStatus(rs.getString("status"));
+                user.setEmail_verified(rs.getBoolean("email_verified"));
+                user.setLast_login_at(rs.getDate("last_login_at"));
+                user.setCreated_at(rs.getDate("created_at"));
+                user.setUpdated_at(rs.getDate("updated_at"));
+                user.setDeleted_at(rs.getDate("deleted_at"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return user;
     }
 

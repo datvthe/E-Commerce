@@ -8,7 +8,7 @@ import java.sql.Date;
 
 public class Users {
 
-    private long user_id;
+    private int user_id;
     private String full_name;
     private String email;
     private String password_hash;
@@ -27,7 +27,7 @@ public class Users {
     public Users() {
     }
 
-    public Users(long user_id, String full_name, String email, String password_hash, String phone_number, String gender, Date date_of_birth, String address, String avatar_url, String status, boolean email_verified, Date last_login_at, Date created_at, Date updated_at, Date deleted_at) {
+    public Users(int user_id, String full_name, String email, String password_hash, String phone_number, String gender, Date date_of_birth, String address, String avatar_url, String status, boolean email_verified, Date last_login_at, Date created_at, Date updated_at, Date deleted_at) {
         this.user_id = user_id;
         this.full_name = full_name;
         this.email = email;
@@ -45,16 +45,16 @@ public class Users {
         this.deleted_at = deleted_at;
     }
 
-    public long getUser_id() {
+    public String getFull_name() {
+        return full_name;
+    }
+
+    public int getUser_id() {
         return user_id;
     }
 
-    public void setUser_id(long user_id) {
+    public void setUser_id(int user_id) {
         this.user_id = user_id;
-    }
-
-    public String getFull_name() {
-        return full_name;
     }
 
     public void setFull_name(String full_name) {
