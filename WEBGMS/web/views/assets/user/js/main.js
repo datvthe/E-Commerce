@@ -173,7 +173,54 @@
     });
 
 
-   
+   // Search Autocomplete (local history + hints)
+   $(document).ready(function(){
+       var $input = $("input[placeholder='Search Looking For?']");
+       if ($input.length === 0) return;
+       var $dropdown = $(
+           '<div id="dropdownToggle123" class="dropdown-menu show" style="position:absolute; top:100%; left:0; right:0; display:none;"></div>'
+       );
+       $input.parent().append($dropdown);
+
+       function getHistory(){
+           try { return JSON.parse(localStorage.getItem('searchHistory')||'[]'); } catch(e){ return []; }
+       }
+       function saveHistory(term){
+           if (!term) return;
+           var list = getHistory();
+           list = [term].concat(list.filter(function(t){ return t.toLowerCase() !== term.toLowerCase(); })).slice(0,8);
+           localStorage.setItem('searchHistory', JSON.stringify(list));
+       }
+       function getHints(prefix){
+           var staticHints = ['iPhone', 'Samsung', 'Laptop', 'Tai nghe', 'Bàn phím', 'Chuột', 'Màn hình'];
+           var hist = getHistory();
+           var pool = hist.concat(staticHints);
+           prefix = (prefix||'').toLowerCase();
+           return pool.filter(function(x){ return x.toLowerCase().indexOf(prefix) !== -1; }).slice(0,8);
+       }
+       function render(list){
+           if (!list.length) { $dropdown.hide(); return; }
+           $dropdown.empty();
+           list.forEach(function(item){
+               var $it = $('<a class="dropdown-item" href="#"></a>').text(item);
+               $it.on('mousedown', function(e){ e.preventDefault(); $input.val(item); $dropdown.hide(); });
+               $dropdown.append($it);
+           });
+           $dropdown.show();
+       }
+
+       $input.on('input focus', function(){
+           var q = $(this).val();
+           render(getHints(q));
+       });
+       $(document).on('click', function(e){
+           if (!$.contains($input.parent()[0], e.target)) $dropdown.hide();
+       });
+       $input.closest('.d-flex').find('button.btn.btn-primary').on('click', function(){
+           var term = $input.val();
+           saveHistory(term);
+       });
+   });
 
 })(jQuery);
 
