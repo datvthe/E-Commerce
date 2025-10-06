@@ -35,6 +35,31 @@ public class CommonLoginController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            String force = request.getParameter("force");
+
+            // Force access to login page: sign out current session and clear remember cookies
+            if ("1".equals(force) || "true".equalsIgnoreCase(force)) {
+                if (request.getSession(false) != null) {
+                    Object userObj = request.getSession().getAttribute("user");
+                    if (userObj != null) {
+                        dao.UsersDAO userDAO = new dao.UsersDAO();
+                        model.user.Users current = (model.user.Users) userObj;
+                        userDAO.removeUserTokens(current.getUser_id());
+                    }
+                    request.getSession().invalidate();
+                }
+                jakarta.servlet.http.Cookie token = new jakarta.servlet.http.Cookie("remember_token", "");
+                token.setMaxAge(0);
+                token.setPath(request.getContextPath());
+                response.addCookie(token);
+                jakarta.servlet.http.Cookie role = new jakarta.servlet.http.Cookie("role_id", "");
+                role.setMaxAge(0);
+                role.setPath(request.getContextPath());
+                response.addCookie(role);
+
+                request.getRequestDispatcher("views/common/login.jsp").forward(request, response);
+                return;
+            }
             if (request.getSession().getAttribute("user") != null) {
                 request.getSession().setAttribute("message", "Đăng nhập thành công!");
 
