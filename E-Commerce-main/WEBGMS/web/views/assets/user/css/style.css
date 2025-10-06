@@ -161,6 +161,32 @@
     color: var(--bs-white);
 }
 
+/* Clearer section boundaries and separators for navbar */
+.nav-bar .row.gx-0.bg-primary {
+    border-bottom: 3px solid rgba(0,0,0,0.15);
+}
+
+.nav-bar .navbar .navbar-nav .nav-link {
+    color: var(--bs-light);
+    position: relative;
+}
+
+.nav-bar .navbar .navbar-nav .nav-link:hover {
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 24px;
+}
+
+.nav-bar .navbar .navbar-nav .nav-link + .nav-link:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.35);
+}
+
 .navbar .dropdown-toggle::after {
     border: none;
     content: "\f107";
@@ -236,6 +262,9 @@
     background: var(--bs-primary);
     color: var(--bs-white);
 }
+
+/* Hide header carousel navigation arrows */
+.header-carousel.owl-carousel .owl-nav { display: none !important; }
 
 .header-carousel.owl-carousel .owl-nav .owl-prev {
     right: 130px;
@@ -563,6 +592,21 @@
     border-bottom-right-radius: 10px;
 }
 /*** bestseller Products End ***/
+
+/* Category buttons balanced sizing */
+.btn-category {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 56px;
+    border-radius: 12px;
+}
+
+/* Ensure product section doesn't collide with footer, accounting for hover reveals */
+.product {
+    padding-bottom: 240px !important;
+}
 
 /*** Pagination Start ***/
 .pagination {

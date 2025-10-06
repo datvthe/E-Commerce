@@ -82,6 +82,16 @@ public class UsersDAO extends DBConnection {
         return user;
     }
 
+    public void removeUserTokens(long userId) {
+        String sql = "DELETE FROM User_Tokens WHERE user_id = ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public UserRoles getRoleByUserId(int user_id) {
         UserRoles userRole = null;
         String sql = "SELECT * FROM User_Roles "
