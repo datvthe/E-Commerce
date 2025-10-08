@@ -61,3 +61,14 @@
 
 <!-- Back to Top -->
 <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+
+<!-- Electro Bootstrap Scripts -->
+<script src="<%= request.getContextPath() %>/views/assets/electro/lib/jquery/jquery.min.js"></script>
+<script src="<%= request.getContextPath() %>/views/assets/electro/lib/bootstrap.bundle.min.js"></script>
+<script src="<%= request.getContextPath() %>/views/assets/electro/lib/wow/wow.min.js"></script>
+<script src="<%= request.getContextPath() %>/views/assets/electro/lib/easing/easing.min.js"></script>
+<script src="<%= request.getContextPath() %>/views/assets/electro/lib/waypoints/waypoints.min.js"></script>
+<script src="<%= request.getContextPath() %>/views/assets/electro/lib/counterup/counterup.min.js"></script>
+<script src="<%= request.getContextPath() %>/views/assets/electro/lib/owlcarousel/owl.carousel.min.js"></script>
+<script src="<%= request.getContextPath() %>/views/assets/electro/lib/lightbox/js/lightbox.min.js"></script>
+<script src="<%= request.getContextPath() %>/views/assets/electro/js/main.js"></script>
