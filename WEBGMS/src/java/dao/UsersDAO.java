@@ -155,4 +155,59 @@ public class UsersDAO extends DBConnection {
         return user;
     }
 
+    public boolean isEmailExists(String email) {
+        String sql = "SELECT 1 FROM Users WHERE email = ? LIMIT 1";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean isPhoneExists(String phoneNumber) {
+        String sql = "SELECT 1 FROM Users WHERE phone_number = ? LIMIT 1";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, phoneNumber);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public Users createUser(String fullName, String email, String passwordHash, String phoneNumber) {
+        Users user = null;
+        String sql = "INSERT INTO Users (full_name, email, password_hash, phone_number, status, email_verified, created_at) VALUES (?, ?, ?, ?, 'active', 0, NOW())";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, fullName);
+            ps.setString(2, email);
+            ps.setString(3, passwordHash);
+            ps.setString(4, phoneNumber);
+            int affected = ps.executeUpdate();
+            if (affected > 0) {
+                ResultSet keys = ps.getGeneratedKeys();
+                if (keys.next()) {
+                    int userId = keys.getInt(1);
+                    user = getUserById(userId);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return user;
+    }
+
+    public void assignDefaultUserRole(int userId) {
+        String sql = "INSERT INTO User_Roles (user_id, role_id, assigned_at) VALUES (?, 3, NOW())";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

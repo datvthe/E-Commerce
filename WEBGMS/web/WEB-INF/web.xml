@@ -5,4 +5,14 @@
 	 xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
 	 version="6.0">
 
+	<!-- Explicit servlet mapping for Register page -->
+	<servlet>
+		<servlet-name>CommonRegisterController</servlet-name>
+		<servlet-class>controller.common.CommonRegisterController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CommonRegisterController</servlet-name>
+		<url-pattern>/register</url-pattern>
+	</servlet-mapping>
+
 </web-app>

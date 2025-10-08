@@ -20,16 +20,12 @@
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
-        <!-- Libraries Stylesheet -->
-        <link href="<%= request.getContextPath() %>/views/assets/user/lib/animate/animate.min.css" rel="stylesheet">
-        <link href="<%= request.getContextPath() %>/views/assets/user/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
-
-
-        <!-- Customized Bootstrap Stylesheet -->
-        <link href="<%= request.getContextPath() %>/views/assets/user/css/bootstrap.min.css" rel="stylesheet">
-
-        <!-- Template Stylesheet -->
-        <link href="<%= request.getContextPath() %>/views/assets/user/css/style.css" rel="stylesheet">
+        <!-- Electro Bootstrap Assets -->
+        <link href="<%= request.getContextPath() %>/views/assets/electro/lib/animate/animate.min.css" rel="stylesheet">
+        <link href="<%= request.getContextPath() %>/views/assets/electro/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+        <link href="<%= request.getContextPath() %>/views/assets/electro/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+        <link href="<%= request.getContextPath() %>/views/assets/electro/css/bootstrap.min.css" rel="stylesheet">
+        <link href="<%= request.getContextPath() %>/views/assets/electro/css/style.css" rel="stylesheet">
     </head>
 
     <body>
@@ -176,9 +172,9 @@
                         <div class="collapse navbar-collapse" id="navbarCollapse">
                             <div class="navbar-nav ms-auto py-0">
                                 <a href="<%= request.getContextPath() %>/home" class="nav-item nav-link">Trang chủ</a>
-                                <a href="<%= request.getContextPath() %>/products" class="nav-item nav-link">Danh mục sản phẩm</a>
-                                <a href="<%= request.getContextPath() %>/promotions" class="nav-item nav-link">Khuyến mãi</a>
-                                <a href="<%= request.getContextPath() %>/cart" class="nav-item nav-link">Giỏ hàng</a>
+                                <a href="<%= request.getContextPath() %>/login" class="nav-item nav-link">Danh mục sản phẩm</a>
+                                <a href="<%= request.getContextPath() %>/login" class="nav-item nav-link">Khuyến mãi</a>
+                                <a href="<%= request.getContextPath() %>/login" class="nav-item nav-link">Giỏ hàng</a>
                                 <c:choose>
                                     <c:when test="${not empty sessionScope.user}">
                                         <a href="<%= request.getContextPath() %>/logout" class="nav-item nav-link me-2">Đăng xuất</a>

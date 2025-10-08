@@ -31,7 +31,7 @@ public class DBConnection {
         if (conn != null) {
             try {
                 conn.close();
-                System.out.println("?Đã đóng kết nối MySQL");
+                System.out.println("Đã đóng kết nối MySQL");
             } catch (SQLException e) {
                 System.out.println("Lỗi đóng kết nối: " + e.getMessage());
             }
