@@ -123,7 +123,7 @@ public class CommonLoginController extends HttpServlet {
             throws ServletException, IOException {
         try {
             String account = request.getParameter("account");
-            String password = request.getParameter("password");
+            String password = request.getParameter("password_hash");
             String remember = request.getParameter("remember");
 
             if (account == null || account.isEmpty() || password == null || password.isEmpty()) {
@@ -183,17 +183,7 @@ public class CommonLoginController extends HttpServlet {
     }
 
     private String getRedirectPathByRole(int roleId) {
-        switch (roleId) {
-            case 1:
-                return "/admin/admin-dashboard";
-            case 2:
-                return "/seller/seller-dashboard";
-            case 3:
-                return "/home";
-            case 4:
-                return "/manager/manager-dashboard";
-            default:
-                return "/home";
-        }
+        // All users redirect to homepage after login
+        return "/home";
     }
 }

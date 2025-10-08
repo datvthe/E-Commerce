@@ -11,6 +11,26 @@
     <body>
 
         <jsp:include page="/views/component/header.jsp" />
+        
+        <!-- Welcome Message for Logged-in Users -->
+        <c:if test="${not empty sessionScope.user}">
+            <div class="container-fluid py-3 bg-primary text-white">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h4 class="mb-1">Chào mừng trở lại, ${sessionScope.user.full_name}!</h4>
+                            <p class="mb-0">Khám phá những sản phẩm mới nhất và ưu đãi hấp dẫn</p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <a href="<%= request.getContextPath() %>/login" class="btn btn-light btn-lg">
+                                <i class="fas fa-shopping-bag me-2"></i>Mua sắm ngay
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </c:if>
+        
         <!-- Banner / Hero Start -->
         <div class="container-fluid p-0">
             <div class="header-carousel owl-carousel">
@@ -20,7 +40,7 @@
                         <div class="carousel-banner">
                             <h1 class="text-white display-4 mb-3">Khuyến mãi lớn</h1>
                             <p class="text-white-50 mb-4">Giảm đến 50% cho sản phẩm nổi bật</p>
-                            <a href="<%= request.getContextPath() %>/promotions" class="btn btn-secondary rounded-pill px-4 py-2">Xem khuyến mãi</a>
+                            <a href="<%= request.getContextPath() %>/login" class="btn btn-secondary rounded-pill px-4 py-2">Xem khuyến mãi</a>
                         </div>
                     </div>
                 </div>
@@ -111,12 +131,12 @@
                                 <div class="product-item-inner-item">
                                     <img src="<%= request.getContextPath() %>/views/assets/user/img/product-1.png" class="img-fluid w-100" alt="">
                                     <div class="product-details">
-                                        <a href="#"><i class="fa fa-eye"></i></a>
+                                        <a href="<%= request.getContextPath() %>/login-a"><i class="fa fa-eye"></i></a>
                                     </div>
                                 </div>
                             </div>
                             <div class="p-3">
-                                <a href="#" class="d-block h6">Sản phẩm A</a>
+                                <a href="<%= request.getContextPath() %>/login-a" class="d-block h6">Sản phẩm A</a>
                                 <div class="mb-2">
                                     <span class="text-primary fw-bold me-2">350.000đ</span>
                                 </div>
@@ -128,11 +148,11 @@
                                         <i class="fa fa-star-half-alt"></i>
                                         <i class="far fa-star"></i>
                                     </div>
-                                    <a href="#" class="btn btn-primary btn-sm rounded-pill">Chi tiết</a>
+                                    <a href="<%= request.getContextPath() %>/login" class="btn btn-primary btn-sm rounded-pill">Chi tiết</a>
                                 </div>
                             </div>
                             <div class="product-item-add p-3 border-top">
-                                <a href="#" class="btn btn-secondary w-100 rounded-pill">Add to Cart</a>
+                                <a href="<%= request.getContextPath() %>/login" class="btn btn-secondary w-100 rounded-pill">Add to Cart</a>
                             </div>
                         </div>
                     </div>
@@ -143,12 +163,12 @@
                                 <div class="product-item-inner-item">
                                     <img src="<%= request.getContextPath() %>/views/assets/user/img/product-2.png" class="img-fluid w-100" alt="">
                                     <div class="product-details">
-                                        <a href="#"><i class="fa fa-eye"></i></a>
+                                        <a href="<%= request.getContextPath() %>/login"><i class="fa fa-eye"></i></a>
                                     </div>
                                 </div>
                             </div>
                             <div class="p-3">
-                                <a href="#" class="d-block h6">Sản phẩm B</a>
+                                <a href="<%= request.getContextPath() %>/login" class="d-block h6">Sản phẩm B</a>
                                 <div class="mb-2">
                                     <span class="text-primary fw-bold me-2">590.000đ</span>
                                 </div>
@@ -160,11 +180,11 @@
                                         <i class="fa fa-star"></i>
                                         <i class="far fa-star"></i>
                                     </div>
-                                    <a href="#" class="btn btn-primary btn-sm rounded-pill">Chi tiết</a>
+                                    <a href="<%= request.getContextPath() %>/login" class="btn btn-primary btn-sm rounded-pill">Chi tiết</a>
                                 </div>
                             </div>
                             <div class="product-item-add p-3 border-top">
-                                <a href="#" class="btn btn-secondary w-100 rounded-pill">Add to Cart</a>
+                                <a href="<%= request.getContextPath() %>/login" class="btn btn-secondary w-100 rounded-pill">Add to Cart</a>
                             </div>
                         </div>
                     </div>
@@ -175,12 +195,12 @@
                                 <div class="product-item-inner-item">
                                     <img src="<%= request.getContextPath() %>/views/assets/user/img/product-3.png" class="img-fluid w-100" alt="">
                                     <div class="product-details">
-                                        <a href="#"><i class="fa fa-eye"></i></a>
+                                        <a href="<%= request.getContextPath() %>/login"><i class="fa fa-eye"></i></a>
                                     </div>
                                 </div>
                             </div>
                             <div class="p-3">
-                                <a href="#" class="d-block h6">Sản phẩm C</a>
+                                <a href="<%= request.getContextPath() %>/login" class="d-block h6">Sản phẩm C</a>
                                 <div class="mb-2">
                                     <span class="text-primary fw-bold me-2">1.290.000đ</span>
                                 </div>
@@ -192,11 +212,11 @@
                                         <i class="far fa-star"></i>
                                         <i class="far fa-star"></i>
                                     </div>
-                                    <a href="#" class="btn btn-primary btn-sm rounded-pill">Chi tiết</a>
+                                    <a href="<%= request.getContextPath() %>/login" class="btn btn-primary btn-sm rounded-pill">Chi tiết</a>
                                 </div>
                             </div>
                             <div class="product-item-add p-3 border-top">
-                                <a href="#" class="btn btn-secondary w-100 rounded-pill">Add to Cart</a>
+                                <a href="<%= request.getContextPath() %>/login" class="btn btn-secondary w-100 rounded-pill">Add to Cart</a>
                             </div>
                         </div>
                     </div>
@@ -207,12 +227,12 @@
                                 <div class="product-item-inner-item">
                                     <img src="<%= request.getContextPath() %>/views/assets/user/img/product-4.png" class="img-fluid w-100" alt="">
                                     <div class="product-details">
-                                        <a href="#"><i class="fa fa-eye"></i></a>
+                                        <a href="<%= request.getContextPath() %>/login"><i class="fa fa-eye"></i></a>
                                     </div>
                                 </div>
                             </div>
                             <div class="p-3">
-                                <a href="#" class="d-block h6">Sản phẩm D</a>
+                                <a href="<%= request.getContextPath() %>/login" class="d-block h6">Sản phẩm D</a>
                                 <div class="mb-2">
                                     <span class="text-primary fw-bold me-2">2.490.000đ</span>
                                 </div>
@@ -224,11 +244,11 @@
                                         <i class="fa fa-star"></i>
                                         <i class="fa fa-star"></i>
                                     </div>
-                                    <a href="#" class="btn btn-primary btn-sm rounded-pill">Chi tiết</a>
+                                    <a href="<%= request.getContextPath() %>/login" class="btn btn-primary btn-sm rounded-pill">Chi tiết</a>
                                 </div>
                             </div>
                             <div class="product-item-add p-3 border-top">
-                                <a href="#" class="btn btn-secondary w-100 rounded-pill">Add to Cart</a>
+                                <a href="<%= request.getContextPath() %>/login" class="btn btn-secondary w-100 rounded-pill">Add to Cart</a>
                             </div>
                         </div>
                     </div>

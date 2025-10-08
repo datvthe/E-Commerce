@@ -176,9 +176,9 @@
                         <div class="collapse navbar-collapse" id="navbarCollapse">
                             <div class="navbar-nav ms-auto py-0">
                                 <a href="<%= request.getContextPath() %>/home" class="nav-item nav-link">Trang chủ</a>
-                                <a href="<%= request.getContextPath() %>/products" class="nav-item nav-link">Danh mục sản phẩm</a>
-                                <a href="<%= request.getContextPath() %>/promotions" class="nav-item nav-link">Khuyến mãi</a>
-                                <a href="<%= request.getContextPath() %>/cart" class="nav-item nav-link">Giỏ hàng</a>
+                                <a href="<%= request.getContextPath() %>/login" class="nav-item nav-link">Danh mục sản phẩm</a>
+                                <a href="<%= request.getContextPath() %>/login" class="nav-item nav-link">Khuyến mãi</a>
+                                <a href="<%= request.getContextPath() %>/login" class="nav-item nav-link">Giỏ hàng</a>
                                 <c:choose>
                                     <c:when test="${not empty sessionScope.user}">
                                         <a href="<%= request.getContextPath() %>/logout" class="nav-item nav-link me-2">Đăng xuất</a>
