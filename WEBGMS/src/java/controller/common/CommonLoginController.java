@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.user.UserRoles;
 import model.user.Users;
+import service.RoleBasedAccessControl;
 
 @WebServlet(name = "CommonLoginController", urlPatterns = {"/login"})
 public class CommonLoginController extends HttpServlet {
@@ -123,7 +124,9 @@ public class CommonLoginController extends HttpServlet {
             throws ServletException, IOException {
         try {
             String account = request.getParameter("account");
-            String password = request.getParameter("password_hash");
+            String password = request.getParameter("password");
+            if (account != null) account = account.trim();
+            if (password != null) password = password.trim();
             String remember = request.getParameter("remember");
 
             if (account == null || account.isEmpty() || password == null || password.isEmpty()) {
@@ -141,9 +144,17 @@ public class CommonLoginController extends HttpServlet {
 
                 UserRoles userRole = userDAO.getRoleByUserId((int) user.getUser_id());
                 if (userRole != null) {
+                    // Initialize RBAC in session
+                    RoleBasedAccessControl rbac = new RoleBasedAccessControl();
+                    request.getSession().setAttribute("rbac", rbac);
+                    request.getSession().setAttribute("userRole", userRole);
+                    
                     int roleId = userRole.getRole_id().getRole_id();
 
-                    if ("on".equals(remember)) {
+                    boolean rememberChecked = "on".equalsIgnoreCase(remember)
+                            || "true".equalsIgnoreCase(remember)
+                            || "1".equals(remember);
+                    if (rememberChecked) {
                         String token = UUID.randomUUID().toString();
                         Cookie cookie = new Cookie("remember_token", token);
                         cookie.setMaxAge(60 * 60 * 24 * 3); // 3 ngày
@@ -164,6 +175,7 @@ public class CommonLoginController extends HttpServlet {
                 }
 
                 response.sendRedirect(request.getContextPath() + "/home");
+                return;
 
             } else {
                 request.getSession().setAttribute("error", "Sai email/số điện thoại hoặc mật khẩu!");
@@ -183,7 +195,7 @@ public class CommonLoginController extends HttpServlet {
     }
 
     private String getRedirectPathByRole(int roleId) {
-        // All users redirect to homepage after login
-        return "/home";
+        RoleBasedAccessControl rbac = new RoleBasedAccessControl();
+        return rbac.getRedirectPathByRole(roleId);
     }
 }

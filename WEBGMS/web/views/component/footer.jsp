@@ -18,7 +18,7 @@
                 <div class="d-flex flex-column justify-content-start">
                     <a class="text-white-50 mb-2" href="<%= request.getContextPath() %>/products"><i class="fa fa-angle-right me-2"></i>Danh mục sản phẩm</a>
                     <a class="text-white-50 mb-2" href="<%= request.getContextPath() %>/promotions"><i class="fa fa-angle-right me-2"></i>Khuyến mãi</a>
-                    <a class="text-white-50 mb-2" href="<%= request.getContextPath() %>/cart"><i class="fa fa-angle-right me-2"></i>Giỏ hàng</a>
+                    <!-- Cart link removed -->
                     <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Hỗ trợ khách hàng</a>
                 </div>
             </div>
@@ -43,14 +43,14 @@
         <div class="copyright">
             <div class="row">
                 <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                    &copy; <a class="border-bottom" href="#">Gicungco Marketplace</a>, All Right Reserved.
+                    &copy; <a class="border-bottom" href="#">Gicungco Marketplace</a>, Tất cả quyền được bảo lưu.
                 </div>
                 <div class="col-md-6 text-center text-md-end">
                     <div class="footer-menu">
-                        <a href="#">Home</a>
-                        <a href="#">Cookies</a>
-                        <a href="#">Help</a>
-                        <a href="#">FQAs</a>
+                        <a href="<%= request.getContextPath() %>/home">Trang chủ</a>
+                        <a href="#">Chính sách Cookie</a>
+                        <a href="#">Trợ giúp</a>
+                        <a href="#">Câu hỏi thường gặp</a>
                     </div>
                 </div>
             </div>

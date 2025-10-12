@@ -382,12 +382,7 @@
                             
                             <!-- Action Buttons -->
                             <div class="action-buttons">
-                                <button class="btn-action btn-add-cart" onclick="addToCart()">
-                                    <i class="fas fa-shopping-cart"></i> Thêm vào giỏ
-                                </button>
-                                <button class="btn-action btn-buy-now" onclick="buyNow()">
-                                    <i class="fas fa-bolt"></i> Mua ngay
-                                </button>
+                                <!-- Cart and Buy Now removed -->
                                 <button class="btn-action btn-wishlist ${isInWishlist ? 'in-wishlist' : ''}" 
                                         onclick="toggleWishlist()" id="wishlistBtn">
                                     <i class="fas fa-heart"></i>
@@ -632,56 +627,7 @@
                 }
             }
 
-            // Add to cart
-            function addToCart() {
-                const quantity = document.getElementById('quantity').value;
-                
-                fetch('<%= request.getContextPath() %>/cart/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `action=add&productId=${productId}&quantity=${quantity}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        // Update cart count in header if needed
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi thêm vào giỏ hàng');
-                });
-            }
-
-            // Buy now
-            function buyNow() {
-                const quantity = document.getElementById('quantity').value;
-                
-                fetch('<%= request.getContextPath() %>/cart/buyNow', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `action=buyNow&productId=${productId}&quantity=${quantity}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        window.location.href = data.redirectUrl;
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi xử lý đơn hàng');
-                });
-            }
+            // Cart / Buy Now removed
 
             // Toggle wishlist
             function toggleWishlist() {

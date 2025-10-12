@@ -18,7 +18,8 @@ import com.google.gson.JsonObject;
  * Controller for Cart operations
  * Handles Add to Cart, Update Cart, Remove from Cart, Buy Now
  */
-@WebServlet(name = "CartController", urlPatterns = {"/cart/*"})
+// Cart disabled
+//@WebServlet(name = "CartController", urlPatterns = {"/cart/*"})
 public class CartController extends HttpServlet {
 
     private CartDAO cartDAO = new CartDAO();

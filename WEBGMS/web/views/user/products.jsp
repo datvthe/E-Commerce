@@ -280,9 +280,7 @@
                                                    class="btn-product btn-detail">
                                                     <i class="fas fa-eye"></i> Chi tiết
                                                 </a>
-                                                <button class="btn-product btn-cart" onclick="addToCart(${product.product_id})">
-                                                    <i class="fas fa-shopping-cart"></i> Giỏ hàng
-                                                </button>
+                                                <!-- Cart button removed -->
                                             </div>
                                         </div>
                                     </div>
@@ -378,29 +376,7 @@
                 window.location.href = '<%= request.getContextPath() %>/products';
             }
             
-            // Add to cart
-            function addToCart(productId) {
-                fetch('<%= request.getContextPath() %>/cart/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `action=add&productId=${productId}&quantity=1`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Show success message
-                        showNotification(data.message, 'success');
-                    } else {
-                        showNotification(data.message, 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showNotification('Có lỗi xảy ra khi thêm vào giỏ hàng', 'error');
-                });
-            }
+            // Cart JS removed
             
             // Show notification
             function showNotification(message, type) {
