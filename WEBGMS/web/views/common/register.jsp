@@ -47,8 +47,8 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="password_hash" class="mb-1">Mật khẩu</label>
-                            <input type="password" class="form-control rounded-pill py-2" id="password_hash" name="password_hash" minlength="6" required>
+                            <label for="password" class="mb-1">Mật khẩu</label>
+                            <input type="password" class="form-control rounded-pill py-2" id="password" name="password" minlength="6" required>
                         </div>
 
                         <div class="form-group mb-4">

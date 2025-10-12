@@ -17,6 +17,8 @@ public class CommonLogoutController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String ajax = request.getParameter("ajax");
+        
         HttpSession session = request.getSession(false);
         try {
             if (session != null) {
@@ -40,9 +42,24 @@ public class CommonLogoutController extends HttpServlet {
             role.setPath(request.getContextPath());
             response.addCookie(role);
 
-            response.sendRedirect(request.getContextPath() + "/home");
+            if ("true".equals(ajax)) {
+                // AJAX response
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{\"success\": true, \"message\": \"Đăng xuất thành công!\"}");
+            } else {
+                // Regular redirect response
+                request.getSession(true).setAttribute("message", "Đăng xuất thành công!");
+                response.sendRedirect(request.getContextPath() + "/home");
+            }
         } catch (Exception e) {
-            response.sendRedirect(request.getContextPath() + "/home");
+            if ("true".equals(ajax)) {
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{\"success\": false, \"message\": \"Có lỗi xảy ra khi đăng xuất!\"}");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/home");
+            }
         }
     }
 }

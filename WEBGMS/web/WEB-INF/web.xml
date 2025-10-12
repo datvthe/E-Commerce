@@ -15,4 +15,14 @@
 		<url-pattern>/register</url-pattern>
 	</servlet-mapping>
 
+	<!-- Explicit servlet mapping for Forgot Password page -->
+	<servlet>
+		<servlet-name>ForgotPasswordController</servlet-name>
+		<servlet-class>controller.common.ForgotPasswordController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ForgotPasswordController</servlet-name>
+		<url-pattern>/forgot-password</url-pattern>
+	</servlet-mapping>
+
 </web-app>

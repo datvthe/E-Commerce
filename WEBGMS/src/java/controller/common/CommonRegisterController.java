@@ -25,8 +25,17 @@ public class CommonRegisterController extends HttpServlet {
             String fullName = request.getParameter("full_name");
             String email = request.getParameter("email");
             String phone = request.getParameter("phone_number");
-            String password = request.getParameter("password_hash");
+            String password = request.getParameter("password");
             String confirm = request.getParameter("confirm_password");
+            if (confirm == null || confirm.isEmpty()) {
+                confirm = request.getParameter("confirm");
+            }
+
+            if (fullName != null) fullName = fullName.trim();
+            if (email != null) email = email.trim();
+            if (phone != null) phone = phone.trim();
+            if (password != null) password = password.trim();
+            if (confirm != null) confirm = confirm.trim();
 
             if (fullName == null || fullName.isEmpty()
                     || email == null || email.isEmpty()

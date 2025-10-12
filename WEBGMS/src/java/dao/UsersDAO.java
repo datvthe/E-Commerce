@@ -13,7 +13,7 @@ public class UsersDAO extends DBConnection {
         Users user = null;
         String sql = "SELECT * FROM Users "
                 + "WHERE (email = ? OR phone_number = ?) "
-                + "AND password_hash = ? "
+                + "AND password = ? "
                 + "AND status = 'active'";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -28,7 +28,7 @@ public class UsersDAO extends DBConnection {
                 user.setUser_id(rs.getInt("user_id"));
                 user.setFull_name(rs.getString("full_name"));
                 user.setEmail(rs.getString("email"));
-                user.setPassword_hash(rs.getString("password_hash"));
+                user.setPassword(rs.getString("password"));
                 user.setPhone_number(rs.getString("phone_number"));
                 user.setGender(rs.getString("gender"));
                 user.setDate_of_birth(rs.getDate("date_of_birth"));
@@ -134,7 +134,7 @@ public class UsersDAO extends DBConnection {
                 user.setUser_id(rs.getInt("user_id"));
                 user.setFull_name(rs.getString("full_name"));
                 user.setEmail(rs.getString("email"));
-                user.setPassword_hash(rs.getString("password_hash"));
+                user.setPassword(rs.getString("password"));
                 user.setPhone_number(rs.getString("phone_number"));
                 user.setGender(rs.getString("gender"));
                 user.setDate_of_birth(rs.getDate("date_of_birth"));
@@ -179,13 +179,13 @@ public class UsersDAO extends DBConnection {
         return false;
     }
 
-    public Users createUser(String fullName, String email, String passwordHash, String phoneNumber) {
+    public Users createUser(String fullName, String email, String password, String phoneNumber) {
         Users user = null;
-        String sql = "INSERT INTO Users (full_name, email, password_hash, phone_number, status, email_verified, created_at) VALUES (?, ?, ?, ?, 'active', 0, NOW())";
+        String sql = "INSERT INTO Users (full_name, email, password, phone_number, status, email_verified, created_at) VALUES (?, ?, ?, ?, 'active', 0, NOW())";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, fullName);
             ps.setString(2, email);
-            ps.setString(3, passwordHash);
+            ps.setString(3, password);
             ps.setString(4, phoneNumber);
             int affected = ps.executeUpdate();
             if (affected > 0) {

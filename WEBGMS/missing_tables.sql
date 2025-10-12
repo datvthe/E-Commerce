@@ -1,20 +1,7 @@
 -- Missing Database Tables for WEBGMS Project
 -- Run this script to create the missing tables
 
--- Create Cart table
-CREATE TABLE IF NOT EXISTS `cart` (
-    `cart_id` INT NOT NULL AUTO_INCREMENT,
-    `user_id` BIGINT NOT NULL,
-    `product_id` BIGINT NOT NULL,
-    `quantity` INT NOT NULL DEFAULT 1,
-    `added_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`cart_id`),
-    KEY `user_id` (`user_id`),
-    KEY `product_id` (`product_id`),
-    CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-    CONSTRAINT `cart_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- Cart removed
 
 -- Create Wishlist table
 CREATE TABLE IF NOT EXISTS `wishlist` (
@@ -107,7 +94,7 @@ UPDATE `products` SET `slug` = LOWER(REPLACE(REPLACE(`name`, ' ', '-'), '&', 'an
 CREATE INDEX IF NOT EXISTS `idx_products_status` ON `products` (`status`);
 CREATE INDEX IF NOT EXISTS `idx_products_seller` ON `products` (`seller_id`);
 CREATE INDEX IF NOT EXISTS `idx_products_category` ON `products` (`category_id`);
-CREATE INDEX IF NOT EXISTS `idx_cart_user` ON `cart` (`user_id`);
+-- Cart index removed
 CREATE INDEX IF NOT EXISTS `idx_wishlist_user` ON `wishlist` (`user_id`);
 CREATE INDEX IF NOT EXISTS `idx_reviews_product` ON `reviews` (`product_id`);
 CREATE INDEX IF NOT EXISTS `idx_reviews_status` ON `reviews` (`status`);

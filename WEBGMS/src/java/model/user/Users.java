@@ -11,7 +11,7 @@ public class Users {
     private int user_id;
     private String full_name;
     private String email;
-    private String password_hash;
+    private String password;
     private String phone_number;
     private String gender;          // male, female, other
     private Date date_of_birth;
@@ -27,11 +27,11 @@ public class Users {
     public Users() {
     }
 
-    public Users(int user_id, String full_name, String email, String password_hash, String phone_number, String gender, Date date_of_birth, String address, String avatar_url, String status, boolean email_verified, Date last_login_at, Date created_at, Date updated_at, Date deleted_at) {
+    public Users(int user_id, String full_name, String email, String password, String phone_number, String gender, Date date_of_birth, String address, String avatar_url, String status, boolean email_verified, Date last_login_at, Date created_at, Date updated_at, Date deleted_at) {
         this.user_id = user_id;
         this.full_name = full_name;
         this.email = email;
-        this.password_hash = password_hash;
+        this.password = password;
         this.phone_number = phone_number;
         this.gender = gender;
         this.date_of_birth = date_of_birth;
@@ -62,12 +62,12 @@ public class Users {
         this.full_name = fullName;
     }
 
-    public String getPasswordHash() {
-        return password_hash;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasswordHash(String passwordHash) {
-        this.password_hash = passwordHash;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getPhoneNumber() {
@@ -168,11 +168,11 @@ public class Users {
     }
 
     public String getPassword_hash() {
-        return password_hash;
+        return password;
     }
 
     public void setPassword_hash(String password_hash) {
-        this.password_hash = password_hash;
+        this.password = password_hash;
     }
 
     public String getPhone_number() {
@@ -269,7 +269,7 @@ public class Users {
                 + "user_id=" + user_id
                 + ", full_name=" + full_name
                 + ", email=" + email
-                + ", password_hash=***"
+                + ", password=***"
                 + ", phone_number=" + phone_number
                 + ", gender=" + gender
                 + ", date_of_birth=" + date_of_birth

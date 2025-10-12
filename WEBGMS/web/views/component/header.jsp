@@ -37,9 +37,37 @@
             </div>
         </div>
          Spinner End -->
-        <%-- Temporarily disable notifications to resolve JSP compile error --%>
-        <%-- <jsp:include page="/views/component/notification.jsp" /> --%>
-
+        <!-- Toast Notifications -->
+        <div class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+            <c:if test="${not empty sessionScope.message}">
+                <div id="toast-success" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">${sessionScope.message}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+                <c:remove var="message" scope="session"/>
+            </c:if>
+            <c:if test="${not empty sessionScope.error}">
+                <div id="toast-error" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">${sessionScope.error}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+                <c:remove var="error" scope="session"/>
+            </c:if>
+        </div>
+        <script>
+            (function () {
+                try {
+                    var toastSuccess = document.getElementById('toast-success');
+                    if (toastSuccess) new bootstrap.Toast(toastSuccess, {delay: 3000}).show();
+                    var toastError = document.getElementById('toast-error');
+                    if (toastError) new bootstrap.Toast(toastError, {delay: 4000}).show();
+                } catch (e) {}
+            })();
+        </script>
 
         <!-- Topbar Start -->
         <div class="container-fluid px-5 d-none border-bottom d-lg-block">
@@ -57,17 +85,17 @@
                 </div>
 
                 <div class="col-lg-4 text-center text-lg-end">
-                    <div class="d-inline-flex align-items-center" style="height: 45px;">
+                    <div class="d-inline-flex align-items-center gap-2" style="height: 45px;">
                         <span class="text-muted me-3"><small>VND</small></span>
                         <span class="text-muted mx-2"><small>Tiếng Việt</small></span>
-                        <div class="dropdown">
-                            <a href="#" class="dropdown-toggle text-muted ms-2" data-bs-toggle="dropdown"><small><i
-                                        class="fa fa-home me-2"></i> Tài khoản</small></a>
-                            <div class="dropdown-menu rounded">
-                                <a href="<%= request.getContextPath() %>/login?force=1" class="dropdown-item" onclick="window.location.href=this.href; return false;"> Đăng nhập / Đăng ký</a>
-                                <a href="<%= request.getContextPath() %>/logout" class="dropdown-item" onclick="window.location.href=this.href; return false;"> Đăng xuất</a>
-                            </div>
-                        </div>
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.user}">
+                                <button onclick="logout()" class="btn btn-outline-danger btn-sm px-3"><i class="bi bi-box-arrow-right me-1"></i>Đăng xuất</button>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="<%= request.getContextPath() %>/login?force=1" class="btn btn-outline-primary btn-sm px-3"><i class="bi bi-person me-1"></i>Đăng nhập / Đăng ký</a>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </div>
             </div>
@@ -102,9 +130,7 @@
                 </div>
                 <div class="col-md-4 col-lg-3 text-center text-lg-end">
                     <div class="d-inline-flex align-items-center">
-                        <a href="<%= request.getContextPath() %>/cart" class="text-muted d-flex align-items-center justify-content-center"><span
-                                class="rounded-circle btn-md-square border"><i class="fas fa-shopping-cart"></i></span>
-                            <span class="text-dark ms-2">0₫</span></a>
+                        <!-- Cart removed -->
                     </div>
                 </div>
             </div>
@@ -172,12 +198,15 @@
                         <div class="collapse navbar-collapse" id="navbarCollapse">
                             <div class="navbar-nav ms-auto py-0">
                                 <a href="<%= request.getContextPath() %>/home" class="nav-item nav-link">Trang chủ</a>
-                                <a href="<%= request.getContextPath() %>/login" class="nav-item nav-link">Danh mục sản phẩm</a>
-                                <a href="<%= request.getContextPath() %>/login" class="nav-item nav-link">Khuyến mãi</a>
-                                <a href="<%= request.getContextPath() %>/login" class="nav-item nav-link">Giỏ hàng</a>
+                                <a href="<%= request.getContextPath() %>/products" class="nav-item nav-link">Danh mục sản phẩm</a>
+                                <a href="<%= request.getContextPath() %>/promotions" class="nav-item nav-link">Khuyến mãi</a>
+                                
+                                <!-- Role-based navigation -->
+                                <jsp:include page="role-navigation.jsp" />
+                                
                                 <c:choose>
                                     <c:when test="${not empty sessionScope.user}">
-                                        <a href="<%= request.getContextPath() %>/logout" class="nav-item nav-link me-2">Đăng xuất</a>
+                                        <button onclick="logout()" class="nav-item nav-link me-2 btn btn-link p-0" style="border: none; background: none;">Đăng xuất</button>
                                     </c:when>
                                     <c:otherwise>
                                         <a href="<%= request.getContextPath() %>/login?force=1" class="nav-item nav-link me-2">Đăng nhập / Đăng ký</a>
@@ -231,6 +260,76 @@
         </div>
         <!-- Navbar & Hero End -->
 
+        <script>
+            function logout() {
+                if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                    fetch('<%= request.getContextPath() %>/logout?ajax=true', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success message
+                            showToast(data.message, 'success');
+                            
+                            // Update UI to show logged out state
+                            updateLogoutUI();
+                        } else {
+                            showToast(data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('Có lỗi xảy ra khi đăng xuất!', 'error');
+                    });
+                }
+            }
+            
+            function updateLogoutUI() {
+                // Update top bar logout button
+                const topBarLogoutBtn = document.querySelector('.btn-outline-danger');
+                if (topBarLogoutBtn) {
+                    topBarLogoutBtn.outerHTML = '<a href="<%= request.getContextPath() %>/login?force=1" class="btn btn-outline-primary btn-sm px-3"><i class="bi bi-person me-1"></i>Đăng nhập / Đăng ký</a>';
+                }
+                
+                // Update navbar logout button
+                const navLogoutBtn = document.querySelector('.nav-item.nav-link.me-2.btn.btn-link');
+                if (navLogoutBtn) {
+                    navLogoutBtn.outerHTML = '<a href="<%= request.getContextPath() %>/login?force=1" class="nav-item nav-link me-2">Đăng nhập / Đăng ký</a>';
+                }
+            }
+            
+            function showToast(message, type) {
+                // Create toast element
+                const toastContainer = document.querySelector('.position-fixed.top-0.end-0.p-3');
+                const toastId = 'toast-' + Date.now();
+                const bgClass = type === 'success' ? 'bg-success' : 'bg-danger';
+                
+                const toastHtml = `
+                    <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body">${message}</div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                `;
+                
+                toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+                
+                // Show toast
+                const toastElement = document.getElementById(toastId);
+                const toast = new bootstrap.Toast(toastElement, {delay: 3000});
+                toast.show();
+                
+                // Remove toast element after it's hidden
+                toastElement.addEventListener('hidden.bs.toast', function() {
+                    toastElement.remove();
+                });
+            }
+        </script>
 
     </body>
 </html>
