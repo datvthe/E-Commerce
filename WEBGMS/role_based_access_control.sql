@@ -150,3 +150,4 @@ INSERT INTO `Role_Permissions` (`role_id`, `permission_name`, `resource`, `actio
 CREATE INDEX IF NOT EXISTS `idx_role_permissions_role` ON `Role_Permissions` (`role_id`);
 CREATE INDEX IF NOT EXISTS `idx_role_permissions_resource` ON `Role_Permissions` (`resource`);
 CREATE INDEX IF NOT EXISTS `idx_role_permissions_action` ON `Role_Permissions` (`action`);
+

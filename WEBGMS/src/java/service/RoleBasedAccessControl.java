@@ -17,16 +17,14 @@ public class RoleBasedAccessControl {
     // Role IDs (should match database)
     public static final int ROLE_ADMIN = 1;
     public static final int ROLE_SELLER = 2;
-    public static final int ROLE_MANAGER = 3;
-    public static final int ROLE_CUSTOMER = 4;
-    public static final int ROLE_GUEST = 5;
+    public static final int ROLE_CUSTOMER = 3;
+    public static final int ROLE_MODERATOR = 4;
     
     // Role Names
     public static final String ROLE_NAME_ADMIN = "admin";
     public static final String ROLE_NAME_SELLER = "seller";
-    public static final String ROLE_NAME_MANAGER = "manager";
     public static final String ROLE_NAME_CUSTOMER = "customer";
-    public static final String ROLE_NAME_GUEST = "guest";
+    public static final String ROLE_NAME_MODERATOR = "moderator";
     
     private UsersDAO usersDAO;
     private RoleDAO roleDAO;
@@ -59,7 +57,7 @@ public class RoleBasedAccessControl {
     public boolean hasRole(HttpServletRequest request, int roleId) {
         UserRoles userRole = getUserRole(request);
         if (userRole == null) {
-            return roleId == ROLE_GUEST; // Guest access for non-logged users
+            return false; // No guest role in database
         }
         
         return userRole.getRole_id().getRole_id() == roleId;
@@ -71,13 +69,7 @@ public class RoleBasedAccessControl {
     public boolean hasAnyRole(HttpServletRequest request, int... roleIds) {
         UserRoles userRole = getUserRole(request);
         if (userRole == null) {
-            // Check if guest role is in the list
-            for (int roleId : roleIds) {
-                if (roleId == ROLE_GUEST) {
-                    return true;
-                }
-            }
-            return false;
+            return false; // No guest role in database
         }
         
         int userRoleId = userRole.getRole_id().getRole_id();
@@ -104,10 +96,10 @@ public class RoleBasedAccessControl {
     }
     
     /**
-     * Check if user is manager
+     * Check if user is moderator
      */
-    public boolean isManager(HttpServletRequest request) {
-        return hasRole(request, ROLE_MANAGER);
+    public boolean isModerator(HttpServletRequest request) {
+        return hasRole(request, ROLE_MODERATOR);
     }
     
     /**
@@ -118,24 +110,24 @@ public class RoleBasedAccessControl {
     }
     
     /**
-     * Check if user is guest (not logged in)
+     * Check if user is not logged in
      */
-    public boolean isGuest(HttpServletRequest request) {
+    public boolean isNotLoggedIn(HttpServletRequest request) {
         return getUserRole(request) == null;
     }
     
     /**
-     * Check if user is logged in (any role except guest)
+     * Check if user is logged in
      */
     public boolean isLoggedIn(HttpServletRequest request) {
         return getUserRole(request) != null;
     }
     
     /**
-     * Check if user has admin or manager privileges
+     * Check if user has admin or moderator privileges
      */
-    public boolean isAdminOrManager(HttpServletRequest request) {
-        return hasAnyRole(request, ROLE_ADMIN, ROLE_MANAGER);
+    public boolean isAdminOrModerator(HttpServletRequest request) {
+        return hasAnyRole(request, ROLE_ADMIN, ROLE_MODERATOR);
     }
     
     /**
@@ -154,11 +146,10 @@ public class RoleBasedAccessControl {
                 return "/admin/dashboard";
             case ROLE_SELLER:
                 return "/seller/dashboard";
-            case ROLE_MANAGER:
-                return "/manager/dashboard";
             case ROLE_CUSTOMER:
                 return "/home";
-            case ROLE_GUEST:
+            case ROLE_MODERATOR:
+                return "/moderator/dashboard";
             default:
                 return "/home";
         }
@@ -173,12 +164,10 @@ public class RoleBasedAccessControl {
                 return ROLE_NAME_ADMIN;
             case ROLE_SELLER:
                 return ROLE_NAME_SELLER;
-            case ROLE_MANAGER:
-                return ROLE_NAME_MANAGER;
             case ROLE_CUSTOMER:
                 return ROLE_NAME_CUSTOMER;
-            case ROLE_GUEST:
-                return ROLE_NAME_GUEST;
+            case ROLE_MODERATOR:
+                return ROLE_NAME_MODERATOR;
             default:
                 return "unknown";
         }
@@ -199,17 +188,17 @@ public class RoleBasedAccessControl {
     }
     
     /**
-     * Check if user can access manager features
+     * Check if user can access moderator features
      */
-    public boolean canAccessManager(HttpServletRequest request) {
-        return hasAnyRole(request, ROLE_ADMIN, ROLE_MANAGER);
+    public boolean canAccessModerator(HttpServletRequest request) {
+        return hasAnyRole(request, ROLE_ADMIN, ROLE_MODERATOR);
     }
     
     /**
      * Check if user can access customer features
      */
     public boolean canAccessCustomer(HttpServletRequest request) {
-        return hasAnyRole(request, ROLE_ADMIN, ROLE_MANAGER, ROLE_CUSTOMER);
+        return hasAnyRole(request, ROLE_ADMIN, ROLE_MODERATOR, ROLE_CUSTOMER);
     }
     
     /**
@@ -244,7 +233,7 @@ public class RoleBasedAccessControl {
      * Check if user can manage users
      */
     public boolean canManageUsers(HttpServletRequest request) {
-        return hasAnyRole(request, ROLE_ADMIN, ROLE_MANAGER);
+        return hasAnyRole(request, ROLE_ADMIN, ROLE_MODERATOR);
     }
     
     /**
@@ -258,6 +247,7 @@ public class RoleBasedAccessControl {
      * Check if user can manage orders
      */
     public boolean canManageOrders(HttpServletRequest request) {
-        return hasAnyRole(request, ROLE_ADMIN, ROLE_MANAGER, ROLE_SELLER);
+        return hasAnyRole(request, ROLE_ADMIN, ROLE_MODERATOR, ROLE_SELLER);
     }
 }
+

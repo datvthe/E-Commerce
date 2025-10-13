@@ -63,8 +63,10 @@
 <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
 
 <!-- Electro Bootstrap Scripts -->
-<script src="<%= request.getContextPath() %>/views/assets/electro/lib/jquery/jquery.min.js"></script>
-<script src="<%= request.getContextPath() %>/views/assets/electro/lib/bootstrap.bundle.min.js"></script>
+<!-- jQuery (CDN fallback because local copy not bundled) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap Bundle (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="<%= request.getContextPath() %>/views/assets/electro/lib/wow/wow.min.js"></script>
 <script src="<%= request.getContextPath() %>/views/assets/electro/lib/easing/easing.min.js"></script>
 <script src="<%= request.getContextPath() %>/views/assets/electro/lib/waypoints/waypoints.min.js"></script>

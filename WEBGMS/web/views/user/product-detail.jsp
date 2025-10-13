@@ -1,713 +1,469 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <meta charset="utf-8">
         <title>${product.name} - Gicungco Marketplace</title>
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
+        <meta content="" name="keywords">
         <meta content="${product.description}" name="description">
-
-        <!-- Google Web Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-
-        <!-- Icon Font Stylesheet -->
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
-
-        <!-- Libraries Stylesheet -->
-        <link href="<%= request.getContextPath() %>/views/assets/user/lib/animate/animate.min.css" rel="stylesheet">
-        <link href="<%= request.getContextPath() %>/views/assets/user/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
-
-        <!-- Customized Bootstrap Stylesheet -->
-        <link href="<%= request.getContextPath() %>/views/assets/user/css/bootstrap.min.css" rel="stylesheet">
-
-        <!-- Template Stylesheet -->
-        <link href="<%= request.getContextPath() %>/views/assets/user/css/style.css" rel="stylesheet">
-        
-        <!-- Product Detail Styles -->
-        <style>
-            .product-image-carousel {
-                position: relative;
-                overflow: hidden;
-                border-radius: 10px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            }
-            
-            .product-image-carousel img {
-                width: 100%;
-                height: 400px;
-                object-fit: cover;
-                cursor: zoom-in;
-                transition: transform 0.3s ease;
-            }
-            
-            .product-image-carousel img:hover {
-                transform: scale(1.05);
-            }
-            
-            .thumbnail-container {
-                display: flex;
-                gap: 10px;
-                margin-top: 15px;
-                overflow-x: auto;
-                padding: 10px 0;
-            }
-            
-            .thumbnail {
-                width: 80px;
-                height: 80px;
-                object-fit: cover;
-                border-radius: 8px;
-                cursor: pointer;
-                border: 2px solid transparent;
-                transition: all 0.3s ease;
-            }
-            
-            .thumbnail.active {
-                border-color: #007bff;
-            }
-            
-            .product-info {
-                padding: 20px;
-            }
-            
-            .product-title {
-                font-size: 2rem;
-                font-weight: 700;
-                color: #333;
-                margin-bottom: 15px;
-            }
-            
-            .product-price {
-                font-size: 1.8rem;
-                font-weight: 600;
-                color: #e74c3c;
-                margin-bottom: 20px;
-            }
-            
-            .product-rating {
-                display: flex;
-                align-items: center;
-                margin-bottom: 20px;
-            }
-            
-            .stars {
-                color: #ffc107;
-                font-size: 1.2rem;
-                margin-right: 10px;
-            }
-            
-            .rating-text {
-                color: #666;
-                font-size: 0.9rem;
-            }
-            
-            .quantity-selector {
-                display: flex;
-                align-items: center;
-                margin-bottom: 20px;
-            }
-            
-            .quantity-input {
-                width: 80px;
-                text-align: center;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-                padding: 8px;
-                margin: 0 10px;
-            }
-            
-            .btn-quantity {
-                width: 35px;
-                height: 35px;
-                border: 1px solid #ddd;
-                background: #f8f9fa;
-                border-radius: 5px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                transition: all 0.3s ease;
-            }
-            
-            .btn-quantity:hover {
-                background: #e9ecef;
-            }
-            
-            .action-buttons {
-                display: flex;
-                gap: 15px;
-                margin-bottom: 30px;
-            }
-            
-            .btn-action {
-                flex: 1;
-                padding: 12px 20px;
-                border-radius: 8px;
-                font-weight: 600;
-                text-decoration: none;
-                text-align: center;
-                transition: all 0.3s ease;
-                border: none;
-                cursor: pointer;
-            }
-            
-            .btn-add-cart {
-                background: #007bff;
-                color: white;
-            }
-            
-            .btn-add-cart:hover {
-                background: #0056b3;
-                color: white;
-            }
-            
-            .btn-buy-now {
-                background: #28a745;
-                color: white;
-            }
-            
-            .btn-buy-now:hover {
-                background: #1e7e34;
-                color: white;
-            }
-            
-            .btn-wishlist {
-                background: #6c757d;
-                color: white;
-                width: 50px;
-                flex: none;
-            }
-            
-            .btn-wishlist:hover {
-                background: #545b62;
-                color: white;
-            }
-            
-            .btn-wishlist.in-wishlist {
-                background: #dc3545;
-            }
-            
-            .btn-wishlist.in-wishlist:hover {
-                background: #c82333;
-            }
-            
-            .product-tabs {
-                margin-top: 40px;
-            }
-            
-            .tab-content {
-                padding: 20px 0;
-            }
-            
-            .review-item {
-                border-bottom: 1px solid #eee;
-                padding: 20px 0;
-            }
-            
-            .review-header {
-                display: flex;
-                align-items: center;
-                margin-bottom: 10px;
-            }
-            
-            .reviewer-avatar {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                margin-right: 15px;
-            }
-            
-            .reviewer-name {
-                font-weight: 600;
-                margin-right: 15px;
-            }
-            
-            .review-rating {
-                color: #ffc107;
-            }
-            
-            .review-date {
-                color: #666;
-                font-size: 0.9rem;
-                margin-left: auto;
-            }
-            
-            .similar-products {
-                margin-top: 50px;
-            }
-            
-            .product-card {
-                border: 1px solid #eee;
-                border-radius: 10px;
-                overflow: hidden;
-                transition: all 0.3s ease;
-                height: 100%;
-            }
-            
-            .product-card:hover {
-                box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-                transform: translateY(-5px);
-            }
-            
-            .product-card img {
-                width: 100%;
-                height: 200px;
-                object-fit: cover;
-            }
-            
-            .product-card-body {
-                padding: 15px;
-            }
-            
-            .product-card-title {
-                font-size: 1rem;
-                font-weight: 600;
-                margin-bottom: 10px;
-                color: #333;
-                text-decoration: none;
-            }
-            
-            .product-card-price {
-                font-size: 1.1rem;
-                font-weight: 600;
-                color: #e74c3c;
-            }
-            
-            .stock-info {
-                margin-bottom: 20px;
-            }
-            
-            .stock-available {
-                color: #28a745;
-                font-weight: 600;
-            }
-            
-            .stock-low {
-                color: #ffc107;
-                font-weight: 600;
-            }
-            
-            .stock-out {
-                color: #dc3545;
-                font-weight: 600;
-            }
-        </style>
+        <link href="<%= request.getContextPath() %>/views/assets/electro/lib/animate/animate.min.css" rel="stylesheet">
+        <link href="<%= request.getContextPath() %>/views/assets/electro/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+        <link href="<%= request.getContextPath() %>/views/assets/electro/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+        <link href="<%= request.getContextPath() %>/views/assets/electro/css/bootstrap.min.css" rel="stylesheet">
+        <link href="<%= request.getContextPath() %>/views/assets/electro/css/style.css" rel="stylesheet">
     </head>
-
     <body>
-        <!-- Header -->
-        <jsp:include page="/views/component/header.jsp" />
-
-        <!-- Product Detail Start -->
-        <div class="container-fluid py-5">
-            <div class="container">
-                <div class="row">
-                    <!-- Product Images -->
-                    <div class="col-lg-6">
-                        <div class="product-image-carousel">
-                            <c:choose>
-                                <c:when test="${not empty images}">
-                                    <img id="mainImage" src="${images[0].url}" alt="${images[0].alt_text}" class="img-fluid">
-                                </c:when>
-                                <c:otherwise>
-                                    <img id="mainImage" src="<%= request.getContextPath() %>/views/assets/user/img/product-1.png" alt="No image available" class="img-fluid">
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
-                        
-                        <!-- Thumbnails -->
-                        <c:if test="${not empty images}">
-                            <div class="thumbnail-container">
-                                <c:forEach var="image" items="${images}" varStatus="status">
-                                    <img src="${image.url}" alt="${image.alt_text}" 
-                                         class="thumbnail ${status.index == 0 ? 'active' : ''}" 
-                                         onclick="changeMainImage('${image.url}', '${image.alt_text}', this)">
-                                </c:forEach>
-                            </div>
-                        </c:if>
+        <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <div class="container-fluid px-5 d-none border-bottom d-lg-block">
+            <div class="row gx-0 align-items-center">
+                <div class="col-lg-4 text-center text-lg-start mb-lg-0">
+                    <div class="d-inline-flex align-items-center" style="height: 45px;">
+                        <a href="#" class="text-muted me-2"> Trợ giúp</a><small> / </small>
+                        <a href="#" class="text-muted mx-2"> Hỗ trợ</a><small> / </small>
+                        <a href="#" class="text-muted ms-2"> Liên hệ</a>
                     </div>
-
-                    <!-- Product Information -->
-                    <div class="col-lg-6">
-                        <div class="product-info">
-                            <h1 class="product-title">${product.name}</h1>
-                            
-                            <div class="product-price">
-                                ${product.price} ${product.currency}
+                </div>
+                <div class="col-lg-4 text-center d-flex align-items-center justify-content-center">
+                    <small class="text-dark">Gọi chúng tôi:</small>
+                    <a href="#" class="text-muted">(+012) 1234 567890</a>
+                </div>
+                <div class="col-lg-4 text-center text-lg-end">
+                    <div class="d-inline-flex align-items-center" style="height: 45px;">
+                        <div class="dropdown">
+                            <a href="#" class="dropdown-toggle text-muted me-2" data-bs-toggle="dropdown"><small> VND</small></a>
+                            <div class="dropdown-menu rounded">
+                                <a href="#" class="dropdown-item"> USD</a>
+                                <a href="#" class="dropdown-item"> Euro</a>
                             </div>
-                            
-                            <div class="product-rating">
-                                <div class="stars">
-                                    <c:forEach begin="1" end="5" var="i">
-                                        <i class="fas fa-star ${i <= product.average_rating ? '' : 'far'}"></i>
-                                    </c:forEach>
-                                </div>
-                                <span class="rating-text">
-                                    ${product.average_rating} (${product.total_reviews} đánh giá)
-                                </span>
+                        </div>
+                        <div class="dropdown">
+                            <a href="#" class="dropdown-toggle text-muted mx-2" data-bs-toggle="dropdown"><small> English</small></a>
+                            <div class="dropdown-menu rounded">
+                                <a href="#" class="dropdown-item"> English</a>
+                                <a href="#" class="dropdown-item"> Turkish</a>
+                                <a href="#" class="dropdown-item"> Spanol</a>
+                                <a href="#" class="dropdown-item"> Italiano</a>
                             </div>
-                            
-                            <!-- Stock Information -->
-                            <div class="stock-info">
-                                <c:choose>
-                                    <c:when test="${availableStock > 10}">
-                                        <span class="stock-available">
-                                            <i class="fas fa-check-circle"></i> Còn hàng (${availableStock} sản phẩm)
-                                        </span>
-                                    </c:when>
-                                    <c:when test="${availableStock > 0}">
-                                        <span class="stock-low">
-                                            <i class="fas fa-exclamation-triangle"></i> Sắp hết hàng (${availableStock} sản phẩm)
-                                        </span>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="stock-out">
-                                            <i class="fas fa-times-circle"></i> Hết hàng
-                                        </span>
-                                    </c:otherwise>
-                                </c:choose>
-                            </div>
-                            
-                            <!-- Quantity Selector -->
-                            <div class="quantity-selector">
-                                <label>Số lượng:</label>
-                                <button class="btn-quantity" onclick="decreaseQuantity()">-</button>
-                                <input type="number" id="quantity" class="quantity-input" value="1" min="1" max="${availableStock}">
-                                <button class="btn-quantity" onclick="increaseQuantity()">+</button>
-                            </div>
-                            
-                            <!-- Action Buttons -->
-                            <div class="action-buttons">
-                                <!-- Cart and Buy Now removed -->
-                                <button class="btn-action btn-wishlist ${isInWishlist ? 'in-wishlist' : ''}" 
-                                        onclick="toggleWishlist()" id="wishlistBtn">
-                                    <i class="fas fa-heart"></i>
-                                </button>
-                            </div>
-                            
-                            <!-- Seller Information -->
-                            <c:if test="${not empty product.seller_id}">
-                                <div class="seller-info mt-4 p-3" style="background: #f8f9fa; border-radius: 8px;">
-                                    <h6><i class="fas fa-store"></i> Thông tin người bán</h6>
-                                    <p class="mb-1"><strong>Tên:</strong> ${product.seller_id.full_name}</p>
-                                    <p class="mb-0"><strong>Email:</strong> ${product.seller_id.email}</p>
-                                </div>
-                            </c:if>
+                        </div>
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.user}">
+                                <a href="<%= request.getContextPath() %>/profile" class="btn btn-outline-info btn-sm px-3 me-2"><i class="bi bi-person me-1"></i>Tài khoản</a>
+                                <a href="#" class="btn btn-outline-danger btn-sm px-3" onclick="logout()"><i class="bi bi-box-arrow-right me-1"></i>Đăng xuất</a>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="<%= request.getContextPath() %>/login" class="btn btn-outline-primary btn-sm px-3 me-2"><i class="bi bi-person me-1"></i>Đăng nhập</a>
+                                <a href="<%= request.getContextPath() %>/register" class="btn btn-outline-success btn-sm px-3"><i class="bi bi-person-plus me-1"></i>Đăng ký</a>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid px-5 py-4 d-none d-lg-block">
+            <div class="row gx-0 align-items-center text-center">
+                <div class="col-md-4 col-lg-3 text-center text-lg-start">
+                    <div class="d-inline-flex align-items-center">
+                        <a href="<%= request.getContextPath() %>/home" class="navbar-brand p-0">
+                            <h1 class="display-5 text-primary m-0"><i class="fas fa-shopping-bag text-secondary me-2"></i>Gicungco</h1>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-6 text-center">
+                    <div class="position-relative ps-4">
+                        <div class="d-flex border rounded-pill">
+                            <input class="form-control border-0 rounded-pill w-100 py-3" type="text" data-bs-target="#dropdownToggle123" placeholder="Tìm kiếm sản phẩm?">
+                            <select class="form-select text-dark border-0 border-start rounded-0 p-3" style="width: 200px;">
+                                <option value="All Category">Tất cả danh mục</option>
+                                <option value="Pest Control-2">Danh mục 1</option>
+                                <option value="Pest Control-3">Danh mục 2</option>
+                                <option value="Pest Control-4">Danh mục 3</option>
+                                <option value="Pest Control-5">Danh mục 4</option>
+                            </select>
+                            <button type="button" class="btn btn-primary rounded-pill py-3 px-5" style="border: 0;"><i class="fas fa-search"></i></button>
                         </div>
                     </div>
                 </div>
-
-                <!-- Product Tabs -->
-                <div class="product-tabs">
-                    <ul class="nav nav-tabs" id="productTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="description-tab" data-bs-toggle="tab" 
-                                    data-bs-target="#description" type="button" role="tab">
-                                Mô tả sản phẩm
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" 
-                                    data-bs-target="#reviews" type="button" role="tab">
-                                Đánh giá (${product.total_reviews})
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="policies-tab" data-bs-toggle="tab" 
-                                    data-bs-target="#policies" type="button" role="tab">
-                                Chính sách
-                            </button>
-                        </li>
-                    </ul>
-                    
-                    <div class="tab-content" id="productTabsContent">
-                        <!-- Description Tab -->
-                        <div class="tab-pane fade show active" id="description" role="tabpanel">
-                            <div class="p-4">
-                                <h5>Mô tả chi tiết</h5>
-                                <div class="product-description">
-                                    ${product.description}
-                                </div>
+                <div class="col-md-4 col-lg-3 text-center text-lg-end">
+                    <div class="d-inline-flex align-items-center">
+                        <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-random"></i></span></a>
+                        <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-heart"></i></span></a>
+                        <a href="#" class="text-muted d-flex align-items-center justify-content-center"><span class="rounded-circle btn-md-square border"><i class="fas fa-shopping-cart"></i></span>
+                            <span class="text-dark ms-2">0₫</span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid nav-bar p-0">
+            <div class="row gx-0 bg-primary px-5 align-items-center">
+                <div class="col-lg-3 d-none d-lg-block">
+                    <nav class="navbar navbar-light position-relative" style="width: 250px;">
+                        <button class="navbar-toggler border-0 fs-4 w-100 px-0 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#allCat">
+                            <h4 class="m-0"><i class="fa fa-bars me-2"></i>Tất cả danh mục</h4>
+                        </button>
+                        <div class="collapse navbar-collapse rounded-bottom" id="allCat">
+                            <div class="navbar-nav ms-auto py-0">
+                                <ul class="list-unstyled categories-bars">
+                                    <li><div class="categories-bars-item"><a href="#">Phụ kiện</a><span>(3)</span></div></li>
+                                    <li><div class="categories-bars-item"><a href="#">Điện tử & Máy tính</a><span>(5)</span></div></li>
+                                    <li><div class="categories-bars-item"><a href="#">Laptop & Desktop</a><span>(2)</span></div></li>
+                                    <li><div class="categories-bars-item"><a href="#">Điện thoại & Máy tính bảng</a><span>(8)</span></div></li>
+                                    <li><div class="categories-bars-item"><a href="#">SmartPhone & Smart TV</a><span>(5)</span></div></li>
+                                </ul>
                             </div>
                         </div>
-                        
-                        <!-- Reviews Tab -->
-                        <div class="tab-pane fade" id="reviews" role="tabpanel">
-                            <div class="p-4">
-                                <h5>Đánh giá sản phẩm</h5>
-                                
-                                <!-- Rating Summary -->
-                                <div class="row mb-4">
-                                    <div class="col-md-4">
-                                        <div class="text-center">
-                                            <h2>${product.average_rating}</h2>
-                                            <div class="stars mb-2">
-                                                <c:forEach begin="1" end="5" var="i">
-                                                    <i class="fas fa-star ${i <= product.average_rating ? '' : 'far'}"></i>
-                                                </c:forEach>
-                                            </div>
-                                            <p>Dựa trên ${product.total_reviews} đánh giá</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <c:forEach begin="5" end="1" step="-1" var="rating">
-                                            <div class="d-flex align-items-center mb-2">
-                                                <span class="me-2">${rating} <i class="fas fa-star text-warning"></i></span>
-                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
-                                                    <div class="progress-bar" style="width: ${ratingDistribution[rating-1] * 100 / product.total_reviews}%"></div>
-                                                </div>
-                                                <span class="text-muted">${ratingDistribution[rating-1]}</span>
-                                            </div>
-                                        </c:forEach>
+                    </nav>
+                </div>
+                <div class="col-12 col-lg-9">
+                    <nav class="navbar navbar-expand-lg navbar-light bg-primary ">
+                        <a href="<%= request.getContextPath() %>/home" class="navbar-brand d-block d-lg-none">
+                            <h1 class="display-5 text-secondary m-0"><i class="fas fa-shopping-bag text-white me-2"></i>Gicungco</h1>
+                        </a>
+                        <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                            <span class="fa fa-bars fa-1x"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarCollapse">
+                            <div class="navbar-nav ms-auto py-0">
+                                <a href="<%= request.getContextPath() %>/home" class="nav-item nav-link">Trang chủ</a>
+                                <a href="<%= request.getContextPath() %>/products" class="nav-item nav-link">Cửa hàng</a>
+                                <a href="#" class="nav-item nav-link active">Sản phẩm</a>
+                                <div class="nav-item dropdown">
+                                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Trang</a>
+                                    <div class="dropdown-menu m-0">
+                                        <a href="#" class="dropdown-item">Bán chạy</a>
+                                        <a href="#" class="dropdown-item">Giỏ hàng</a>
+                                        <a href="#" class="dropdown-item">Thanh toán</a>
+                                        <a href="#" class="dropdown-item">404 Trang</a>
                                     </div>
                                 </div>
-                                
-                                <!-- Reviews List -->
-                                <div class="reviews-list">
+                                <a href="#" class="nav-item nav-link me-2">Liên hệ</a>
+                                <div class="nav-item dropdown d-block d-lg-none mb-3">
+                                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Tất cả danh mục</a>
+                                    <div class="dropdown-menu m-0">
+                                        <ul class="list-unstyled categories-bars">
+                                            <li><div class="categories-bars-item"><a href="#">Phụ kiện</a><span>(3)</span></div></li>
+                                            <li><div class="categories-bars-item"><a href="#">Điện tử & Máy tính</a><span>(5)</span></div></li>
+                                            <li><div class="categories-bars-item"><a href="#">Laptop & Desktop</a><span>(2)</span></div></li>
+                                            <li><div class="categories-bars-item"><a href="#">Điện thoại & Máy tính bảng</a><span>(8)</span></div></li>
+                                            <li><div class="categories-bars-item"><a href="#">SmartPhone & Smart TV</a><span>(5)</span></div></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#" class="btn btn-secondary rounded-pill py-2 px-4 px-lg-3 mb-3 mb-md-3 mb-lg-0"><i class="fa fa-mobile-alt me-2"></i> +0123 456 7890</a>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- Single Page Header start -->
+        <div class="container-fluid page-header py-5">
+            <h1 class="text-center text-white display-6 wow fadeInUp" data-wow-delay="0.1s">Chi tiết sản phẩm</h1>
+            <ol class="breadcrumb justify-content-center mb-0 wow fadeInUp" data-wow-delay="0.3s">
+                <li class="breadcrumb-item"><a href="<%= request.getContextPath() %>/home">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="<%= request.getContextPath() %>/products">Sản phẩm</a></li>
+                <li class="breadcrumb-item active text-white">${product.name}</li>
+            </ol>
+        </div>
+        <!-- Single Page Header End -->
+
+        <!-- Single Products Start -->
+        <div class="container-fluid shop py-5">
+            <div class="container py-5">
+                <div class="row g-4">
+                    <div class="col-lg-5 col-xl-3 wow fadeInUp" data-wow-delay="0.1s">
+                        <div class="input-group w-100 mx-auto d-flex mb-4">
+                            <input type="search" class="form-control p-3" placeholder="Từ khóa" aria-describedby="search-icon-1">
+                            <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+                        </div>
+                        <div class="product-categories mb-4">
+                            <h4>Danh mục sản phẩm</h4>
+                            <ul class="list-unstyled">
+                                <li>
+                                    <div class="categories-item">
+                                        <a href="#" class="text-dark"><i class="fas fa-apple-alt text-secondary me-2"></i>Phụ kiện</a>
+                                        <span>(3)</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="categories-item">
+                                        <a href="#" class="text-dark"><i class="fas fa-apple-alt text-secondary me-2"></i>Điện tử & Máy tính</a>
+                                        <span>(5)</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="categories-item">
+                                        <a href="#" class="text-dark"><i class="fas fa-apple-alt text-secondary me-2"></i>Laptop & Desktop</a>
+                                        <span>(2)</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="categories-item">
+                                        <a href="#" class="text-dark"><i class="fas fa-apple-alt text-secondary me-2"></i>Điện thoại & Máy tính bảng</a>
+                                        <span>(8)</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="categories-item">
+                                        <a href="#" class="text-dark"><i class="fas fa-apple-alt text-secondary me-2"></i>SmartPhone & Smart TV</a>
+                                        <span>(5)</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="featured-products mb-4">
+                            <h4 class="mb-3">Sản phẩm nổi bật</h4>
+                            <c:if test="${not empty similarProducts}">
+                                <c:forEach var="similarProduct" items="${similarProducts}" begin="0" end="5">
+                                    <div class="featured-product-item">
+                                        <div class="rounded me-4" style="width: 100px; height: 100px;">
+                                            <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-1.png" class="img-fluid rounded" alt="Image">
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-2">${similarProduct.name}</h6>
+                                            <div class="d-flex mb-2">
+                                                <c:forEach begin="1" end="5" var="i">
+                                                    <i class="fa fa-star text-secondary"></i>
+                                                </c:forEach>
+                                            </div>
+                                            <div class="d-flex mb-2">
+                                                <h5 class="fw-bold me-2">${similarProduct.price}₫</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </c:if>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 col-xl-9 wow fadeInUp" data-wow-delay="0.1s">
+                        <div class="row g-4 single-product">
+                            <div class="col-xl-6">
+                                <div class="single-carousel owl-carousel">
                                     <c:choose>
-                                        <c:when test="${not empty reviews}">
-                                            <c:forEach var="review" items="${reviews}">
-                                                <div class="review-item">
-                                                    <div class="review-header">
-                                                        <img src="${review.buyer_id.avatar_url != null ? review.buyer_id.avatar_url : '/views/assets/user/img/avatar.jpg'}" 
-                                                             alt="Avatar" class="reviewer-avatar">
-                                                        <span class="reviewer-name">${review.buyer_id.full_name}</span>
-                                                        <div class="review-rating">
-                                                            <c:forEach begin="1" end="5" var="i">
-                                                                <i class="fas fa-star ${i <= review.rating ? '' : 'far'}"></i>
-                                                            </c:forEach>
-                                                        </div>
-                                                        <span class="review-date">${review.createdAt}</span>
+                                        <c:when test="${not empty images}">
+                                            <c:forEach var="image" items="${images}" varStatus="status">
+                                                <div class="single-item" data-dot="<img class='img-fluid' src='${image.url}' alt='${image.alt_text}'>">
+                                                    <div class="single-inner bg-light rounded">
+                                                        <img src="${image.url}" class="img-fluid rounded" alt="${image.alt_text}">
                                                     </div>
-                                                    <p class="mb-0">${review.comment}</p>
                                                 </div>
                                             </c:forEach>
                                         </c:when>
                                         <c:otherwise>
-                                            <p class="text-muted">Chưa có đánh giá nào cho sản phẩm này.</p>
+                                            <div class="single-item" data-dot="<img class='img-fluid' src='<%= request.getContextPath() %>/views/assets/electro/img/product-1.png' alt='${product.name}'>">
+                                                <div class="single-inner bg-light rounded">
+                                                    <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-1.png" class="img-fluid rounded" alt="${product.name}">
+                                                </div>
+                                            </div>
                                         </c:otherwise>
                                     </c:choose>
                                 </div>
-                                
-                                <!-- Add Review Form -->
-                                <c:if test="${not empty sessionScope.user}">
-                                    <div class="mt-4 p-3" style="background: #f8f9fa; border-radius: 8px;">
-                                        <h6>Viết đánh giá</h6>
-                                        <form id="reviewForm">
-                                            <div class="mb-3">
-                                                <label class="form-label">Đánh giá</label>
-                                                <div class="rating-input">
+                            </div>
+                            <div class="col-xl-6">
+                                <h4 class="fw-bold mb-3">${product.name}</h4>
+                                <p class="mb-3">Danh mục: ${product.category_id != null ? product.category_id.name : 'Không xác định'}</p>
+                                <h5 class="fw-bold mb-3">${product.price}₫</h5>
+                                <div class="d-flex mb-4">
+                                    <c:forEach begin="1" end="5" var="i">
+                                        <i class="fa fa-star ${i <= product.average_rating ? 'text-secondary' : ''}"></i>
+                                    </c:forEach>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="btn btn-primary d-inline-block rounded text-white py-1 px-4 me-2"><i class="fab fa-facebook-f me-1"></i> Chia sẻ</div>
+                                    <div class="btn btn-secondary d-inline-block rounded text-white py-1 px-4 ms-2"><i class="fab fa-twitter ms-1"></i> Chia sẻ</div>
+                                </div>
+                                <div class="d-flex flex-column mb-3">
+                                    <small>Mã sản phẩm: ${product.product_id}</small>
+                                    <small>Còn hàng: <strong class="text-primary">${availableStock} sản phẩm trong kho</strong></small>
+                                </div>
+                                <p class="mb-4">${product.description}</p>
+                                <div class="input-group quantity mb-5" style="width: 100px;">
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-sm btn-minus rounded-circle bg-light border">
+                                            <i class="fa fa-minus"></i>
+                                        </button>
+                                    </div>
+                                    <input type="text" class="form-control form-control-sm text-center border-0" value="1" id="quantity">
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-sm btn-plus rounded-circle bg-light border">
+                                            <i class="fa fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <a href="#" class="btn btn-primary border border-secondary rounded-pill px-4 py-2 mb-4 text-primary" onclick="addToCart()">
+                                    <i class="fa fa-shopping-bag me-2 text-white"></i> Thêm vào giỏ
+                                </a>
+                            </div>
+                            <div class="col-lg-12">
+                                <nav>
+                                    <div class="nav nav-tabs mb-3">
+                                        <button class="nav-link active border-white border-bottom-0" type="button" role="tab" id="nav-about-tab" data-bs-toggle="tab" data-bs-target="#nav-about" aria-controls="nav-about" aria-selected="true">Mô tả</button>
+                                        <button class="nav-link border-white border-bottom-0" type="button" role="tab" id="nav-mission-tab" data-bs-toggle="tab" data-bs-target="#nav-mission" aria-controls="nav-mission" aria-selected="false">Đánh giá</button>
+                                    </div>
+                                </nav>
+                                <div class="tab-content mb-5">
+                                    <div class="tab-pane active" id="nav-about" role="tabpanel" aria-labelledby="nav-about-tab">
+                                        <p>${product.description}</p>
+                                        <c:if test="${not empty product.seller_id}">
+                                            <p><strong>Thông tin người bán:</strong></p>
+                                            <p>Tên: ${product.seller_id.full_name}</p>
+                                            <p>Email: ${product.seller_id.email}</p>
+                                        </c:if>
+                                    </div>
+                                    <div class="tab-pane" id="nav-mission" role="tabpanel" aria-labelledby="nav-mission-tab">
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div class="text-center me-4">
+                                                <h2>${product.average_rating}</h2>
+                                                <div class="d-flex justify-content-center">
                                                     <c:forEach begin="1" end="5" var="i">
-                                                        <i class="fas fa-star rating-star" data-rating="${i}" style="cursor: pointer; color: #ddd;"></i>
+                                                        <i class="fa fa-star ${i <= product.average_rating ? 'text-secondary' : ''}"></i>
                                                     </c:forEach>
                                                 </div>
+                                                <p>Dựa trên ${product.total_reviews} đánh giá</p>
                                             </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Nhận xét</label>
-                                                <textarea class="form-control" id="reviewComment" rows="3" required></textarea>
-                                            </div>
-                                            <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
-                                        </form>
-                                    </div>
-                                </c:if>
-                            </div>
-                        </div>
-                        
-                        <!-- Policies Tab -->
-                        <div class="tab-pane fade" id="policies" role="tabpanel">
-                            <div class="p-4">
-                                <h5>Chính sách</h5>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <h6><i class="fas fa-truck"></i> Vận chuyển</h6>
-                                        <ul>
-                                            <li>Miễn phí vận chuyển cho đơn hàng từ 500.000đ</li>
-                                            <li>Giao hàng trong 1-3 ngày làm việc</li>
-                                            <li>Hỗ trợ giao hàng tận nơi</li>
-                                        </ul>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <h6><i class="fas fa-undo"></i> Đổi trả</h6>
-                                        <ul>
-                                            <li>Đổi trả trong 7 ngày</li>
-                                            <li>Sản phẩm phải còn nguyên vẹn</li>
-                                            <li>Miễn phí đổi trả</li>
-                                        </ul>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <h6><i class="fas fa-shield-alt"></i> Bảo hành</h6>
-                                        <ul>
-                                            <li>Bảo hành 12 tháng</li>
-                                            <li>Hỗ trợ kỹ thuật 24/7</li>
-                                            <li>Đổi mới nếu lỗi từ nhà sản xuất</li>
-                                        </ul>
+                                        </div>
+                                        <c:if test="${not empty reviews}">
+                                            <c:forEach var="review" items="${reviews}">
+                                                <div class="border-bottom pb-3 mb-3">
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <img src="${review.buyer_id.avatar_url != null ? review.buyer_id.avatar_url : '/views/assets/user/img/avatar.jpg'}" class="rounded-circle me-2" width="40" height="40" alt="Avatar">
+                                                        <div>
+                                                            <h6 class="mb-0">${review.buyer_id.full_name}</h6>
+                                                            <div class="d-flex">
+                                                                <c:forEach begin="1" end="5" var="i">
+                                                                    <i class="fa fa-star ${i <= review.rating ? 'text-warning' : 'text-muted'}"></i>
+                                                                </c:forEach>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <p class="mb-0">${review.comment}</p>
+                                                </div>
+                                            </c:forEach>
+                                        </c:if>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Similar Products -->
-                <c:if test="${not empty similarProducts}">
-                    <div class="similar-products">
-                        <h4 class="mb-4">Sản phẩm tương tự</h4>
-                        <div class="row">
-                            <c:forEach var="similarProduct" items="${similarProducts}">
-                                <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
-                                    <div class="product-card">
-                                        <a href="<%= request.getContextPath() %>/product/${similarProduct.slug}">
-                                            <img src="<%= request.getContextPath() %>/views/assets/user/img/product-1.png" alt="${similarProduct.name}">
-                                        </a>
-                                        <div class="product-card-body">
-                                            <a href="<%= request.getContextPath() %>/product/${similarProduct.slug}" class="product-card-title">
-                                                ${similarProduct.name}
-                                            </a>
-                                            <div class="product-card-price">
-                                                ${similarProduct.price} ${similarProduct.currency}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </c:forEach>
-                        </div>
-                    </div>
-                </c:if>
             </div>
         </div>
-        <!-- Product Detail End -->
+        <!-- Single Products End -->
 
-        <!-- Footer -->
-        <jsp:include page="/views/component/footer.jsp" />
+        <!-- Footer Start -->
+        <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
+            <div class="container py-5">
+                <div class="row g-5">
+                    <div class="col-lg-3 col-md-6">
+                        <h5 class="text-white text-uppercase mb-4">Gicungco Marketplace</h5>
+                        <p class="mb-4">Nền tảng thương mại điện tử hàng đầu Việt Nam, kết nối người mua và người bán một cách an toàn và tiện lợi.</p>
+                        <div class="d-flex pt-2">
+                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-twitter"></i></a>
+                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-facebook-f"></i></a>
+                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-youtube"></i></a>
+                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <h5 class="text-white text-uppercase mb-4">Dịch vụ</h5>
+                        <div class="d-flex flex-column justify-content-start">
+                            <a class="text-white-50 mb-2" href="<%= request.getContextPath() %>/products"><i class="fa fa-angle-right me-2"></i>Danh mục sản phẩm</a>
+                            <a class="text-white-50 mb-2" href="<%= request.getContextPath() %>/promotions"><i class="fa fa-angle-right me-2"></i>Khuyến mãi</a>
+                            <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Hỗ trợ khách hàng</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <h5 class="text-white text-uppercase mb-4">Hỗ trợ</h5>
+                        <div class="d-flex flex-column justify-content-start">
+                            <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Trung tâm trợ giúp</a>
+                            <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Chính sách bảo mật</a>
+                            <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Điều khoản sử dụng</a>
+                            <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Chính sách vận chuyển</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <h5 class="text-white text-uppercase mb-4">Liên hệ</h5>
+                        <p class="mb-2"><i class="fa fa-map-marker-alt me-3"></i>123 Đường ABC, Quận 1, TP.HCM</p>
+                        <p class="mb-2"><i class="fa fa-phone-alt me-3"></i>+012 345 67890</p>
+                        <p class="mb-2"><i class="fa fa-envelope me-3"></i>info@example.com</p>
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="copyright">
+                    <div class="row">
+                        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                            &copy; <a class="border-bottom" href="#">Gicungco Marketplace</a>, Tất cả quyền được bảo lưu.
+                        </div>
+                        <div class="col-md-6 text-center text-md-end">
+                            <div class="footer-menu">
+                                <a href="<%= request.getContextPath() %>/home">Trang chủ</a>
+                                <a href="#">Chính sách Cookie</a>
+                                <a href="#">Trợ giúp</a>
+                                <a href="#">Câu hỏi thường gặp</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Footer End -->
 
-        <!-- JavaScript Libraries -->
-        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="<%= request.getContextPath() %>/views/assets/user/lib/easing/easing.min.js"></script>
-        <script src="<%= request.getContextPath() %>/views/assets/user/lib/waypoints/waypoints.min.js"></script>
-        <script src="<%= request.getContextPath() %>/views/assets/user/lib/owlcarousel/owl.carousel.min.js"></script>
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
 
-        <!-- Template Javascript -->
-        <script src="<%= request.getContextPath() %>/views/assets/user/js/main.js"></script>
+        <!-- Electro Bootstrap Scripts -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="<%= request.getContextPath() %>/views/assets/electro/lib/wow/wow.min.js"></script>
+        <script src="<%= request.getContextPath() %>/views/assets/electro/lib/easing/easing.min.js"></script>
+        <script src="<%= request.getContextPath() %>/views/assets/electro/lib/waypoints/waypoints.min.js"></script>
+        <script src="<%= request.getContextPath() %>/views/assets/electro/lib/counterup/counterup.min.js"></script>
+        <script src="<%= request.getContextPath() %>/views/assets/electro/lib/owlcarousel/owl.carousel.min.js"></script>
+        <script src="<%= request.getContextPath() %>/views/assets/electro/lib/lightbox/js/lightbox.min.js"></script>
+        <script src="<%= request.getContextPath() %>/views/assets/electro/js/main.js"></script>
 
-        <!-- Product Detail JavaScript -->
+        <!-- Product Detail Scripts -->
         <script>
-            let selectedRating = 0;
-            const productId = ${product.product_id};
-            const maxQuantity = ${availableStock};
-
-            // Image carousel functionality
-            function changeMainImage(src, alt, element) {
-                document.getElementById('mainImage').src = src;
-                document.getElementById('mainImage').alt = alt;
-                
-                // Update active thumbnail
-                document.querySelectorAll('.thumbnail').forEach(thumb => thumb.classList.remove('active'));
-                element.classList.add('active');
-            }
-
-            // Quantity selector
-            function increaseQuantity() {
+            // Quantity controls
+            document.querySelector('.btn-minus').addEventListener('click', function() {
                 const quantityInput = document.getElementById('quantity');
-                let currentQuantity = parseInt(quantityInput.value);
-                if (currentQuantity < maxQuantity) {
-                    quantityInput.value = currentQuantity + 1;
+                let value = parseInt(quantityInput.value);
+                if (value > 1) {
+                    quantityInput.value = value - 1;
                 }
-            }
-
-            function decreaseQuantity() {
-                const quantityInput = document.getElementById('quantity');
-                let currentQuantity = parseInt(quantityInput.value);
-                if (currentQuantity > 1) {
-                    quantityInput.value = currentQuantity - 1;
-                }
-            }
-
-            // Cart / Buy Now removed
-
-            // Toggle wishlist
-            function toggleWishlist() {
-                const wishlistBtn = document.getElementById('wishlistBtn');
-                const isInWishlist = wishlistBtn.classList.contains('in-wishlist');
-                
-                fetch('<%= request.getContextPath() %>/wishlist/toggle', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `action=toggle&productId=${productId}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        if (isInWishlist) {
-                            wishlistBtn.classList.remove('in-wishlist');
-                        } else {
-                            wishlistBtn.classList.add('in-wishlist');
-                        }
-                        alert(data.message);
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi cập nhật wishlist');
-                });
-            }
-
-            // Rating stars for review
-            document.querySelectorAll('.rating-star').forEach(star => {
-                star.addEventListener('click', function() {
-                    selectedRating = parseInt(this.dataset.rating);
-                    document.querySelectorAll('.rating-star').forEach((s, index) => {
-                        if (index < selectedRating) {
-                            s.style.color = '#ffc107';
-                        } else {
-                            s.style.color = '#ddd';
-                        }
-                    });
-                });
             });
 
-            // Review form submission
-            document.getElementById('reviewForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                if (selectedRating === 0) {
-                    alert('Vui lòng chọn đánh giá');
-                    return;
-                }
-                
-                const comment = document.getElementById('reviewComment').value;
-                
-                fetch('<%= request.getContextPath() %>/review/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `action=add&productId=${productId}&rating=${selectedRating}&comment=${encodeURIComponent(comment)}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    if (data.success) {
-                        document.getElementById('reviewForm').reset();
-                        selectedRating = 0;
-                        document.querySelectorAll('.rating-star').forEach(star => {
-                            star.style.color = '#ddd';
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi gửi đánh giá');
-                });
+            document.querySelector('.btn-plus').addEventListener('click', function() {
+                const quantityInput = document.getElementById('quantity');
+                let value = parseInt(quantityInput.value);
+                quantityInput.value = value + 1;
             });
+
+            // Add to cart function
+            function addToCart() {
+                const quantity = document.getElementById('quantity').value;
+                // Add your cart logic here
+                alert('Đã thêm ' + quantity + ' sản phẩm vào giỏ hàng!');
+            }
+
+            // Logout function
+            function logout() {
+                if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                    window.location.href = '<%= request.getContextPath() %>/logout';
+                }
+            }
         </script>
     </body>
 </html>
