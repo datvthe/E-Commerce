@@ -15,7 +15,7 @@ import dao.UsersDAO;
  * Role-Based Access Control Filter
  * Intercepts requests and checks user permissions based on their role
  */
-@WebFilter(filterName = "RoleBasedAccessFilter", urlPatterns = {"/admin/*", "/seller/*", "/manager/*", "/customer/*"})
+@WebFilter(filterName = "RoleBasedAccessFilter", urlPatterns = {"/admin/*", "/seller/*", "/moderator/*", "/customer/*"})
 public class RoleBasedAccessFilter implements Filter {
     
     private RoleBasedAccessControl rbac;
@@ -43,7 +43,7 @@ public class RoleBasedAccessFilter implements Filter {
         if (session == null || session.getAttribute("user") == null) {
             // Redirect to login for protected areas
             if (path.startsWith("/admin") || path.startsWith("/seller") || 
-                path.startsWith("/manager") || path.startsWith("/customer")) {
+                path.startsWith("/moderator") || path.startsWith("/customer")) {
                 httpResponse.sendRedirect(contextPath + "/login?redirect=" + java.net.URLEncoder.encode(path, "UTF-8"));
                 return;
             }
@@ -68,8 +68,8 @@ public class RoleBasedAccessFilter implements Filter {
                     return;
                 }
                 
-                // Check manager access
-                if (path.startsWith("/manager") && roleId != RoleBasedAccessControl.ROLE_MANAGER && 
+                // Check moderator access
+                if (path.startsWith("/moderator") && roleId != RoleBasedAccessControl.ROLE_MODERATOR && 
                     roleId != RoleBasedAccessControl.ROLE_ADMIN) {
                     httpResponse.sendRedirect(contextPath + "/home?error=access_denied");
                     return;
@@ -93,3 +93,4 @@ public class RoleBasedAccessFilter implements Filter {
         // Cleanup if needed
     }
 }
+

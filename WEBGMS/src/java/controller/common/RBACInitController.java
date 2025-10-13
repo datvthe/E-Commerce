@@ -38,3 +38,4 @@ public class RBACInitController extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/home");
     }
 }
+

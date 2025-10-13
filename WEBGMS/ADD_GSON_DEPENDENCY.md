@@ -34,7 +34,7 @@ implementation 'com.google.code.gson:gson:2.10.1'
 
 ## Verification
 After adding the dependency, the following should work:
-- Add to cart functionality
+- Cart functionality removed
 - Wishlist toggle functionality
 - Review submission
 - All AJAX responses will return proper JSON

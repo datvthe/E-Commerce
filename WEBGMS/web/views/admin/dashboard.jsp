@@ -3,13 +3,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8">
+        <jsp:include page="/views/component/head.jspf" />
         <title>Admin Dashboard - Gicungco Marketplace</title>
-        <meta content="width=device-width, initial-scale=1.0" name="viewport">
-        
-        <!-- Bootstrap CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
         
         <style>
             .sidebar {
@@ -66,7 +61,7 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="<%= request.getContextPath() %>/admin/orders">
-                                    <i class="fas fa-shopping-cart me-2"></i>Quản lý đơn hàng
+                                    <i class="fas fa-clipboard-list me-2"></i>Quản lý đơn hàng
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -150,7 +145,7 @@
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">89</div>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -272,7 +267,7 @@
         <!-- Footer -->
         <jsp:include page="../component/footer.jsp" />
         
-        <!-- Bootstrap JS -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Bootstrap JS loaded via footer include -->
     </body>
 </html>
+

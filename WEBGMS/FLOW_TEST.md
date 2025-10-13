@@ -24,7 +24,7 @@
 - **Links Updated:**
   - Product detail links → `/login`
   - "Chi tiết" buttons → `/login`
-  - "Add to Cart" buttons → `/login`
+  - "View Details" buttons → `/login`
   - "Mua sắm ngay" button → `/login`
   - "Xem khuyến mãi" button → `/login`
 
