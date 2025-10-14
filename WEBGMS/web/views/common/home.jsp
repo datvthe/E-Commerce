@@ -54,7 +54,7 @@
                                 <a href="#" class="dropdown-item"> Spanol</a>
                                 <a href="#" class="dropdown-item"> Italiano</a>
             </div>
-            </div>
+                        </div>
                         <c:choose>
                             <c:when test="${not empty sessionScope.user}">
                                 <a href="<%= request.getContextPath() %>/profile" class="btn btn-outline-info btn-sm px-3 me-2"><i class="bi bi-person me-1"></i>Tài khoản</a>
@@ -65,10 +65,10 @@
                                 <a href="<%= request.getContextPath() %>/register" class="btn btn-outline-success btn-sm px-3"><i class="bi bi-person-plus me-1"></i>Đăng ký</a>
                             </c:otherwise>
                         </c:choose>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         <div class="container-fluid px-5 py-4 d-none d-lg-block">
             <div class="row gx-0 align-items-center text-center">
                 <div class="col-md-4 col-lg-3 text-center text-lg-start">
@@ -92,7 +92,7 @@
                             <button type="button" class="btn btn-primary rounded-pill py-3 px-5" style="border: 0;"><i class="fas fa-search"></i></button>
                         </div>
                     </div>
-                        </div>
+            </div>
                 <div class="col-md-4 col-lg-3 text-center text-lg-end">
                     <div class="d-inline-flex align-items-center">
                         <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-random"></i></span></a>
@@ -190,10 +190,10 @@
                                 <h1 class="display-3 text-capitalize mb-4 wow fadeInRight" data-wow-delay="0.3s">On Selected Laptops & Desktop Or Smartphone</h1>
                                 <p class="text-dark wow fadeInRight" data-wow-delay="0.5s">Terms and Condition Apply</p>
                                 <a class="btn btn-primary rounded-pill py-3 px-5 wow fadeInRight" data-wow-delay="0.7s" href="#">Shop Now</a>
-                            </div>
                         </div>
                     </div>
-                                </div>
+                        </div>
+                    </div>
                 <div class="col-12 col-lg-5 col-xl-3 wow fadeInRight" data-wow-delay="0.1s">
                     <div class="carousel-header-banner h-100">
                         <img src="<%= request.getContextPath() %>/views/assets/electro/img/header-img.jpg" class="img-fluid w-100 h-100" style="object-fit: cover;" alt="Image">
@@ -209,7 +209,7 @@
                                 <span class="text-primary fs-5">$1,050.00</span>
                     </div>
                             <a href="#" class="btn btn-primary rounded-pill py-2 px-4"><i class="fas fa-shopping-cart me-2"></i> Add To Cart</a>
-                    </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -231,12 +231,12 @@
                 </div>
                 <div class="col-6 col-md-4 col-lg-2 border-end wow fadeInUp" data-wow-delay="0.5s">
                     <div class="p-4"><div class="d-flex align-items-center"><i class="fas fa-lock fa-2x text-primary"></i><div class="ms-4"><h6 class="text-uppercase mb-2">Thanh toán an toàn</h6><p class="mb-0">Chúng tôi coi trọng bảo mật của bạn</p></div></div></div>
-                </div>
+                    </div>
                 <div class="col-6 col-md-4 col-lg-2 border-end wow fadeInUp" data-wow-delay="0.6s">
                     <div class="p-4"><div class="d-flex align-items-center"><i class="fas fa-blog fa-2x text-primary"></i><div class="ms-4"><h6 class="text-uppercase mb-2">Dịch vụ trực tuyến</h6><p class="mb-0">Đổi trả sản phẩm miễn phí trong 30 ngày</p></div></div></div>
-                </div>
                     </div>
-                </div>
+                    </div>
+                    </div>
 
         <!-- Featured Products Section -->
         <div class="container-fluid py-5">
@@ -250,8 +250,8 @@
                                     <button class="btn btn-primary" type="button">
                                         <i class="fa fa-search"></i>
                                     </button>
-                                </div>
-                            </div>
+                    </div>
+                </div>
                             <div class="col-12">
                                 <div class="bg-light p-4 rounded">
                                     <h5 class="mb-3">Bộ lọc & Sắp xếp</h5>
@@ -288,7 +288,7 @@
                                             <option value="5">5 sao</option>
                                             <option value="4">4 sao trở lên</option>
                                             <option value="3">3 sao trở lên</option>
-                                        </select>
+                        </select>
                                     </div>
                                     
                                     <!-- Sort -->
@@ -300,7 +300,7 @@
                                             <option value="price-desc">Giá giảm dần</option>
                                             <option value="rating">Đánh giá cao</option>
                                             <option value="newest">Mới nhất</option>
-                                        </select>
+                        </select>
                                     </div>
                                     
                                     <button class="btn btn-primary w-100 mb-2" onclick="applyFilters()">
@@ -309,9 +309,9 @@
                                     <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
                                         <i class="fas fa-times me-1"></i> Xóa bộ lọc
                                     </button>
-                                </div>
-                            </div>
-                            
+                    </div>
+                </div>
+
                             <!-- AI Suggestions -->
                             <div class="col-12">
                                 <div class="bg-primary text-white p-4 rounded">
@@ -322,8 +322,8 @@
                                             <span class="badge bg-light text-dark me-1 mb-1">iPhone 15</span>
                                             <span class="badge bg-light text-dark me-1 mb-1">Laptop Gaming</span>
                                             <span class="badge bg-light text-dark me-1 mb-1">Tai nghe</span>
-                                        </div>
-                                    </div>
+                                </div>
+                            </div>
                                 </div>
                             </div>
                         </div>
@@ -408,12 +408,12 @@
                                         <div class="d-flex align-items-center justify-content-between mb-3">
                                             <div>
                                                 <span class="h5 text-primary mb-0">45,000,000₫</span>
-                                            </div>
-                                        </div>
+                                </div>
+                            </div>
                                         <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(2)">
                                             <i class="fas fa-eye me-1"></i> Chi tiết
                                         </button>
-                                    </div>
+                                </div>
                                 </div>
                             </div>
                             
@@ -479,16 +479,16 @@
                                         <div class="d-flex align-items-center justify-content-between mb-3">
                                             <div>
                                                 <span class="h5 text-primary mb-0">6,500,000₫</span>
-                                            </div>
-                                        </div>
+                                </div>
+                            </div>
                                         <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(4)">
                                             <i class="fas fa-eye me-1"></i> Chi tiết
                                         </button>
-                                    </div>
                                 </div>
                             </div>
                         </div>
-                        
+                    </div>
+
                         <!-- Load More Button -->
                         <div class="text-center mt-5">
                             <button class="btn btn-outline-primary px-5 py-3" onclick="loadMoreProducts()">
@@ -555,12 +555,12 @@
                                 <a href="#">Chính sách Cookie</a>
                                 <a href="#">Trợ giúp</a>
                                 <a href="#">Liên hệ</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
         <!-- Back to Top -->
         <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
@@ -789,7 +789,7 @@
                                 </button>
                             </div>
                         </div>
-                    </div>
+            </div>
                 `;
             }
             
