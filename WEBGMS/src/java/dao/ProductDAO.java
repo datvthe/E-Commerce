@@ -47,9 +47,9 @@ public class ProductDAO extends DBConnection {
                 product.setUpdated_at(rs.getTimestamp("updated_at"));
 
                 // Set category
-                if (rs.getInt("category_id") > 0) {
+                if (rs.getLong("category_id") > 0) {
                     ProductCategories category = new ProductCategories();
-                    category.setCategory_id(rs.getInt("category_id"));
+                    category.setCategory_id(rs.getLong("category_id"));
                     category.setName(rs.getString("category_name"));
                     category.setSlug(rs.getString("category_slug"));
                     product.setCategory_id(category);
@@ -106,9 +106,9 @@ public class ProductDAO extends DBConnection {
                 product.setUpdated_at(rs.getTimestamp("updated_at"));
 
                 // Set category
-                if (rs.getInt("category_id") > 0) {
+                if (rs.getLong("category_id") > 0) {
                     ProductCategories category = new ProductCategories();
-                    category.setCategory_id(rs.getInt("category_id"));
+                    category.setCategory_id(rs.getLong("category_id"));
                     category.setName(rs.getString("category_name"));
                     category.setSlug(rs.getString("category_slug"));
                     product.setCategory_id(category);
@@ -203,6 +203,50 @@ public class ProductDAO extends DBConnection {
             e.printStackTrace();
         }
         return products;
+    }
+
+    /**
+     * Check if there are any products in the database
+     */
+    public boolean hasProducts() {
+        String sql = "SELECT COUNT(*) as count FROM Products WHERE deleted_at IS NULL";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt("count");
+                System.out.println("Total products in database: " + count);
+                return count > 0;
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error checking products count: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Get total product count
+     */
+    public int getTotalProductCount() {
+        String sql = "SELECT COUNT(*) as count FROM Products WHERE deleted_at IS NULL";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("count");
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error getting product count: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
 
