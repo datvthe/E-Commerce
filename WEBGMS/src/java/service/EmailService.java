@@ -6,11 +6,11 @@ import javax.mail.internet.*;
 
 public class EmailService {
     
-    // Gmail SMTP configuration
-    private static final String SMTP_HOST = "smtp.gmail.com";
+    // FPT Email SMTP configuration
+    private static final String SMTP_HOST = "smtp.gmail.com"; // FPT sử dụng Gmail SMTP
     private static final String SMTP_PORT = "587";
-    private static final String EMAIL_USERNAME = "gicungco.marketplace@gmail.com";
-    private static final String EMAIL_PASSWORD = "wltf drfp blty wjje"; // App password for Gmail
+    private static final String EMAIL_USERNAME = "phinhhe181076@fpt.edu.vn";
+    private static final String EMAIL_PASSWORD = "qyer kmxy siti kwke"; // Cần App Password từ Gmail
     
     /**
      * Gửi email mã xác thực đặt lại mật khẩu
