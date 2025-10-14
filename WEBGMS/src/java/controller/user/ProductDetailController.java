@@ -85,8 +85,8 @@ public class ProductDetailController extends HttpServlet {
         int[] ratingDistribution = reviewDAO.getRatingDistribution(product.getProduct_id());
         
         // Get similar products
-        int categoryId = (product.getCategory_id() != null) ? product.getCategory_id().getCategory_id() : 0;
-        List<Products> similarProducts = productDAO.getSimilarProducts(product.getProduct_id(), categoryId, 6);
+        long categoryId = (product.getCategory_id() != null) ? product.getCategory_id().getCategory_id() : 0;
+        List<Products> similarProducts = productDAO.getSimilarProducts(product.getProduct_id(), (int) categoryId, 6);
         
         // Check if product is in user's wishlist
         HttpSession session = request.getSession();
@@ -97,6 +97,14 @@ public class ProductDetailController extends HttpServlet {
             isInWishlist = wishlistDAO.isInWishlist(currentUser.getUser_id(), product.getProduct_id());
         }
 
+        // Check if product is digital goods
+        boolean isDigitalGoods = product.getCategory_id() != null && 
+            (product.getCategory_id().getName().toLowerCase().contains("thẻ cào") ||
+             product.getCategory_id().getName().toLowerCase().contains("tài khoản") ||
+             product.getCategory_id().getName().toLowerCase().contains("phần mềm") ||
+             product.getCategory_id().getName().toLowerCase().contains("digital") ||
+             product.getCategory_id().getName().toLowerCase().contains("số"));
+
         // Set attributes
         request.setAttribute("product", product);
         request.setAttribute("images", images);
@@ -106,6 +114,7 @@ public class ProductDetailController extends HttpServlet {
         request.setAttribute("ratingDistribution", ratingDistribution);
         request.setAttribute("similarProducts", similarProducts);
         request.setAttribute("isInWishlist", isInWishlist);
+        request.setAttribute("isDigitalGoods", isDigitalGoods);
         request.setAttribute("reviewPage", reviewPage);
 
         // Forward to JSP

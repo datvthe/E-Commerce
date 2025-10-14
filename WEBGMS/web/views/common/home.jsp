@@ -105,24 +105,25 @@
         </div>
         <div class="container-fluid nav-bar p-0">
             <div class="row gx-0 bg-primary px-5 align-items-center">
-                <div class="col-lg-3 d-none d-lg-block">
-                    <nav class="navbar navbar-light position-relative" style="width: 250px;">
-                        <button class="navbar-toggler border-0 fs-4 w-100 px-0 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#allCat">
-                            <h4 class="m-0"><i class="fa fa-bars me-2"></i>Tất cả danh mục</h4>
-                        </button>
-                        <div class="collapse navbar-collapse rounded-bottom" id="allCat">
-                            <div class="navbar-nav ms-auto py-0">
-                                <ul class="list-unstyled categories-bars">
-                                    <li><div class="categories-bars-item"><a href="#">Phụ kiện</a><span>(3)</span></div></li>
-                                    <li><div class="categories-bars-item"><a href="#">Điện tử & Máy tính</a><span>(5)</span></div></li>
-                                    <li><div class="categories-bars-item"><a href="#">Laptop & Desktop</a><span>(2)</span></div></li>
-                                    <li><div class="categories-bars-item"><a href="#">Điện thoại & Máy tính bảng</a><span>(8)</span></div></li>
-                                    <li><div class="categories-bars-item"><a href="#">SmartPhone & Smart TV</a><span>(5)</span></div></li>
-                                </ul>
-                    </div>
-                </div>
-                    </nav>
-                </div>
+                            <div class="col-lg-3 d-none d-lg-block">
+                                <nav class="navbar navbar-light position-relative" style="width: 250px;">
+                                    <button class="navbar-toggler border-0 fs-4 w-100 px-0 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#allCat">
+                                        <h4 class="m-0"><i class="fa fa-bars me-2"></i>Tất cả danh mục</h4>
+                                    </button>
+                                    <div class="collapse navbar-collapse rounded-bottom" id="allCat">
+                                        <div class="navbar-nav ms-auto py-0">
+                                            <ul class="list-unstyled categories-bars">
+                                                <li><div class="categories-bars-item"><a href="#"><i class="fas fa-gift me-2"></i>Thẻ cào</a><span>(15)</span></div></li>
+                                                <li><div class="categories-bars-item"><a href="#"><i class="fas fa-user-circle me-2"></i>Tài khoản Game</a><span>(25)</span></div></li>
+                                                <li><div class="categories-bars-item"><a href="#"><i class="fas fa-download me-2"></i>Phần mềm</a><span>(12)</span></div></li>
+                                                <li><div class="categories-bars-item"><a href="#"><i class="fas fa-mobile-alt me-2"></i>App & Tools</a><span>(8)</span></div></li>
+                                                <li><div class="categories-bars-item"><a href="#"><i class="fas fa-file-code me-2"></i>Code & Script</a><span>(6)</span></div></li>
+                                                <li><div class="categories-bars-item"><a href="#"><i class="fas fa-music me-2"></i>Media & Content</a><span>(4)</span></div></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </nav>
+                            </div>
                 <div class="col-12 col-lg-9">
                     <nav class="navbar navbar-expand-lg navbar-light bg-primary ">
                         <a href="<%= request.getContextPath() %>/home" class="navbar-brand d-block d-lg-none">
@@ -206,9 +207,9 @@
                                 <a href="#" class="d-block text-white fs-3">Apple iPad Mini <br> G2356</a>
                                 <del class="me-2 text-white fs-5">$1,250.00</del>
                                 <span class="text-primary fs-5">$1,050.00</span>
-                            </div>
+                    </div>
                             <a href="#" class="btn btn-primary rounded-pill py-2 px-4"><i class="fas fa-shopping-cart me-2"></i> Add To Cart</a>
-                        </div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -234,8 +235,8 @@
                 <div class="col-6 col-md-4 col-lg-2 border-end wow fadeInUp" data-wow-delay="0.6s">
                     <div class="p-4"><div class="d-flex align-items-center"><i class="fas fa-blog fa-2x text-primary"></i><div class="ms-4"><h6 class="text-uppercase mb-2">Dịch vụ trực tuyến</h6><p class="mb-0">Đổi trả sản phẩm miễn phí trong 30 ngày</p></div></div></div>
                 </div>
-            </div>
-        </div>
+                    </div>
+                </div>
 
         <!-- Featured Products Section -->
         <div class="container-fluid py-5">
@@ -327,7 +328,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-lg-9">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h4 class="mb-0">Sản phẩm nổi bật</h4>
@@ -347,18 +348,18 @@
                             <div class="col-md-6 col-lg-4 col-xl-3">
                                 <div class="product-card h-100">
                                     <div class="position-relative">
-                                        <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-1.png" class="card-img-top" alt="iPhone 15 Pro">
+                                        <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-1.png" class="card-img-top" alt="Thẻ cào Viettel">
                                         <div class="position-absolute top-0 end-0 p-2">
                                             <button class="btn btn-sm btn-light rounded-circle">
                                                 <i class="fas fa-heart"></i>
                                             </button>
                                         </div>
                                         <div class="position-absolute top-0 start-0 p-2">
-                                            <span class="badge bg-danger">-15%</span>
+                                            <span class="badge bg-success">Digital</span>
                                         </div>
                                     </div>
                                     <div class="card-body d-flex flex-column">
-                                        <h6 class="card-title">iPhone 15 Pro Max 256GB</h6>
+                                        <h6 class="card-title">Thẻ cào Viettel 100K</h6>
                                         <div class="d-flex align-items-center mb-2">
                                             <div class="text-warning me-2">
                                                 <i class="fas fa-star"></i>
@@ -367,16 +368,16 @@
                                                 <i class="fas fa-star"></i>
                                                 <i class="fas fa-star"></i>
                                             </div>
-                                            <small class="text-muted">(128)</small>
+                                            <small class="text-muted">(89)</small>
                                         </div>
                                         <div class="d-flex align-items-center justify-content-between mb-3">
                                             <div>
-                                                <span class="h5 text-primary mb-0">28,500,000₫</span>
-                                                <small class="text-muted d-block"><del>33,500,000₫</del></small>
+                                                <span class="h5 text-primary mb-0">95,000₫</span>
+                                                <small class="text-success d-block"><i class="fas fa-bolt"></i> Giao tức thì</small>
                                             </div>
                                         </div>
-                                        <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(1)">
-                                            <i class="fas fa-eye me-1"></i> Chi tiết
+                                        <button class="btn btn-success w-100 mt-auto" onclick="viewProduct(1)">
+                                            <i class="fas fa-download me-1"></i> Mua ngay
                                         </button>
                                     </div>
                                 </div>
@@ -444,15 +445,15 @@
                                         <div class="d-flex align-items-center justify-content-between mb-3">
                                             <div>
                                                 <span class="h5 text-primary mb-0">32,000,000₫</span>
-                                            </div>
-                                        </div>
+                        </div>
+                    </div>
                                         <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(3)">
                                             <i class="fas fa-eye me-1"></i> Chi tiết
                                         </button>
-                                    </div>
-                                </div>
                             </div>
-                            
+                        </div>
+                    </div>
+
                             <div class="col-md-6 col-lg-4 col-xl-3">
                                 <div class="product-card h-100">
                                     <div class="position-relative">
@@ -494,10 +495,76 @@
                                 <i class="fas fa-plus me-2"></i> Xem thêm sản phẩm
                             </button>
                         </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+        <!-- Enhanced Footer -->
+        <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
+            <div class="container py-5">
+                <div class="row g-5">
+                    <div class="col-lg-3 col-md-6">
+                        <h5 class="text-white text-uppercase mb-4">Gicungco Marketplace</h5>
+                        <p class="mb-4">Nền tảng thương mại điện tử hàng đầu Việt Nam, kết nối người mua và người bán một cách an toàn và tiện lợi.</p>
+                        <div class="d-flex pt-2">
+                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-twitter"></i></a>
+                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-facebook-f"></i></a>
+                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-youtube"></i></a>
+                            <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <h5 class="text-white text-uppercase mb-4">Dịch vụ</h5>
+                        <div class="d-flex flex-column justify-content-start">
+                            <a class="text-white-50 mb-2" href="<%= request.getContextPath() %>/products"><i class="fa fa-angle-right me-2"></i>Danh mục sản phẩm</a>
+                            <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Khuyến mãi</a>
+                            <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Hỗ trợ khách hàng</a>
+                            <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Chương trình thành viên</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <h5 class="text-white text-uppercase mb-4">Hỗ trợ & FAQ</h5>
+                        <div class="d-flex flex-column justify-content-start">
+                            <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Trung tâm trợ giúp</a>
+                            <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Câu hỏi thường gặp</a>
+                            <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Hướng dẫn mua hàng</a>
+                            <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Chính sách đổi trả</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <h5 class="text-white text-uppercase mb-4">Chính sách</h5>
+                        <div class="d-flex flex-column justify-content-start">
+                            <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Chính sách bảo mật</a>
+                            <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Điều khoản sử dụng</a>
+                            <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Chính sách vận chuyển</a>
+                            <a class="text-white-50 mb-2" href="#"><i class="fa fa-angle-right me-2"></i>Chính sách thanh toán</a>
+                        </div>
+                    </div>
+                                </div>
+                            </div>
+            <div class="container">
+                <div class="copyright">
+                    <div class="row">
+                        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                            &copy; <a class="border-bottom" href="#">Gicungco Marketplace</a>, Tất cả quyền được bảo lưu.
+                                </div>
+                        <div class="col-md-6 text-center text-md-end">
+                            <div class="footer-menu">
+                                <a href="<%= request.getContextPath() %>/home">Trang chủ</a>
+                                <a href="#">Chính sách Cookie</a>
+                                <a href="#">Trợ giúp</a>
+                                <a href="#">Liên hệ</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script src="<%= request.getContextPath() %>/views/assets/electro/lib/wow/wow.min.js"></script>
@@ -583,14 +650,12 @@
                 const toastId = 'toast-' + Date.now();
                 const bgClass = type === 'success' ? 'bg-success' : 'bg-danger';
                 
-                const toastHtml = `
-                    <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
-                        <div class="d-flex">
-                            <div class="toast-body">${message}</div>
-                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                        </div>
-                    </div>
-                `;
+                const toastHtml = '<div id="' + toastId + '" class="toast align-items-center text-white ' + bgClass + ' border-0" role="alert" aria-live="assertive" aria-atomic="true">' +
+                    '<div class="d-flex">' +
+                        '<div class="toast-body">' + message + '</div>' +
+                        '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>' +
+                    '</div>' +
+                '</div>';
                 
                 toastContainer.innerHTML = toastHtml;
                 
@@ -604,6 +669,156 @@
                     toastContainer.remove();
                 });
             }
+        </script>
+
+        <!-- Enhanced Buyer Homepage JavaScript -->
+        <script>
+            // Search with AI autocomplete
+            let searchTimeout;
+            document.getElementById('searchInput').addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const query = this.value;
+                
+                if (query.length >= 2) {
+                    searchTimeout = setTimeout(() => {
+                        showSearchSuggestions(query);
+                    }, 300);
+                } else {
+                    hideSearchSuggestions();
+                }
+            });
+            
+            function showSearchSuggestions(query) {
+                const suggestions = [
+                    'iPhone 15 Pro Max',
+                    'MacBook Pro M3',
+                    'Samsung Galaxy S24',
+                    'AirPods Pro',
+                    'iPad Air',
+                    'Apple Watch'
+                ].filter(item => item.toLowerCase().includes(query.toLowerCase()));
+                
+                const aiSuggestions = document.getElementById('aiSuggestions');
+                if (suggestions.length > 0) {
+                    let suggestionsHtml = '<p class="small mb-2">Gợi ý cho "' + query + '":</p>';
+                    suggestionsHtml += '<div class="d-flex flex-wrap gap-1">';
+                    suggestions.forEach(function(suggestion) {
+                        suggestionsHtml += '<span class="badge bg-light text-dark me-1 mb-1" onclick="searchProduct(\'' + suggestion + '\')">' + suggestion + '</span>';
+                    });
+                    suggestionsHtml += '</div>';
+                    aiSuggestions.innerHTML = suggestionsHtml;
+                }
+            }
+            
+            function hideSearchSuggestions() {
+                const aiSuggestions = document.getElementById('aiSuggestions');
+                aiSuggestions.innerHTML = '<p class="small mb-2">Dựa trên lịch sử tìm kiếm của bạn:</p>' +
+                    '<div class="d-flex flex-wrap gap-1">' +
+                        '<span class="badge bg-light text-dark me-1 mb-1">iPhone 15</span>' +
+                        '<span class="badge bg-light text-dark me-1 mb-1">Laptop Gaming</span>' +
+                        '<span class="badge bg-light text-dark me-1 mb-1">Tai nghe</span>' +
+                    '</div>';
+            }
+            
+            function searchProduct(query) {
+                document.getElementById('searchInput').value = query;
+                applyFilters();
+            }
+            
+            // Filter and Sort Functions
+            function applyFilters() {
+                const category = document.getElementById('categoryFilter').value;
+                const price = document.getElementById('priceFilter').value;
+                const rating = document.getElementById('ratingFilter').value;
+                const sort = document.getElementById('sortFilter').value;
+                const search = document.getElementById('searchInput').value;
+                
+                const productGrid = document.getElementById('productGrid');
+                productGrid.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"><span class="sr-only">Đang tải...</span></div></div>';
+                
+                setTimeout(() => {
+                    loadFilteredProducts(category, price, rating, sort, search);
+                }, 1000);
+            }
+            
+            function clearFilters() {
+                document.getElementById('categoryFilter').value = '';
+                document.getElementById('priceFilter').value = '';
+                document.getElementById('ratingFilter').value = '';
+                document.getElementById('sortFilter').value = '';
+                document.getElementById('searchInput').value = '';
+                applyFilters();
+            }
+            
+            function loadFilteredProducts(category, price, rating, sort, search) {
+                const productGrid = document.getElementById('productGrid');
+                productGrid.innerHTML = `
+                    <div class="col-md-6 col-lg-4 col-xl-3">
+                        <div class="product-card h-100">
+                            <div class="position-relative">
+                                <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-1.png" class="card-img-top" alt="iPhone 15 Pro">
+                                <div class="position-absolute top-0 end-0 p-2">
+                                    <button class="btn btn-sm btn-light rounded-circle">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                </div>
+                                <div class="position-absolute top-0 start-0 p-2">
+                                    <span class="badge bg-danger">-15%</span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h6 class="card-title">iPhone 15 Pro Max 256GB</h6>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="text-warning me-2">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <small class="text-muted">(128)</small>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <div>
+                                        <span class="h5 text-primary mb-0">28,500,000₫</span>
+                                        <small class="text-muted d-block"><del>33,500,000₫</del></small>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(1)">
+                                    <i class="fas fa-eye me-1"></i> Chi tiết
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            function viewMode(mode) {
+                const productGrid = document.getElementById('productGrid');
+                if (mode === 'list') {
+                    productGrid.className = 'row g-4 list-view';
+                } else {
+                    productGrid.className = 'row g-4';
+                }
+            }
+            
+            function viewProduct(productId) {
+                window.location.href = '<%= request.getContextPath() %>/product/' + productId;
+            }
+            
+            function loadMoreProducts() {
+                const loadMoreBtn = event.target;
+                loadMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Đang tải...';
+                
+                setTimeout(() => {
+                    loadMoreBtn.innerHTML = '<i class="fas fa-plus me-2"></i> Xem thêm sản phẩm';
+                }, 2000);
+            }
+            
+            // Initialize page
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('Gicungco Marketplace - Buyer Homepage Loaded');
+            });
         </script>
     </body>
 </html>
