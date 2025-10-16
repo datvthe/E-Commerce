@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Random;
+import util.PasswordUtil;
 
 public class PasswordResetDAO extends DBConnection {
 
@@ -188,12 +189,13 @@ public class PasswordResetDAO extends DBConnection {
      * Update user password
      */
     public boolean updateUserPassword(String email, String newPassword) {
-        String sql = "UPDATE Users SET password = ?, updated_at = NOW() WHERE email = ?";
+        String hashedPassword = PasswordUtil.hashPassword(newPassword);
+        String sql = "UPDATE Users SET password_hash = ?, updated_at = NOW() WHERE email = ?";
         
         try (Connection conn = DBConnection.getConnection(); 
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
-            ps.setString(1, newPassword);
+            ps.setString(1, hashedPassword);
             ps.setString(2, email);
             int affected = ps.executeUpdate();
             return affected > 0;

@@ -1162,4 +1162,250 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-09-20 11:00:29
-create Database gicungco;
+
+-- ========================================
+-- ADDITIONAL TABLES FOR DIGITAL GOODS MARKETPLACE
+-- ========================================
+
+-- Create Digital_Goods_Codes table for storing digital codes/accounts
+CREATE TABLE IF NOT EXISTS `digital_goods_codes` (
+    `code_id` INT NOT NULL AUTO_INCREMENT,
+    `product_id` BIGINT NOT NULL,
+    `code_value` TEXT NOT NULL,
+    `code_type` ENUM('serial', 'account', 'license', 'gift_card', 'file_url') NOT NULL,
+    `is_used` BOOLEAN DEFAULT FALSE,
+    `used_by` BIGINT DEFAULT NULL,
+    `used_at` TIMESTAMP NULL,
+    `expires_at` TIMESTAMP NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`code_id`),
+    KEY `product_id` (`product_id`),
+    KEY `is_used` (`is_used`),
+    KEY `used_by` (`used_by`),
+    CONSTRAINT `digital_goods_codes_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE,
+    CONSTRAINT `digital_goods_codes_ibfk_2` FOREIGN KEY (`used_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Create Digital_Goods_Files table for downloadable files
+CREATE TABLE IF NOT EXISTS `digital_goods_files` (
+    `file_id` INT NOT NULL AUTO_INCREMENT,
+    `product_id` BIGINT NOT NULL,
+    `file_name` VARCHAR(255) NOT NULL,
+    `file_path` VARCHAR(500) NOT NULL,
+    `file_size` BIGINT DEFAULT NULL,
+    `file_type` VARCHAR(100) DEFAULT NULL,
+    `download_count` INT DEFAULT 0,
+    `max_downloads` INT DEFAULT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`file_id`),
+    KEY `product_id` (`product_id`),
+    CONSTRAINT `digital_goods_files_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Create Wishlist table
+CREATE TABLE IF NOT EXISTS `wishlist` (
+    `wishlist_id` INT NOT NULL AUTO_INCREMENT,
+    `user_id` BIGINT NOT NULL,
+    `product_id` BIGINT NOT NULL,
+    `added_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`wishlist_id`),
+    UNIQUE KEY `user_product` (`user_id`, `product_id`),
+    KEY `user_id` (`user_id`),
+    KEY `product_id` (`product_id`),
+    CONSTRAINT `wishlist_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+    CONSTRAINT `wishlist_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Create Password_Reset_Tokens table
+CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
+    `token_id` INT NOT NULL AUTO_INCREMENT,
+    `user_id` BIGINT NOT NULL,
+    `token` VARCHAR(255) NOT NULL,
+    `expires_at` TIMESTAMP NOT NULL,
+    `is_used` BOOLEAN DEFAULT FALSE,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`token_id`),
+    KEY `user_id` (`user_id`),
+    KEY `token` (`token`),
+    CONSTRAINT `password_reset_tokens_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Update products table to add digital goods fields
+-- Check if columns exist before adding them
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+     WHERE TABLE_SCHEMA = DATABASE() 
+     AND TABLE_NAME = 'products' 
+     AND COLUMN_NAME = 'is_digital') = 0,
+    'ALTER TABLE `products` ADD COLUMN `is_digital` BOOLEAN DEFAULT TRUE AFTER `currency`',
+    'SELECT "Column is_digital already exists"'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+     WHERE TABLE_SCHEMA = DATABASE() 
+     AND TABLE_NAME = 'products' 
+     AND COLUMN_NAME = 'delivery_type') = 0,
+    'ALTER TABLE `products` ADD COLUMN `delivery_type` ENUM(''instant'', ''manual'', ''email'') DEFAULT ''instant'' AFTER `is_digital`',
+    'SELECT "Column delivery_type already exists"'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+     WHERE TABLE_SCHEMA = DATABASE() 
+     AND TABLE_NAME = 'products' 
+     AND COLUMN_NAME = 'delivery_time') = 0,
+    'ALTER TABLE `products` ADD COLUMN `delivery_time` VARCHAR(50) DEFAULT ''Tức thì'' AFTER `delivery_type`',
+    'SELECT "Column delivery_time already exists"'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+     WHERE TABLE_SCHEMA = DATABASE() 
+     AND TABLE_NAME = 'products' 
+     AND COLUMN_NAME = 'warranty_days') = 0,
+    'ALTER TABLE `products` ADD COLUMN `warranty_days` INT DEFAULT 7 AFTER `delivery_time`',
+    'SELECT "Column warranty_days already exists"'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Insert sample digital goods products
+INSERT INTO `products` (`seller_id`, `name`, `slug`, `description`, `price`, `currency`, `is_digital`, `delivery_type`, `delivery_time`, `warranty_days`, `status`, `average_rating`, `total_reviews`, `created_at`, `updated_at`) VALUES
+(2, 'Thẻ cào Viettel 100K', 'the-cao-viettel-100k', 'Thẻ cào Viettel mệnh giá 100,000 VNĐ. Giao ngay sau khi thanh toán.', 95000, 'VND', TRUE, 'instant', 'Tức thì', 7, 'active', 4.8, 156, NOW(), NOW()),
+(2, 'Tài khoản PUBG Mobile VIP', 'tai-khoan-pubg-mobile-vip', 'Tài khoản PUBG Mobile cấp VIP với skin hiếm và vũ khí mạnh. Đảm bảo 100% chính chủ.', 250000, 'VND', TRUE, 'instant', 'Tức thì', 7, 'active', 4.5, 89, NOW(), NOW()),
+(2, 'Adobe Photoshop 2024 Full', 'adobe-photoshop-2024-full', 'Phần mềm Adobe Photoshop 2024 bản full với license vĩnh viễn. Hỗ trợ cài đặt 24/7.', 1500000, 'VND', TRUE, 'instant', 'Tức thì', 30, 'active', 4.9, 234, NOW(), NOW()),
+(2, 'Premium App Bundle', 'premium-app-bundle', 'Gói ứng dụng premium bao gồm: Spotify, Netflix, YouTube Premium, Canva Pro. Thời hạn 1 tháng.', 500000, 'VND', TRUE, 'instant', 'Tức thì', 7, 'active', 4.6, 78, NOW(), NOW()),
+(2, 'Thẻ cào VinaPhone 200K', 'the-cao-vinaphone-200k', 'Thẻ cào VinaPhone mệnh giá 200,000 VNĐ. Tích điểm và nhận ưu đãi.', 195000, 'VND', TRUE, 'instant', 'Tức thì', 7, 'active', 4.7, 123, NOW(), NOW()),
+(2, 'Tài khoản Genshin Impact', 'tai-khoan-genshin-impact', 'Tài khoản Genshin Impact cấp cao với nhân vật 5 sao và vũ khí mạnh. Server Asia.', 800000, 'VND', TRUE, 'instant', 'Tức thì', 7, 'active', 4.4, 67, NOW(), NOW()),
+(2, 'Microsoft Office 2024', 'microsoft-office-2024', 'Bộ Microsoft Office 2024 full bao gồm Word, Excel, PowerPoint, Outlook. License vĩnh viễn.', 2000000, 'VND', TRUE, 'instant', 'Tức thì', 30, 'active', 4.8, 145, NOW(), NOW()),
+(2, 'Template Website Responsive', 'template-website-responsive', 'Bộ template website responsive HTML/CSS/JS. Bao gồm 10 mẫu đẹp và code sạch.', 300000, 'VND', TRUE, 'instant', 'Tức thì', 7, 'active', 4.6, 45, NOW(), NOW());
+
+-- Insert sample digital codes
+INSERT INTO `digital_goods_codes` (`product_id`, `code_value`, `code_type`, `is_used`) VALUES
+-- Viettel 100K cards
+(1, 'VT100K001234567890', 'gift_card', FALSE),
+(1, 'VT100K001234567891', 'gift_card', FALSE),
+(1, 'VT100K001234567892', 'gift_card', FALSE),
+(1, 'VT100K001234567893', 'gift_card', FALSE),
+(1, 'VT100K001234567894', 'gift_card', FALSE),
+-- PUBG Mobile accounts
+(2, 'PUBG_ACCOUNT_001:Username:Player123|Password:Pass456|Level:50|Skins:RoyalPass', 'account', FALSE),
+(2, 'PUBG_ACCOUNT_002:Username:ProGamer|Password:Game789|Level:45|Skins:ElitePass', 'account', FALSE),
+(2, 'PUBG_ACCOUNT_003:Username:Winner2024|Password:Win123|Level:60|Skins:Premium', 'account', FALSE),
+-- Adobe Photoshop licenses
+(3, 'ADOBE_PS_2024_001:Serial:1234-5678-9012-3456|Activation:Online', 'license', FALSE),
+(3, 'ADOBE_PS_2024_002:Serial:2345-6789-0123-4567|Activation:Online', 'license', FALSE),
+(3, 'ADOBE_PS_2024_003:Serial:3456-7890-1234-5678|Activation:Online', 'license', FALSE),
+-- App Bundle accounts
+(4, 'APP_BUNDLE_001:Spotify:user1@email.com|Netflix:user1@email.com|YouTube:user1@email.com|Canva:user1@email.com', 'account', FALSE),
+(4, 'APP_BUNDLE_002:Spotify:user2@email.com|Netflix:user2@email.com|YouTube:user2@email.com|Canva:user2@email.com', 'account', FALSE),
+-- VinaPhone 200K cards
+(5, 'VP200K001234567890', 'gift_card', FALSE),
+(5, 'VP200K001234567891', 'gift_card', FALSE),
+(5, 'VP200K001234567892', 'gift_card', FALSE),
+-- Genshin Impact accounts
+(6, 'GENSHIN_ACCOUNT_001:Username:GenshinPlayer|Password:Gen123|AR:55|Characters:5Star|Weapons:Legendary', 'account', FALSE),
+(6, 'GENSHIN_ACCOUNT_002:Username:AnemoMaster|Password:Wind456|AR:50|Characters:5Star|Weapons:Epic', 'account', FALSE),
+-- Microsoft Office licenses
+(7, 'MS_OFFICE_2024_001:ProductKey:XXXXX-XXXXX-XXXXX-XXXXX-XXXXX|Activation:Online', 'license', FALSE),
+(7, 'MS_OFFICE_2024_002:ProductKey:YYYYY-YYYYY-YYYYY-YYYYY-YYYYY|Activation:Online', 'license', FALSE),
+-- Template files
+(8, 'https://download.example.com/template-bundle-001.zip', 'file_url', FALSE),
+(8, 'https://download.example.com/template-bundle-002.zip', 'file_url', FALSE);
+
+-- Create indexes for better performance
+-- Check if indexes exist before creating them
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS 
+     WHERE TABLE_SCHEMA = DATABASE() 
+     AND TABLE_NAME = 'products' 
+     AND INDEX_NAME = 'idx_products_digital') = 0,
+    'CREATE INDEX `idx_products_digital` ON `products` (`is_digital`)',
+    'SELECT "Index idx_products_digital already exists"'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS 
+     WHERE TABLE_SCHEMA = DATABASE() 
+     AND TABLE_NAME = 'products' 
+     AND INDEX_NAME = 'idx_products_delivery') = 0,
+    'CREATE INDEX `idx_products_delivery` ON `products` (`delivery_type`)',
+    'SELECT "Index idx_products_delivery already exists"'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS 
+     WHERE TABLE_SCHEMA = DATABASE() 
+     AND TABLE_NAME = 'wishlist' 
+     AND INDEX_NAME = 'idx_wishlist_user') = 0,
+    'CREATE INDEX `idx_wishlist_user` ON `wishlist` (`user_id`)',
+    'SELECT "Index idx_wishlist_user already exists"'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS 
+     WHERE TABLE_SCHEMA = DATABASE() 
+     AND TABLE_NAME = 'digital_goods_codes' 
+     AND INDEX_NAME = 'idx_digital_codes_product') = 0,
+    'CREATE INDEX `idx_digital_codes_product` ON `digital_goods_codes` (`product_id`)',
+    'SELECT "Index idx_digital_codes_product already exists"'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS 
+     WHERE TABLE_SCHEMA = DATABASE() 
+     AND TABLE_NAME = 'digital_goods_codes' 
+     AND INDEX_NAME = 'idx_digital_codes_used') = 0,
+    'CREATE INDEX `idx_digital_codes_used` ON `digital_goods_codes` (`is_used`)',
+    'SELECT "Index idx_digital_codes_used already exists"'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS 
+     WHERE TABLE_SCHEMA = DATABASE() 
+     AND TABLE_NAME = 'digital_goods_files' 
+     AND INDEX_NAME = 'idx_digital_files_product') = 0,
+    'CREATE INDEX `idx_digital_files_product` ON `digital_goods_files` (`product_id`)',
+    'SELECT "Index idx_digital_files_product already exists"'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- ========================================
+-- DIGITAL GOODS MARKETPLACE ADDITIONS COMPLETE!
+-- ========================================
+-- Added features:
+-- ✅ Digital codes management  
+-- ✅ File downloads
+-- ✅ User wishlist
+-- ✅ Password reset functionality
+-- ✅ Digital delivery system
+-- ✅ Sample digital products and codes

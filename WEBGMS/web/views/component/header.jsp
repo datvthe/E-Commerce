@@ -70,7 +70,18 @@
                         <span class="text-muted mx-2"><small>Tiếng Việt</small></span>
                         <c:choose>
                             <c:when test="${not empty sessionScope.user}">
-                                <button onclick="logout()" class="btn btn-outline-danger btn-sm px-3"><i class="bi bi-box-arrow-right me-1"></i>Đăng xuất</button>
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-primary btn-sm px-3 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-person me-1"></i>${sessionScope.user.full_name}
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="<%= request.getContextPath() %>/profile"><i class="fas fa-user me-2"></i>Hồ sơ cá nhân</a></li>
+                                        <li><a class="dropdown-item" href="<%= request.getContextPath() %>/orders"><i class="fas fa-shopping-bag me-2"></i>Đơn hàng</a></li>
+                                        <li><a class="dropdown-item" href="<%= request.getContextPath() %>/wishlist"><i class="fas fa-heart me-2"></i>Yêu thích</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                                    </ul>
+                                </div>
                             </c:when>
                             <c:otherwise>
                                 <a href="<%= request.getContextPath() %>/login?force=1" class="btn btn-outline-primary btn-sm px-3"><i class="bi bi-person me-1"></i>Đăng nhập / Đăng ký</a>
@@ -186,7 +197,18 @@
                                 
                                 <c:choose>
                                     <c:when test="${not empty sessionScope.user}">
-                                        <button onclick="logout()" class="nav-item nav-link me-2 btn btn-link p-0" style="border: none; background: none;">Đăng xuất</button>
+                                        <div class="nav-item dropdown">
+                                            <a href="#" class="nav-link dropdown-toggle me-2" data-bs-toggle="dropdown">
+                                                <i class="fas fa-user me-1"></i>${sessionScope.user.full_name}
+                                            </a>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="<%= request.getContextPath() %>/profile"><i class="fas fa-user me-2"></i>Hồ sơ cá nhân</a>
+                                                <a class="dropdown-item" href="<%= request.getContextPath() %>/orders"><i class="fas fa-shopping-bag me-2"></i>Đơn hàng</a>
+                                                <a class="dropdown-item" href="<%= request.getContextPath() %>/wishlist"><i class="fas fa-heart me-2"></i>Yêu thích</a>
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a>
+                                            </div>
+                                        </div>
                                     </c:when>
                                     <c:otherwise>
                                         <a href="<%= request.getContextPath() %>/login?force=1" class="nav-item nav-link me-2">Đăng nhập / Đăng ký</a>
