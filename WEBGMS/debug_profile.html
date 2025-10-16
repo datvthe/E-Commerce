@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Profile - Gicungco</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .warning { background: #fff3cd; border-color: #ffeaa7; }
+        .test-link { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 5px; }
+        .test-link:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Debug Profile System</h1>
+    
+    <div class="debug-section success">
+        <h3>✅ Files Created</h3>
+        <ul>
+            <li><strong>ProfileController.java</strong> - Fixed imports (javax instead of jakarta)</li>
+            <li><strong>UpdateProfileController.java</strong> - Fixed imports</li>
+            <li><strong>ChangePasswordController.java</strong> - Fixed imports</li>
+            <li><strong>profile-simple.jsp</strong> - Simplified profile page</li>
+            <li><strong>UsersDAO.java</strong> - Added updateUser() and updatePassword() methods</li>
+        </ul>
+    </div>
+    
+    <div class="debug-section warning">
+        <h3>⚠️ Common Issues Fixed</h3>
+        <ul>
+            <li><strong>Import Issues:</strong> Changed jakarta to javax for compatibility</li>
+            <li><strong>JSTL Issues:</strong> Changed jakarta.tags.core to java.sun.com/jsp/jstl/core</li>
+            <li><strong>Type Issues:</strong> Fixed int comparison instead of equals()</li>
+            <li><strong>Session Issues:</strong> Added request.setAttribute("user", user)</li>
+            <li><strong>JSP Issues:</strong> Simplified profile page to avoid complex template</li>
+        </ul>
+    </div>
+    
+    <div class="debug-section">
+        <h3>🧪 Test Steps</h3>
+        <ol>
+            <li><strong>Login First:</strong> <a href="http://localhost:9999/WEBGMS/login" class="test-link">Login</a></li>
+            <li><strong>Test Profile:</strong> <a href="http://localhost:9999/WEBGMS/profile" class="test-link">Profile Page</a></li>
+            <li><strong>Check Console:</strong> Open browser console for errors</li>
+            <li><strong>Check Server Logs:</strong> Check Tomcat logs for errors</li>
+        </ol>
+    </div>
+    
+    <div class="debug-section">
+        <h3>🔍 Debug Information</h3>
+        <p><strong>Profile URL:</strong> <code>http://localhost:9999/WEBGMS/profile</code></p>
+        <p><strong>Update URL:</strong> <code>http://localhost:9999/WEBGMS/update-profile</code></p>
+        <p><strong>Change Password URL:</strong> <code>http://localhost:9999/WEBGMS/change-password</code></p>
+        <p><strong>JSP File:</strong> <code>/views/common/profile-simple.jsp</code></p>
+    </div>
+    
+    <div class="debug-section error">
+        <h3>❌ If Still Loading Forever</h3>
+        <p>Possible causes:</p>
+        <ul>
+            <li><strong>Session Issue:</strong> User not logged in or session expired</li>
+            <li><strong>Database Issue:</strong> Connection problem</li>
+            <li><strong>JSP Compilation:</strong> JSP compilation error</li>
+            <li><strong>Missing Dependencies:</strong> JSTL libraries missing</li>
+            <li><strong>Server Issue:</strong> Tomcat server problem</li>
+        </ul>
+    </div>
+    
+    <div class="debug-section">
+        <h3>🛠️ Quick Fixes</h3>
+        <ol>
+            <li><strong>Restart Tomcat:</strong> Stop and start Tomcat server</li>
+            <li><strong>Clear Browser Cache:</strong> Clear browser cache and cookies</li>
+            <li><strong>Check JSTL:</strong> Ensure JSTL libraries are in WEB-INF/lib</li>
+            <li><strong>Check Database:</strong> Ensure database connection is working</li>
+            <li><strong>Check Logs:</strong> Check Tomcat logs for specific errors</li>
+        </ol>
+    </div>
+    
+    <div class="debug-section success">
+        <h3>✅ Expected Behavior</h3>
+        <ul>
+            <li>Profile page should load within 2-3 seconds</li>
+            <li>User information should display correctly</li>
+            <li>Form should be pre-filled with user data</li>
+            <li>Navigation should work properly</li>
+            <li>No JavaScript errors in console</li>
+        </ul>
+    </div>
+</body>
+</html>

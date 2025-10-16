@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Profile - Gicungco</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-title {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        .test-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .test-link:hover {
+            background: #0056b3;
+        }
+        .success {
+            background: #28a745;
+        }
+        .warning {
+            background: #ffc107;
+            color: #333;
+        }
+        .info {
+            background: #17a2b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test Profile System - Gicungco</h1>
+        
+        <div class="test-section">
+            <h3 class="test-title">📋 Profile Features Test</h3>
+            <p>Test các chức năng profile đã được tạo:</p>
+            
+            <a href="http://localhost:9999/WEBGMS/profile" class="test-link success">
+                👤 Xem Profile Page
+            </a>
+            
+            <a href="http://localhost:9999/WEBGMS/login" class="test-link warning">
+                🔐 Login trước khi test
+            </a>
+            
+            <a href="http://localhost:9999/WEBGMS/register" class="test-link info">
+                📝 Register tài khoản mới
+            </a>
+        </div>
+        
+        <div class="test-section">
+            <h3 class="test-title">🔧 Profile Controllers</h3>
+            <p>Các controller đã được tạo:</p>
+            <ul>
+                <li><strong>ProfileController</strong> - Hiển thị trang profile</li>
+                <li><strong>UpdateProfileController</strong> - Cập nhật thông tin cá nhân</li>
+                <li><strong>ChangePasswordController</strong> - Đổi mật khẩu</li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h3 class="test-title">📊 Profile Features</h3>
+            <p>Các tính năng profile đã implement:</p>
+            <ul>
+                <li>✅ <strong>Thông tin cá nhân</strong> - Xem và chỉnh sửa</li>
+                <li>✅ <strong>Đổi mật khẩu</strong> - Bảo mật tài khoản</li>
+                <li>✅ <strong>Thống kê</strong> - Đơn hàng, yêu thích, đánh giá</li>
+                <li>✅ <strong>Navigation</strong> - Dropdown menu cho user</li>
+                <li>✅ <strong>Responsive Design</strong> - Tương thích mobile</li>
+                <li>✅ <strong>Vietnamese UI</strong> - Giao diện tiếng Việt</li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h3 class="test-title">🎨 UI Components</h3>
+            <p>Giao diện profile sử dụng Electro template:</p>
+            <ul>
+                <li>📱 <strong>Profile Header</strong> - Avatar và thông tin cơ bản</li>
+                <li>📊 <strong>Stats Cards</strong> - Thống kê người dùng</li>
+                <li>📝 <strong>Tab Interface</strong> - Thông tin, Bảo mật, Đơn hàng</li>
+                <li>🎨 <strong>Modern Design</strong> - Gradient colors và animations</li>
+                <li>📱 <strong>Mobile Responsive</strong> - Tối ưu cho mobile</li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h3 class="test-title">🔗 Navigation Integration</h3>
+            <p>Profile đã được tích hợp vào navigation:</p>
+            <ul>
+                <li>🔝 <strong>Top Bar</strong> - Dropdown menu với tên user</li>
+                <li>🧭 <strong>Main Nav</strong> - Dropdown menu trong navbar</li>
+                <li>📱 <strong>Mobile Menu</strong> - Responsive cho mobile</li>
+                <li>🎯 <strong>Quick Access</strong> - Truy cập nhanh profile</li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h3 class="test-title">🚀 How to Test</h3>
+            <ol>
+                <li><strong>Login</strong> - Đăng nhập với tài khoản có sẵn</li>
+                <li><strong>Access Profile</strong> - Click vào tên user trong navigation</li>
+                <li><strong>Edit Info</strong> - Chỉnh sửa thông tin cá nhân</li>
+                <li><strong>Change Password</strong> - Đổi mật khẩu</li>
+                <li><strong>View Stats</strong> - Xem thống kê (sẽ hiển thị 0 vì chưa có data)</li>
+                <li><strong>Test Responsive</strong> - Test trên mobile/tablet</li>
+            </ol>
+        </div>
+        
+        <div class="test-section">
+            <h3 class="test-title">📝 Notes</h3>
+            <p><strong>Lưu ý:</strong></p>
+            <ul>
+                <li>Profile chỉ hiển thị khi user đã đăng nhập</li>
+                <li>Nếu chưa đăng nhập sẽ redirect về trang login</li>
+                <li>Thống kê hiện tại hiển thị 0 vì chưa có data thực tế</li>
+                <li>Form validation được thực hiện ở cả client và server</li>
+                <li>Password được hash bằng SHA-256 trước khi lưu</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
