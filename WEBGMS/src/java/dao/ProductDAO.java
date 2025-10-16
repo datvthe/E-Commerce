@@ -26,8 +26,7 @@ public class ProductDAO extends DBConnection {
                 + "LEFT JOIN Users u ON p.seller_id = u.user_id "
                 + "WHERE p.product_id = ? AND p.deleted_at IS NULL";
 
-        try (Connection conn = DBConnection.getConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, productId);
             ResultSet rs = ps.executeQuery();
@@ -85,8 +84,7 @@ public class ProductDAO extends DBConnection {
                 + "LEFT JOIN Users u ON p.seller_id = u.user_id "
                 + "WHERE p.slug = ? AND p.deleted_at IS NULL";
 
-        try (Connection conn = DBConnection.getConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, slug);
             ResultSet rs = ps.executeQuery();
@@ -142,8 +140,7 @@ public class ProductDAO extends DBConnection {
                 + "ORDER BY p.average_rating DESC, p.created_at DESC "
                 + "LIMIT ?";
 
-        try (Connection conn = DBConnection.getConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, categoryId);
             ps.setLong(2, productId);
@@ -174,14 +171,13 @@ public class ProductDAO extends DBConnection {
     public List<Products> getAllProducts(int page, int pageSize) {
         List<Products> products = new ArrayList<>();
         int offset = (page - 1) * pageSize;
-        
+
         String sql = "SELECT * FROM Products "
                 + "WHERE status = 'active' AND deleted_at IS NULL "
                 + "ORDER BY created_at DESC "
                 + "LIMIT ? OFFSET ?";
 
-        try (Connection conn = DBConnection.getConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, pageSize);
             ps.setInt(2, offset);
@@ -210,17 +206,16 @@ public class ProductDAO extends DBConnection {
      */
     public boolean hasProducts() {
         String sql = "SELECT COUNT(*) as count FROM Products WHERE deleted_at IS NULL";
-        
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 int count = rs.getInt("count");
                 System.out.println("Total products in database: " + count);
                 return count > 0;
             }
-            
+
         } catch (Exception e) {
             System.err.println("Error checking products count: " + e.getMessage());
             e.printStackTrace();
@@ -228,20 +223,33 @@ public class ProductDAO extends DBConnection {
         return false;
     }
 
+    public int countBySeller(int sellerId) {
+        String sql = "SELECT COUNT(*) FROM Products WHERE seller_id = ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, sellerId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     /**
      * Get total product count
      */
     public int getTotalProductCount() {
         String sql = "SELECT COUNT(*) as count FROM Products WHERE deleted_at IS NULL";
-        
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt("count");
             }
-            
+
         } catch (Exception e) {
             System.err.println("Error getting product count: " + e.getMessage());
             e.printStackTrace();
@@ -249,4 +257,3 @@ public class ProductDAO extends DBConnection {
         return 0;
     }
 }
-
