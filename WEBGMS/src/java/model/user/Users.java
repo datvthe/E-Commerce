@@ -12,6 +12,9 @@ public class Users {
     private String full_name;
     private String email;
     private String password;
+    private String google_id;
+    private String auth_provider;
+    private String default_role;
     private String phone_number;
     private String gender;          // male, female, other
     private Date date_of_birth;
@@ -27,11 +30,14 @@ public class Users {
     public Users() {
     }
 
-    public Users(int user_id, String full_name, String email, String password, String phone_number, String gender, Date date_of_birth, String address, String avatar_url, String status, boolean email_verified, Date last_login_at, Date created_at, Date updated_at, Date deleted_at) {
+    public Users(int user_id, String full_name, String email, String password, String google_id, String auth_provider, String default_role, String phone_number, String gender, Date date_of_birth, String address, String avatar_url, String status, boolean email_verified, Date last_login_at, Date created_at, Date updated_at, Date deleted_at) {
         this.user_id = user_id;
         this.full_name = full_name;
         this.email = email;
         this.password = password;
+        this.google_id = google_id;
+        this.auth_provider = auth_provider;
+        this.default_role = default_role;
         this.phone_number = phone_number;
         this.gender = gender;
         this.date_of_birth = date_of_birth;
@@ -167,6 +173,30 @@ public class Users {
         this.email = email;
     }
 
+    public String getGoogle_id() {
+        return google_id;
+    }
+
+    public void setGoogle_id(String google_id) {
+        this.google_id = google_id;
+    }
+
+    public String getAuth_provider() {
+        return auth_provider;
+    }
+
+    public void setAuth_provider(String auth_provider) {
+        this.auth_provider = auth_provider;
+    }
+
+    public String getDefault_role() {
+        return default_role;
+    }
+
+    public void setDefault_role(String default_role) {
+        this.default_role = default_role;
+    }
+
     public String getPassword_hash() {
         return password;
     }
@@ -270,6 +300,9 @@ public class Users {
                 + ", full_name=" + full_name
                 + ", email=" + email
                 + ", password=***"
+                + ", google_id=" + google_id
+                + ", auth_provider=" + auth_provider
+                + ", default_role=" + default_role
                 + ", phone_number=" + phone_number
                 + ", gender=" + gender
                 + ", date_of_birth=" + date_of_birth

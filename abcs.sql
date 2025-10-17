@@ -1400,6 +1400,69 @@ EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
 -- ========================================
+-- GOOGLE OAUTH AUTHENTICATION
+-- ========================================
+
+-- Create Google_Auth table for OAuth integration
+CREATE TABLE IF NOT EXISTS `google_auth` (
+    `google_auth_id` INT NOT NULL AUTO_INCREMENT,
+    `user_id` BIGINT NOT NULL,
+    `google_id` VARCHAR(255) NOT NULL UNIQUE,
+    `email` VARCHAR(255) NOT NULL,
+    `name` VARCHAR(255) DEFAULT NULL,
+    `picture_url` TEXT DEFAULT NULL,
+    `access_token` TEXT DEFAULT NULL,
+    `refresh_token` TEXT DEFAULT NULL,
+    `token_expires_at` TIMESTAMP NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`google_auth_id`),
+    KEY `user_id` (`user_id`),
+    KEY `idx_google_auth_google_id` (`google_id`),
+    CONSTRAINT `google_auth_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Add Google login fields to users table
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+     WHERE TABLE_SCHEMA = DATABASE() 
+     AND TABLE_NAME = 'users' 
+     AND COLUMN_NAME = 'google_id') = 0,
+    'ALTER TABLE `users` ADD COLUMN `google_id` VARCHAR(255) DEFAULT NULL AFTER `email`',
+    'SELECT "Column google_id already exists"'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+     WHERE TABLE_SCHEMA = DATABASE() 
+     AND TABLE_NAME = 'users' 
+     AND COLUMN_NAME = 'auth_provider') = 0,
+    'ALTER TABLE `users` ADD COLUMN `auth_provider` ENUM(''local'', ''google'', ''facebook'') DEFAULT ''local'' AFTER `google_id`',
+    'SELECT "Column auth_provider already exists"'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Add unique constraint for google_id if it doesn't exist
+SET @sql = (SELECT IF(
+    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS 
+     WHERE TABLE_SCHEMA = DATABASE() 
+     AND TABLE_NAME = 'users' 
+     AND INDEX_NAME = 'google_id') = 0,
+    'ALTER TABLE `users` ADD UNIQUE KEY `google_id` (`google_id`)',
+    'SELECT "Unique key google_id already exists"'
+));
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Note: google_id already has UNIQUE KEY constraint above, no need for separate index
+
+-- ========================================
 -- DIGITAL GOODS MARKETPLACE ADDITIONS COMPLETE!
 -- ========================================
 -- Added features:
@@ -1409,3 +1472,4 @@ DEALLOCATE PREPARE stmt;
 -- ✅ Password reset functionality
 -- ✅ Digital delivery system
 -- ✅ Sample digital products and codes
+-- ✅ Google OAuth authentication
