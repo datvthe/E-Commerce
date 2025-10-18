@@ -16,9 +16,12 @@ public class SellerDashboardController extends HttpServlet {
         Integer sellerId = (Integer) request.getSession().getAttribute("userId");
 
         // Nếu chưa login, tạm cho test bằng sellerId = 1
-        if (sellerId == null) {
-            sellerId = 1;
+            HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
         }
+        
 
         ProductDAO productDao = new ProductDAO();
         OrderDAO orderDao = new OrderDAO();

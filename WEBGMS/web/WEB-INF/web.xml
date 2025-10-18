@@ -33,5 +33,14 @@
         <servlet-name>SellerDashboardController</servlet-name>
         <url-pattern>/seller/dashboard</url-pattern>
     </servlet-mapping>
+    <servlet>
+    <servlet-name>RegisterSellerController</servlet-name>
+    <servlet-class>controller.seller.RegisterSellerController</servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>RegisterSellerController</servlet-name>
+    <url-pattern>/seller/register</url-pattern>
+</servlet-mapping>
 
 </web-app>
