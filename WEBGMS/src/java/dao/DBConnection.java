@@ -42,7 +42,7 @@ public class DBConnection {
 
         if (conn != null) {
             try {
-                String sql = "SELECT user_id, full_name, email FROM Users LIMIT 5";
+                String sql = "SELECT user_id, full_name, email FROM users LIMIT 5";
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql);
 

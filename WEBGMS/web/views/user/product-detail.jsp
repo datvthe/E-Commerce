@@ -114,11 +114,12 @@
                         <div class="collapse navbar-collapse rounded-bottom" id="allCat">
                             <div class="navbar-nav ms-auto py-0">
                                 <ul class="list-unstyled categories-bars">
-                                    <li><div class="categories-bars-item"><a href="#">Phụ kiện</a><span>(3)</span></div></li>
-                                    <li><div class="categories-bars-item"><a href="#">Điện tử & Máy tính</a><span>(5)</span></div></li>
-                                    <li><div class="categories-bars-item"><a href="#">Laptop & Desktop</a><span>(2)</span></div></li>
-                                    <li><div class="categories-bars-item"><a href="#">Điện thoại & Máy tính bảng</a><span>(8)</span></div></li>
-                                    <li><div class="categories-bars-item"><a href="#">SmartPhone & Smart TV</a><span>(5)</span></div></li>
+                                    <li><div class="categories-bars-item"><a href="#"><i class="fas fa-graduation-cap me-2"></i>Học tập</a><span>(1,250)</span></div></li>
+                                    <li><div class="categories-bars-item"><a href="#"><i class="fas fa-play-circle me-2"></i>Xem phim</a><span>(850)</span></div></li>
+                                    <li><div class="categories-bars-item"><a href="#"><i class="fas fa-laptop-code me-2"></i>Phần mềm</a><span>(2,100)</span></div></li>
+                                    <li><div class="categories-bars-item"><a href="#"><i class="fas fa-file-alt me-2"></i>Tài liệu</a><span>(680)</span></div></li>
+                                    <li><div class="categories-bars-item"><a href="#"><i class="fas fa-gift me-2"></i>Thẻ cào</a><span>(1,500)</span></div></li>
+                                    <li><div class="categories-bars-item"><a href="#"><i class="fas fa-user-circle me-2"></i>Tài khoản Game</a><span>(2,300)</span></div></li>
                                 </ul>
                             </div>
                         </div>
@@ -138,15 +139,18 @@
                                 <a href="<%= request.getContextPath() %>/products" class="nav-item nav-link">Cửa hàng</a>
                                 <a href="#" class="nav-item nav-link active">Sản phẩm</a>
                                 <div class="nav-item dropdown">
-                                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Trang</a>
+                                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Danh mục</a>
                                     <div class="dropdown-menu m-0">
-                                        <a href="#" class="dropdown-item">Bán chạy</a>
-                                        <a href="#" class="dropdown-item">Giỏ hàng</a>
-                                        <a href="#" class="dropdown-item">Thanh toán</a>
-                                        <a href="#" class="dropdown-item">404 Trang</a>
+                                        <a href="#" class="dropdown-item"><i class="fas fa-graduation-cap me-2"></i>Học tập</a>
+                                        <a href="#" class="dropdown-item"><i class="fas fa-play-circle me-2"></i>Xem phim</a>
+                                        <a href="#" class="dropdown-item"><i class="fas fa-laptop-code me-2"></i>Phần mềm</a>
+                                        <a href="#" class="dropdown-item"><i class="fas fa-file-alt me-2"></i>Tài liệu</a>
+                                        <a href="#" class="dropdown-item"><i class="fas fa-ellipsis-h me-2"></i>Khác</a>
                                     </div>
                                 </div>
-                                <a href="#" class="nav-item nav-link me-2">Liên hệ</a>
+                                <a href="#" class="nav-item nav-link">Tin tức</a>
+                                <a href="#" class="nav-item nav-link">Chia sẻ</a>
+                                <a href="<%= request.getContextPath() %>/contact" class="nav-item nav-link me-2">Hỗ trợ</a>
                                 <div class="nav-item dropdown d-block d-lg-none mb-3">
                                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Tất cả danh mục</a>
                                     <div class="dropdown-menu m-0">
@@ -330,18 +334,79 @@
                             
                             <!-- Seller Information -->
                             <c:if test="${not empty product.seller_id}">
-                                        <div class="seller-info mb-4 p-3 bg-light rounded">
-                                            <h6 class="mb-2"><i class="fas fa-store me-2"></i>Thông tin người bán</h6>
-                                            <div class="d-flex align-items-center">
-                                                <div class="seller-avatar me-3">
-                                                    <img src="${product.seller_id.avatar_url != null ? product.seller_id.avatar_url : '/views/assets/user/img/avatar.jpg'}" 
-                                                         class="rounded-circle" width="40" height="40" alt="Seller Avatar">
-                                                </div>
-                                                <div>
-                                                    <p class="mb-1"><strong>${product.seller_id.full_name}</strong></p>
-                                                    <p class="mb-0 text-muted small">${product.seller_id.email}</p>
+                                <div class="seller-info mb-4 p-4 bg-light rounded-3 border">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <h6 class="mb-0"><i class="fas fa-store me-2 text-primary"></i>Thông tin người bán</h6>
+                                        <span class="badge bg-success">Đã xác thực</span>
+                                    </div>
+                                    
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            <div class="seller-avatar">
+                                                <img src="${product.seller_id.avatar_url != null ? product.seller_id.avatar_url : '/views/assets/user/img/avatar.jpg'}" 
+                                                     class="rounded-circle border border-3 border-primary" width="60" height="60" alt="Seller Avatar">
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="seller-details">
+                                                <h6 class="mb-1 fw-bold">${product.seller_id.full_name}</h6>
+                                                <p class="mb-1 text-muted small">
+                                                    <i class="fas fa-envelope me-1"></i>${product.seller_id.email}
+                                                </p>
+                                                <div class="seller-stats d-flex gap-3">
+                                                    <div class="stat-item">
+                                                        <span class="text-primary fw-bold">4.8</span>
+                                                        <div class="stars">
+                                                            <i class="fas fa-star text-warning"></i>
+                                                            <i class="fas fa-star text-warning"></i>
+                                                            <i class="fas fa-star text-warning"></i>
+                                                            <i class="fas fa-star text-warning"></i>
+                                                            <i class="fas fa-star text-warning"></i>
+                                                        </div>
+                                                        <small class="text-muted">(1,250 đánh giá)</small>
+                                                    </div>
+                                                    <div class="stat-item">
+                                                        <span class="text-success fw-bold">98%</span>
+                                                        <small class="text-muted d-block">Tỷ lệ hài lòng</small>
+                                                    </div>
+                                                    <div class="stat-item">
+                                                        <span class="text-info fw-bold">2,500+</span>
+                                                        <small class="text-muted d-block">Sản phẩm đã bán</small>
+                                                    </div>
                                                 </div>
                                             </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="seller-actions">
+                                                <button class="btn btn-outline-primary btn-sm mb-2" onclick="viewSellerProfile(${product.seller_id.user_id})">
+                                                    <i class="fas fa-user me-1"></i>Xem shop
+                                                </button>
+                                                <button class="btn btn-outline-success btn-sm" onclick="contactSeller(${product.seller_id.user_id})">
+                                                    <i class="fas fa-comments me-1"></i>Liên hệ
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Seller Description -->
+                                    <div class="seller-description mt-3 pt-3 border-top">
+                                        <p class="mb-2 text-muted small">
+                                            <i class="fas fa-quote-left me-1"></i>
+                                            "Chuyên cung cấp tài nguyên digital chất lượng cao với giá cả hợp lý. 
+                                            Cam kết giao hàng nhanh chóng và hỗ trợ khách hàng 24/7."
+                                        </p>
+                                        <div class="d-flex gap-2">
+                                            <span class="badge bg-light text-dark">
+                                                <i class="fas fa-clock me-1"></i>Phản hồi trong 1h
+                                            </span>
+                                            <span class="badge bg-light text-dark">
+                                                <i class="fas fa-shipping-fast me-1"></i>Giao hàng tức thì
+                                            </span>
+                                            <span class="badge bg-light text-dark">
+                                                <i class="fas fa-shield-alt me-1"></i>Bảo hành 7 ngày
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </c:if>
                                     
@@ -1179,6 +1244,18 @@
             // Product navigation
             function viewProduct(productId) {
                 window.location.href = '<%= request.getContextPath() %>/product/' + productId;
+            }
+
+            // Seller interaction functions
+            function viewSellerProfile(sellerId) {
+                window.location.href = '<%= request.getContextPath() %>/seller/' + sellerId;
+            }
+
+            function contactSeller(sellerId) {
+                // Show contact modal or redirect to chat
+                if (confirm('Bạn có muốn liên hệ với người bán này không?')) {
+                    window.location.href = '<%= request.getContextPath() %>/chat?seller=' + sellerId;
+                }
             }
 
             // Toast notification function
