@@ -17,6 +17,34 @@
         <link href="<%= request.getContextPath() %>/views/assets/electro/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
         <link href="<%= request.getContextPath() %>/views/assets/electro/css/bootstrap.min.css" rel="stylesheet">
         <link href="<%= request.getContextPath() %>/views/assets/electro/css/style.css" rel="stylesheet">
+        <style>
+            /* Orange Theme Override */
+            .bg-primary {
+                background: linear-gradient(135deg, #ff6b35, #f7931e) !important;
+            }
+            .btn-primary {
+                background: linear-gradient(135deg, #ff6b35, #f7931e) !important;
+                border-color: #ff6b35 !important;
+            }
+            .btn-primary:hover {
+                background: linear-gradient(135deg, #e55a2b, #e0841a) !important;
+                border-color: #e55a2b !important;
+            }
+            .text-primary {
+                color: #ff6b35 !important;
+            }
+            .border-primary {
+                border-color: #ff6b35 !important;
+            }
+            .btn-outline-primary {
+                color: #ff6b35 !important;
+                border-color: #ff6b35 !important;
+            }
+            .btn-outline-primary:hover {
+                background-color: #ff6b35 !important;
+                border-color: #ff6b35 !important;
+            }
+        </style>
     </head>
     <body>
         <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
@@ -168,8 +196,26 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="phone_number" class="mb-1">Số điện thoại</label>
-                            <input type="text" class="form-control rounded-pill py-2" id="phone_number" name="phone_number" required>
+                            <label for="phone_number" class="mb-1">
+                                <i class="fas fa-phone me-1"></i>Số điện thoại
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">
+                                    <i class="fas fa-flag me-1"></i>+84
+                                </span>
+                                <input type="tel" 
+                                       class="form-control rounded-pill rounded-start-0 border-start-0 py-2" 
+                                       id="phone_number" 
+                                       name="phone_number" 
+                                       placeholder="Nhập số điện thoại"
+                                       pattern="[0-9]{9,10}"
+                                       maxlength="10"
+                                       required>
+                            </div>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Nhập 9-10 chữ số (VD: 123456789)
+                            </div>
                         </div>
 
                         <div class="form-group mb-3">
@@ -257,5 +303,91 @@
         <script src="<%= request.getContextPath() %>/views/assets/electro/lib/counterup/counterup.min.js"></script>
         <script src="<%= request.getContextPath() %>/views/assets/electro/lib/owlcarousel/owl.carousel.min.js"></script>
         <script src="<%= request.getContextPath() %>/views/assets/electro/js/main.js"></script>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const phoneInput = document.getElementById('phone_number');
+                const form = document.querySelector('form');
+                
+                // Phone number validation
+                phoneInput.addEventListener('input', function() {
+                    let value = this.value.replace(/\D/g, ''); // Remove non-digits
+                    this.value = value;
+                    
+                    // Visual feedback
+                    if (value.length >= 9 && value.length <= 10) {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                    } else if (value.length > 0) {
+                        this.classList.remove('is-valid');
+                        this.classList.add('is-invalid');
+                    } else {
+                        this.classList.remove('is-valid', 'is-invalid');
+                    }
+                });
+                
+                // Form validation
+                form.addEventListener('submit', function(e) {
+                    const phone = phoneInput.value;
+                    const password = document.getElementById('password').value;
+                    const confirmPassword = document.getElementById('confirm_password').value;
+                    
+                    // Phone validation
+                    if (phone.length < 9 || phone.length > 10) {
+                        e.preventDefault();
+                        showAlert('Số điện thoại phải có 9-10 chữ số!', 'warning');
+                        phoneInput.focus();
+                        return;
+                    }
+                    
+                    // Password validation
+                    if (password.length < 6) {
+                        e.preventDefault();
+                        showAlert('Mật khẩu phải có ít nhất 6 ký tự!', 'warning');
+                        document.getElementById('password').focus();
+                        return;
+                    }
+                    
+                    // Confirm password validation
+                    if (password !== confirmPassword) {
+                        e.preventDefault();
+                        showAlert('Mật khẩu xác nhận không khớp!', 'warning');
+                        document.getElementById('confirm_password').focus();
+                        return;
+                    }
+                    
+                    // Show loading state
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang tạo tài khoản...';
+                });
+                
+                // Alert function
+                function showAlert(message, type) {
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+                    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+                    
+                    let iconClass = 'info-circle';
+                    if (type === 'success') iconClass = 'check-circle';
+                    else if (type === 'warning') iconClass = 'exclamation-triangle';
+                    else if (type === 'error') iconClass = 'times-circle';
+                    
+                    alertDiv.innerHTML = `
+                        <i class="fas fa-${iconClass} me-2"></i>
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    
+                    document.body.appendChild(alertDiv);
+                    
+                    setTimeout(() => {
+                        if (alertDiv.parentNode) {
+                            alertDiv.remove();
+                        }
+                    }, 5000);
+                }
+            });
+        </script>
     </body>
 </html>

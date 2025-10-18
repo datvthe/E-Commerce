@@ -269,7 +269,7 @@ public class GoogleAuthService {
      * Create new user from Google info
      */
     private Users createUserFromGoogle(GoogleUserInfo googleUser) {
-        String sql = "INSERT INTO users (full_name, email, password_hash, google_id, auth_provider, status, email_verified, default_role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+        String sql = "INSERT INTO users (full_name, email, password_hash, phone_number, google_id, auth_provider, status, email_verified, default_role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -277,11 +277,12 @@ public class GoogleAuthService {
             ps.setString(1, googleUser.getName());
             ps.setString(2, googleUser.getEmail());
             ps.setString(3, "GOOGLE_AUTH_USER"); // Placeholder password
-            ps.setString(4, googleUser.getId());
-            ps.setString(5, "google");
-            ps.setString(6, "active");
-            ps.setBoolean(7, true);
-            ps.setString(8, "customer");
+            ps.setString(4, null); // Phone number will be set later
+            ps.setString(5, googleUser.getId());
+            ps.setString(6, "google");
+            ps.setString(7, "active");
+            ps.setBoolean(8, true);
+            ps.setString(9, "customer");
             
             int rowsAffected = ps.executeUpdate();
             

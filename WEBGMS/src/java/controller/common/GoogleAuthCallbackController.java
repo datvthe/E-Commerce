@@ -46,6 +46,9 @@ public class GoogleAuthCallbackController extends HttpServlet {
                 session.setAttribute("user", user);
                 session.setAttribute("userRole", user.getDefault_role());
                 
+                // Google OAuth login successful - redirect directly
+                System.out.println("Google OAuth - Login successful for: " + user.getEmail());
+                
                 // Redirect based on user role
                 String redirectUrl = getRedirectUrlByRole(user.getDefault_role());
                 response.sendRedirect(request.getContextPath() + redirectUrl);

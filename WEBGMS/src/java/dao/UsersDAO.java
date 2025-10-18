@@ -12,7 +12,7 @@ public class UsersDAO extends DBConnection {
 
     public Users checkLogin(String account, String password) {
         Users user = null;
-        String sql = "SELECT * FROM Users "
+        String sql = "SELECT * FROM users "
                 + "WHERE (email = ? OR phone_number = ?) "
                 + "AND status = 'active'";
 
@@ -28,8 +28,11 @@ public class UsersDAO extends DBConnection {
                 // Check if password is hashed or plain text (for migration)
                 boolean passwordMatch = false;
                 if (PasswordUtil.isHashed(storedPassword)) {
-                    // Password is hashed, verify with hash
+                    // Password is hashed with new format (hash:salt), verify with hash
                     passwordMatch = PasswordUtil.verifyPassword(password, storedPassword);
+                } else if (storedPassword.length() > 50 && !storedPassword.contains(":")) {
+                    // Password is hashed with old format (Base64 combined), verify with old method
+                    passwordMatch = verifyOldPassword(password, storedPassword);
                 } else {
                     // Password is plain text, check directly (for migration)
                     passwordMatch = password.equals(storedPassword);
@@ -75,7 +78,7 @@ public class UsersDAO extends DBConnection {
 
     public Users getUserByToken(String token) {
         Users user = null;
-        String sql = "SELECT u.* FROM Users u "
+        String sql = "SELECT u.* FROM users u "
                 + "JOIN User_Tokens t ON u.user_id = t.user_id "
                 + "WHERE t.token = ? AND t.expiry > NOW()";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -132,10 +135,38 @@ public class UsersDAO extends DBConnection {
 
         return userRole;
     }
+    
+    /**
+     * Verify password with old format (Base64 combined salt + hash)
+     */
+    private boolean verifyOldPassword(String password, String hashedPassword) {
+        try {
+            // Decode the combined salt + hash
+            byte[] combined = java.util.Base64.getDecoder().decode(hashedPassword);
+            
+            // Extract salt (first 16 bytes)
+            byte[] salt = new byte[16];
+            System.arraycopy(combined, 0, salt, 0, 16);
+            
+            // Extract hash (remaining bytes)
+            byte[] storedHash = new byte[combined.length - 16];
+            System.arraycopy(combined, 16, storedHash, 0, storedHash.length);
+            
+            // Hash the input password with the same salt
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            md.update(salt);
+            byte[] computedHash = md.digest(password.getBytes());
+            
+            // Compare hashes
+            return java.security.MessageDigest.isEqual(storedHash, computedHash);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     public Users getUserById(int userId) {
         Users user = null;
-        String sql = "SELECT * FROM Users WHERE user_id = ?";
+        String sql = "SELECT * FROM users WHERE user_id = ?";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -169,7 +200,7 @@ public class UsersDAO extends DBConnection {
     }
 
     public boolean isEmailExists(String email) {
-        String sql = "SELECT 1 FROM Users WHERE email = ? LIMIT 1";
+        String sql = "SELECT 1 FROM users WHERE email = ? LIMIT 1";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
@@ -181,7 +212,7 @@ public class UsersDAO extends DBConnection {
     }
 
     public boolean isPhoneExists(String phoneNumber) {
-        String sql = "SELECT 1 FROM Users WHERE phone_number = ? LIMIT 1";
+        String sql = "SELECT 1 FROM users WHERE phone_number = ? LIMIT 1";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, phoneNumber);
             ResultSet rs = ps.executeQuery();
@@ -194,12 +225,12 @@ public class UsersDAO extends DBConnection {
 
     public Users createUser(String fullName, String email, String password, String phoneNumber) {
         Users user = null;
-        String hashedPassword = PasswordUtil.hashPassword(password);
-        String sql = "INSERT INTO Users (full_name, email, password_hash, phone_number, status, email_verified, created_at) VALUES (?, ?, ?, ?, 'active', 0, NOW())";
+        // Password is already hashed in CommonRegisterController, don't hash again
+        String sql = "INSERT INTO users (full_name, email, password_hash, phone_number, status, email_verified, default_role, created_at) VALUES (?, ?, ?, ?, 'active', 0, 'customer', NOW())";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, fullName);
             ps.setString(2, email);
-            ps.setString(3, hashedPassword);
+            ps.setString(3, password);
             ps.setString(4, phoneNumber);
             int affected = ps.executeUpdate();
             if (affected > 0) {
@@ -227,7 +258,7 @@ public class UsersDAO extends DBConnection {
     
     public Users getUserByEmail(String email) {
         Users user = null;
-        String sql = "SELECT * FROM Users WHERE email = ?";
+        String sql = "SELECT * FROM users WHERE email = ?";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
@@ -256,13 +287,17 @@ public class UsersDAO extends DBConnection {
     }
     
     public boolean updateUser(Users user) {
-        String sql = "UPDATE Users SET full_name = ?, email = ?, phone_number = ?, address = ?, updated_at = NOW() WHERE user_id = ?";
+        String sql = "UPDATE users SET full_name = ?, email = ?, phone_number = ?, address = ?, default_role = ?, gender = ?, date_of_birth = ?, avatar_url = ?, updated_at = NOW() WHERE user_id = ?";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getFull_name());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getPhone_number());
             ps.setString(4, user.getAddress());
-            ps.setInt(5, user.getUser_id());
+            ps.setString(5, user.getDefault_role());
+            ps.setString(6, user.getGender());
+            ps.setDate(7, user.getDate_of_birth());
+            ps.setString(8, user.getAvatar_url());
+            ps.setInt(9, user.getUser_id());
             
             int affected = ps.executeUpdate();
             return affected > 0;
@@ -274,7 +309,7 @@ public class UsersDAO extends DBConnection {
     
     public boolean updatePassword(int userId, String newPassword) {
         String hashedPassword = PasswordUtil.hashPassword(newPassword);
-        String sql = "UPDATE Users SET password_hash = ?, updated_at = NOW() WHERE user_id = ?";
+        String sql = "UPDATE users SET password_hash = ?, updated_at = NOW() WHERE user_id = ?";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, hashedPassword);
             ps.setInt(2, userId);
@@ -286,4 +321,19 @@ public class UsersDAO extends DBConnection {
         }
         return false;
     }
+    
+    public boolean updateAvatar(int userId, String avatarUrl) {
+        String sql = "UPDATE users SET avatar_url = ?, updated_at = NOW() WHERE user_id = ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, avatarUrl);
+            ps.setInt(2, userId);
+            
+            int affected = ps.executeUpdate();
+            return affected > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
 }

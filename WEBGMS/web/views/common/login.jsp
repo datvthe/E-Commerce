@@ -17,6 +17,34 @@
         <link href="<%= request.getContextPath() %>/views/assets/electro/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
         <link href="<%= request.getContextPath() %>/views/assets/electro/css/bootstrap.min.css" rel="stylesheet">
         <link href="<%= request.getContextPath() %>/views/assets/electro/css/style.css" rel="stylesheet">
+        <style>
+            /* Orange Theme Override */
+            .bg-primary {
+                background: linear-gradient(135deg, #ff6b35, #f7931e) !important;
+            }
+            .btn-primary {
+                background: linear-gradient(135deg, #ff6b35, #f7931e) !important;
+                border-color: #ff6b35 !important;
+            }
+            .btn-primary:hover {
+                background: linear-gradient(135deg, #e55a2b, #e0841a) !important;
+                border-color: #e55a2b !important;
+            }
+            .text-primary {
+                color: #ff6b35 !important;
+            }
+            .border-primary {
+                border-color: #ff6b35 !important;
+            }
+            .btn-outline-primary {
+                color: #ff6b35 !important;
+                border-color: #ff6b35 !important;
+            }
+            .btn-outline-primary:hover {
+                background-color: #ff6b35 !important;
+                border-color: #ff6b35 !important;
+            }
+        </style>
     </head>
     <body>
         <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">

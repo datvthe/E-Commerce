@@ -28,11 +28,42 @@
     <link href="<%= request.getContextPath() %>/views/assets/electro/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Template Stylesheet -->
-    <link href="<%= request.getContextPath() %>/views/assets/electro/css/style.css" rel="stylesheet">
+        <link href="<%= request.getContextPath() %>/views/assets/electro/css/style.css" rel="stylesheet">
+        <style>
+            /* Orange Theme Override */
+            .bg-primary {
+                background: linear-gradient(135deg, #ff6b35, #f7931e) !important;
+            }
+            .btn-primary {
+                background: linear-gradient(135deg, #ff6b35, #f7931e) !important;
+                border-color: #ff6b35 !important;
+            }
+            .btn-primary:hover {
+                background: linear-gradient(135deg, #e55a2b, #e0841a) !important;
+                border-color: #e55a2b !important;
+            }
+            .text-primary {
+                color: #ff6b35 !important;
+            }
+            .border-primary {
+                border-color: #ff6b35 !important;
+            }
+            .btn-outline-primary {
+                color: #ff6b35 !important;
+                border-color: #ff6b35 !important;
+            }
+            .btn-outline-primary:hover {
+                background-color: #ff6b35 !important;
+                border-color: #ff6b35 !important;
+            }
+            .navbar-nav .nav-link:hover {
+                color: #ff6b35 !important;
+            }
+        </style>
     
     <style>
         .profile-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
             color: white;
             padding: 2rem 0;
             margin-bottom: 2rem;
@@ -51,15 +82,16 @@
             overflow: hidden;
         }
         .profile-card .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
             color: white;
             border: none;
             padding: 1.5rem;
         }
         .profile-stats {
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #fff5f0, #ffe8d6);
             padding: 1rem;
             border-radius: 10px;
+            border: 1px solid rgba(255, 107, 53, 0.1);
         }
         .stat-item {
             text-align: center;
@@ -68,7 +100,7 @@
         .stat-number {
             font-size: 2rem;
             font-weight: bold;
-            color: #667eea;
+            color: #ff6b35;
         }
         .stat-label {
             color: #6c757d;
@@ -80,25 +112,25 @@
             font-weight: 500;
         }
         .profile-tabs .nav-link.active {
-            background: #667eea;
+            background: #ff6b35;
             color: white;
             border-radius: 25px;
         }
         .profile-tabs .nav-link:hover {
-            color: #667eea;
+            color: #ff6b35;
         }
         .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            border-color: #ff6b35;
+            box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.25);
         }
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
             border: none;
             border-radius: 25px;
             padding: 0.5rem 2rem;
         }
         .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            background: linear-gradient(135deg, #e55a2b, #e0841a);
         }
         .profile-card {
             transition: all 0.3s ease;
@@ -117,13 +149,28 @@
             transition: all 0.3s ease;
         }
         .nav-link:hover {
-            color: #667eea !important;
+            color: #ff6b35 !important;
         }
         .btn {
             transition: all 0.3s ease;
         }
         .btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+        .avatar-container {
+            position: relative;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .avatar-container:hover {
+            transform: scale(1.05);
+        }
+        .avatar-container img {
+            transition: all 0.3s ease;
+        }
+        .avatar-container:hover img {
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
         }
         .fade-in {
             animation: fadeIn 0.6s ease-in;
@@ -263,10 +310,6 @@
                     </c:choose>
                 </div>
                 <div class="d-none d-lg-flex ms-2">
-                    <a class="btn btn-primary position-relative" href="<%= request.getContextPath() %>/cart">
-                        <i class="fas fa-shopping-cart me-1"></i>Giỏ hàng
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">0</span>
-                    </a>
                     <a class="btn btn-outline-primary ms-2 position-relative" href="<%= request.getContextPath() %>/wishlist">
                         <i class="fas fa-heart me-1"></i>Yêu thích
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="wishlistCount">0</span>
@@ -367,8 +410,31 @@
                         <div class="tab-content" id="profileTabsContent">
                             <!-- Personal Info Tab -->
                             <div class="tab-pane fade show active" id="info" role="tabpanel">
-                                <form id="profileForm" method="POST" action="<%= request.getContextPath() %>/update-profile">
+                                <form id="profileForm" method="POST" action="<%= request.getContextPath() %>/update-profile" enctype="multipart/form-data">
                                     <div class="row">
+                                        <!-- Avatar Upload Section -->
+                                        <div class="col-12 mb-4">
+                                            <div class="text-center">
+                                                <div class="avatar-container mb-3">
+                                                    <img id="avatarPreview" 
+                                                         src="${user.avatar_url != null ? user.avatar_url : request.getContextPath() + '/views/assets/electro/img/avatar.svg'}" 
+                                                         alt="Avatar" 
+                                                         class="rounded-circle border border-3 border-primary" 
+                                                         style="width: 120px; height: 120px; object-fit: cover;">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="avatar" class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-camera me-2"></i>Chọn ảnh đại diện
+                                                    </label>
+                                                    <input type="file" class="form-control d-none" id="avatar" name="avatar" accept="image/*" onchange="previewAvatar(this)">
+                                                    <button type="button" class="btn btn-outline-danger btn-sm ms-2" onclick="removeAvatar()">
+                                                        <i class="fas fa-trash me-2"></i>Xóa ảnh
+                                                    </button>
+                                                </div>
+                                                <small class="text-muted">Hỗ trợ: JPG, PNG, GIF (tối đa 2MB)</small>
+                                            </div>
+                                        </div>
+                                        
                                         <div class="col-md-6 mb-3">
                                             <label for="fullName" class="form-label">Họ và tên *</label>
                                             <input type="text" class="form-control" id="fullName" name="full_name" value="${user.full_name}" required>
@@ -384,6 +450,19 @@
                                         <div class="col-md-6 mb-3">
                                             <label for="phone" class="form-label">Số điện thoại</label>
                                             <input type="tel" class="form-control" id="phone" name="phone" value="${user.phone_number}">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="gender" class="form-label">Giới tính</label>
+                                            <select class="form-select" id="gender" name="gender">
+                                                <option value="">Chọn giới tính</option>
+                                                <option value="male" ${user.gender == 'male' ? 'selected' : ''}>Nam</option>
+                                                <option value="female" ${user.gender == 'female' ? 'selected' : ''}>Nữ</option>
+                                                <option value="other" ${user.gender == 'other' ? 'selected' : ''}>Khác</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="dateOfBirth" class="form-label">Ngày sinh</label>
+                                            <input type="date" class="form-control" id="dateOfBirth" name="date_of_birth" value="${user.date_of_birth}">
                                         </div>
                                         <div class="col-12 mb-3">
                                             <label for="address" class="form-label">Địa chỉ</label>
@@ -430,7 +509,7 @@
                                     <h5>Chưa có đơn hàng nào</h5>
                                     <p class="text-muted">Bạn chưa có đơn hàng nào. Hãy mua sắm ngay!</p>
                                     <a href="<%= request.getContextPath() %>/products" class="btn btn-primary">
-                                        <i class="fas fa-shopping-cart me-2"></i>Mua sắm ngay
+                                        <i class="fas fa-shopping-bag me-2"></i>Mua sắm ngay
                                     </a>
                                 </div>
                             </div>
@@ -694,17 +773,6 @@
             showToast('Đã thêm vào danh sách yêu thích!', 'success');
         }
         
-        // Add to cart function
-        function addToCart(productId) {
-            // Simulate adding to cart
-            const cartCount = document.getElementById('cartCount');
-            let count = parseInt(cartCount.textContent) || 0;
-            count++;
-            cartCount.textContent = count;
-            cartCount.style.display = count > 0 ? 'block' : 'none';
-            
-            showToast('Đã thêm vào giỏ hàng!', 'success');
-        }
         
         // Newsletter subscription
         function subscribeNewsletter() {
@@ -722,6 +790,71 @@
             const newsletterBtn = document.querySelector('.newsletter button');
             if (newsletterBtn) {
                 newsletterBtn.addEventListener('click', subscribeNewsletter);
+            }
+        });
+        
+        // Avatar upload functions
+        function previewAvatar(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // Validate file size (2MB max)
+                if (file.size > 2 * 1024 * 1024) {
+                    showToast('Kích thước file quá lớn! Vui lòng chọn file nhỏ hơn 2MB.', 'error');
+                    input.value = '';
+                    return;
+                }
+                
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    showToast('Vui lòng chọn file ảnh hợp lệ!', 'error');
+                    input.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatarPreview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function removeAvatar() {
+            const avatarPreview = document.getElementById('avatarPreview');
+            const avatarInput = document.getElementById('avatar');
+            
+            // Reset to default avatar
+            avatarPreview.src = '<%= request.getContextPath() %>/views/assets/electro/img/avatar.svg';
+            avatarInput.value = '';
+            
+            showToast('Đã xóa ảnh đại diện!', 'success');
+        }
+        
+        // Form validation for avatar upload
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileForm = document.getElementById('profileForm');
+            if (profileForm) {
+                profileForm.addEventListener('submit', function(e) {
+                    const avatarInput = document.getElementById('avatar');
+                    if (avatarInput && avatarInput.files && avatarInput.files[0]) {
+                        const file = avatarInput.files[0];
+                        
+                        // Validate file size
+                        if (file.size > 2 * 1024 * 1024) {
+                            e.preventDefault();
+                            showToast('Kích thước file quá lớn! Vui lòng chọn file nhỏ hơn 2MB.', 'error');
+                            return;
+                        }
+                        
+                        // Validate file type
+                        if (!file.type.startsWith('image/')) {
+                            e.preventDefault();
+                            showToast('Vui lòng chọn file ảnh hợp lệ!', 'error');
+                            return;
+                        }
+                    }
+                });
             }
         });
     </script>
