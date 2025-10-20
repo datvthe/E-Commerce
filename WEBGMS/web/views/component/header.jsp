@@ -66,8 +66,6 @@
 
                 <div class="col-lg-4 text-center text-lg-end">
                     <div class="d-inline-flex align-items-center gap-2" style="height: 45px;">
-                        <span class="text-muted me-3"><small>VND</small></span>
-                        <span class="text-muted mx-2"><small>Tiếng Việt</small></span>
                         <c:choose>
                             <c:when test="${not empty sessionScope.user}">
                                 <div class="dropdown">

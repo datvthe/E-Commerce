@@ -19,8 +19,15 @@ public class ForgotPasswordController extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
+        // Initialize only DAO - EmailService will be initialized when needed
         passwordResetDAO = new PasswordResetDAO();
-        emailService = new EmailService();
+    }
+    
+    private EmailService getEmailService() {
+        if (emailService == null) {
+            emailService = new EmailService();
+        }
+        return emailService;
     }
 
     @Override
@@ -76,7 +83,7 @@ public class ForgotPasswordController extends HttpServlet {
             
             if (passwordReset != null) {
                 // Send verification code via email
-                boolean emailSent = emailService.sendPasswordResetEmail(email, passwordReset.getVerification_code());
+                boolean emailSent = getEmailService().sendPasswordResetEmail(email, passwordReset.getVerification_code());
                 
                 if (emailSent) {
                     request.getSession().setAttribute("message", 

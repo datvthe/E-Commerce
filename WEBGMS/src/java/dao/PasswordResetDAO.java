@@ -22,7 +22,7 @@ public class PasswordResetDAO extends DBConnection {
         // Generate a 6-digit verification code
         String verificationCode = generateVerificationCode();
         
-        String sql = "INSERT INTO Password_Reset (email, verification_code, created_at, expires_at, used) " +
+        String sql = "INSERT INTO password_reset (email, verification_code, created_at, expires_at, used) " +
                     "VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 15 MINUTE), 0)";
         
         try (Connection conn = DBConnection.getConnection(); 
@@ -52,7 +52,7 @@ public class PasswordResetDAO extends DBConnection {
      */
     public PasswordReset getPasswordResetById(int resetId) {
         PasswordReset passwordReset = null;
-        String sql = "SELECT * FROM Password_Reset WHERE reset_id = ?";
+        String sql = "SELECT * FROM password_reset WHERE reset_id = ?";
         
         try (Connection conn = DBConnection.getConnection(); 
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -83,7 +83,7 @@ public class PasswordResetDAO extends DBConnection {
      */
     public PasswordReset getValidPasswordReset(String email, String verificationCode) {
         PasswordReset passwordReset = null;
-        String sql = "SELECT * FROM Password_Reset " +
+        String sql = "SELECT * FROM password_reset " +
                     "WHERE email = ? AND verification_code = ? " +
                     "AND used = 0 AND expires_at > NOW()";
         
@@ -116,7 +116,7 @@ public class PasswordResetDAO extends DBConnection {
      * Mark password reset request as used
      */
     public boolean markAsUsed(int resetId) {
-        String sql = "UPDATE Password_Reset SET used = 1, used_at = NOW() WHERE reset_id = ?";
+        String sql = "UPDATE password_reset SET used = 1, used_at = NOW() WHERE reset_id = ?";
         
         try (Connection conn = DBConnection.getConnection(); 
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -136,7 +136,7 @@ public class PasswordResetDAO extends DBConnection {
      * Invalidate existing password reset requests for an email
      */
     public void invalidateExistingRequests(String email) {
-        String sql = "UPDATE Password_Reset SET used = 1 WHERE email = ? AND used = 0";
+        String sql = "UPDATE password_reset SET used = 1 WHERE email = ? AND used = 0";
         
         try (Connection conn = DBConnection.getConnection(); 
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -153,7 +153,7 @@ public class PasswordResetDAO extends DBConnection {
      * Clean up expired password reset requests
      */
     public void cleanupExpiredRequests() {
-        String sql = "DELETE FROM Password_Reset WHERE expires_at < NOW()";
+        String sql = "DELETE FROM password_reset WHERE expires_at < NOW()";
         
         try (Connection conn = DBConnection.getConnection(); 
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -169,7 +169,7 @@ public class PasswordResetDAO extends DBConnection {
      * Check if user exists by email
      */
     public boolean userExistsByEmail(String email) {
-        String sql = "SELECT 1 FROM Users WHERE email = ? AND status = 'active' LIMIT 1";
+        String sql = "SELECT 1 FROM users WHERE email = ? AND status = 'active' LIMIT 1";
         
         try (Connection conn = DBConnection.getConnection(); 
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -190,7 +190,7 @@ public class PasswordResetDAO extends DBConnection {
      */
     public boolean updateUserPassword(String email, String newPassword) {
         String hashedPassword = PasswordUtil.hashPassword(newPassword);
-        String sql = "UPDATE Users SET password_hash = ?, updated_at = NOW() WHERE email = ?";
+        String sql = "UPDATE users SET password_hash = ?, updated_at = NOW() WHERE email = ?";
         
         try (Connection conn = DBConnection.getConnection(); 
              PreparedStatement ps = conn.prepareStatement(sql)) {

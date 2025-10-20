@@ -119,22 +119,7 @@
                 </div>
                 <div class="col-lg-4 text-center text-lg-end">
                     <div class="d-inline-flex align-items-center" style="height: 45px;">
-                        <div class="dropdown">
-                            <a href="#" class="dropdown-toggle text-muted me-2" data-bs-toggle="dropdown"><small> VND</small></a>
-                            <div class="dropdown-menu rounded">
-                                <a href="#" class="dropdown-item"> USD</a>
-                                <a href="#" class="dropdown-item"> Euro</a>
-                            </div>
-                        </div>
-                        <div class="dropdown">
-                            <a href="#" class="dropdown-toggle text-muted mx-2" data-bs-toggle="dropdown"><small> English</small></a>
-                            <div class="dropdown-menu rounded">
-                                <a href="#" class="dropdown-item"> English</a>
-                                <a href="#" class="dropdown-item"> Turkish</a>
-                                <a href="#" class="dropdown-item"> Spanol</a>
-                                <a href="#" class="dropdown-item"> Italiano</a>
-            </div>
-                        </div>
+                        
                         <c:choose>
                             <c:when test="${not empty sessionScope.user}">
                                 <a href="<%= request.getContextPath() %>/profile" class="btn btn-outline-info btn-sm px-3 me-2"><i class="bi bi-person me-1"></i>Tài khoản</a>
