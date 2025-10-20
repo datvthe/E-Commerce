@@ -21,7 +21,7 @@ public class ProductDAO extends DBConnection {
         Products product = null;
         String sql = "SELECT p.*, pc.category_id, pc.name as category_name, pc.slug as category_slug, "
                 + "u.user_id, u.full_name, u.email, u.avatar_url "
-                + "FROM Products p "
+                + "FROM products p "
                 + "LEFT JOIN Product_Categories pc ON p.category_id = pc.category_id "
                 + "LEFT JOIN Users u ON p.seller_id = u.user_id "
                 + "WHERE p.product_id = ? AND p.deleted_at IS NULL";
@@ -79,7 +79,7 @@ public class ProductDAO extends DBConnection {
         Products product = null;
         String sql = "SELECT p.*, pc.category_id, pc.name as category_name, pc.slug as category_slug, "
                 + "u.user_id, u.full_name, u.email, u.avatar_url "
-                + "FROM Products p "
+                + "FROM products p "
                 + "LEFT JOIN Product_Categories pc ON p.category_id = pc.category_id "
                 + "LEFT JOIN Users u ON p.seller_id = u.user_id "
                 + "WHERE p.slug = ? AND p.deleted_at IS NULL";
@@ -134,7 +134,7 @@ public class ProductDAO extends DBConnection {
      */
     public List<Products> getSimilarProducts(long productId, int categoryId, int limit) {
         List<Products> products = new ArrayList<>();
-        String sql = "SELECT p.* FROM Products p "
+        String sql = "SELECT p.* FROM products p "
                 + "WHERE p.category_id = ? AND p.product_id != ? "
                 + "AND p.status = 'active' AND p.deleted_at IS NULL "
                 + "ORDER BY p.average_rating DESC, p.created_at DESC "
@@ -172,7 +172,7 @@ public class ProductDAO extends DBConnection {
         List<Products> products = new ArrayList<>();
         int offset = (page - 1) * pageSize;
 
-        String sql = "SELECT * FROM Products "
+        String sql = "SELECT * FROM products "
                 + "WHERE status = 'active' AND deleted_at IS NULL "
                 + "ORDER BY created_at DESC "
                 + "LIMIT ? OFFSET ?";
@@ -205,7 +205,7 @@ public class ProductDAO extends DBConnection {
      * Check if there are any products in the database
      */
     public boolean hasProducts() {
-        String sql = "SELECT COUNT(*) as count FROM Products WHERE deleted_at IS NULL";
+        String sql = "SELECT COUNT(*) as count FROM products WHERE deleted_at IS NULL";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -224,7 +224,7 @@ public class ProductDAO extends DBConnection {
     }
 
     public int countBySeller(int sellerId) {
-        String sql = "SELECT COUNT(*) FROM Products WHERE seller_id = ?";
+        String sql = "SELECT COUNT(*) FROM products WHERE seller_id = ?";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, sellerId);
             ResultSet rs = ps.executeQuery();
@@ -241,7 +241,7 @@ public class ProductDAO extends DBConnection {
      * Get total product count
      */
     public int getTotalProductCount() {
-        String sql = "SELECT COUNT(*) as count FROM Products WHERE deleted_at IS NULL";
+        String sql = "SELECT COUNT(*) as count FROM products WHERE deleted_at IS NULL";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 

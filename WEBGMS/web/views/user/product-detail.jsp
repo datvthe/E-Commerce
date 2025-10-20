@@ -1,13 +1,15 @@
+
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>${product.name} - Gicungco Marketplace</title>
+        <title>iPhone 15 Pro Max 256GB - Gicungco Marketplace</title>
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
-        <meta content="" name="keywords">
-        <meta content="${product.description}" name="description">
+        <meta content="iPhone, smartphone, Apple, mobile" name="keywords">
+        <meta content="iPhone 15 Pro Max 256GB với chip A17 Pro mạnh mẽ, camera 48MP và thiết kế titan cao cấp" name="description">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -177,7 +179,7 @@
             <ol class="breadcrumb justify-content-center mb-0 wow fadeInUp" data-wow-delay="0.3s">
                 <li class="breadcrumb-item"><a href="<%= request.getContextPath() %>/home">Trang chủ</a></li>
                 <li class="breadcrumb-item"><a href="<%= request.getContextPath() %>/products">Sản phẩm</a></li>
-                <li class="breadcrumb-item active text-white">${product.name}</li>
+                <li class="breadcrumb-item active text-white">iPhone 15 Pro Max 256GB</li>
             </ol>
         </div>
         <!-- Single Page Header End -->
@@ -185,6 +187,21 @@
         <!-- Single Products Start -->
         <div class="container-fluid shop py-5">
             <div class="container py-5">
+                <c:choose>
+                    <c:when test="false">
+                        <div class="row justify-content-center">
+                            <div class="col-md-8 text-center">
+                                <div class="alert alert-danger">
+                                    <h4><i class="fas fa-exclamation-triangle me-2"></i>Sản phẩm không tồn tại</h4>
+                                    <p class="mb-3">Xin lỗi, sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
+                                    <a href="<%= request.getContextPath() %>/products" class="btn btn-primary">
+                                        <i class="fas fa-arrow-left me-2"></i>Quay lại cửa hàng
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
                 <div class="row g-4">
                     <div class="col-lg-5 col-xl-3 wow fadeInUp" data-wow-delay="0.1s">
                         <div class="input-group w-100 mx-auto d-flex mb-4">
@@ -242,7 +259,14 @@
                                 </c:forEach>
                             </div>
                                             <div class="d-flex mb-2">
-                                                <h5 class="fw-bold me-2">${similarProduct.price}₫</h5>
+                                                <h5 class="fw-bold me-2">
+                                                    <c:choose>
+                                                        <c:when test="${similarProduct.price != null}">
+                                                            <fmt:formatNumber value="${similarProduct.price}" type="currency" currencyCode="VND" pattern="#,##0₫"/>
+                                                        </c:when>
+                                                        <c:otherwise>Liên hệ</c:otherwise>
+                                                    </c:choose>
+                                                </h5>
                                             </div>
                                         </div>
                                             </div>
@@ -254,49 +278,46 @@
                         <div class="row g-4 single-product">
                             <div class="col-xl-6">
                                 <div class="single-carousel owl-carousel">
-                                    <c:choose>
-                                        <c:when test="${not empty images}">
-                                            <c:forEach var="image" items="${images}" varStatus="status">
-                                                <div class="single-item" data-dot="<img class='img-fluid' src='${image.url}' alt='${image.alt_text}'>">
-                                                    <div class="single-inner bg-light rounded">
-                                                        <img src="${image.url}" class="img-fluid rounded" alt="${image.alt_text}">
-                                                    </div>
-                                                </div>
-                                            </c:forEach>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <div class="single-item" data-dot="<img class='img-fluid' src='<%= request.getContextPath() %>/views/assets/electro/img/product-1.png' alt='${product.name}'>">
-                                                <div class="single-inner bg-light rounded">
-                                                    <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-1.png" class="img-fluid rounded" alt="${product.name}">
-                                                </div>
-                                            </div>
-                                        </c:otherwise>
-                                    </c:choose>
+                                    <div class="single-item" data-dot="<img class='img-fluid' src='<%= request.getContextPath() %>/views/assets/electro/img/product-1.png' alt='iPhone 15 Pro Max'>">
+                                        <div class="single-inner bg-light rounded">
+                                            <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-1.png" class="img-fluid rounded" alt="iPhone 15 Pro Max">
+                                        </div>
+                                    </div>
+                                    <div class="single-item" data-dot="<img class='img-fluid' src='<%= request.getContextPath() %>/views/assets/electro/img/product-2.png' alt='iPhone 15 Pro Max'>">
+                                        <div class="single-inner bg-light rounded">
+                                            <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-2.png" class="img-fluid rounded" alt="iPhone 15 Pro Max">
+                                        </div>
+                                    </div>
+                                    <div class="single-item" data-dot="<img class='img-fluid' src='<%= request.getContextPath() %>/views/assets/electro/img/product-3.png' alt='iPhone 15 Pro Max'>">
+                                        <div class="single-inner bg-light rounded">
+                                            <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-3.png" class="img-fluid rounded" alt="iPhone 15 Pro Max">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-xl-6">
                         <div class="product-info">
-                                    <h1 class="product-title mb-3">${product.name}</h1>
+                                    <h1 class="product-title mb-3">iPhone 15 Pro Max 256GB</h1>
                                     
                                     <!-- Product Rating & Reviews -->
                                     <div class="d-flex align-items-center mb-3">
                                         <div class="rating me-3">
-                                    <c:forEach begin="1" end="5" var="i">
-                                                <i class="fa fa-star ${i <= product.average_rating ? 'text-warning' : 'text-muted'}"></i>
-                                    </c:forEach>
-                                </div>
-                                        <span class="text-muted">(${product.total_reviews} đánh giá)</span>
-                                        <span class="badge bg-success ms-3">${product.average_rating}/5</span>
-                            </div>
-                            
+                                            <i class="fa fa-star text-warning"></i>
+                                            <i class="fa fa-star text-warning"></i>
+                                            <i class="fa fa-star text-warning"></i>
+                                            <i class="fa fa-star text-warning"></i>
+                                            <i class="fa fa-star text-warning"></i>
+                                        </div>
+                                        <span class="text-muted">(127 đánh giá)</span>
+                                        <span class="badge bg-success ms-3">4.8/5</span>
+                                    </div>
+                                    
                                     <!-- Price Section -->
                                     <div class="price-section mb-4">
                                         <div class="d-flex align-items-center">
-                                            <h2 class="text-primary mb-0 me-3">${product.price}₫</h2>
-                                            <c:if test="${product.original_price != null && product.original_price > product.price}">
-                                                <span class="text-muted text-decoration-line-through me-2">${product.original_price}₫</span>
-                                                <span class="badge bg-danger">-${Math.round((1 - product.price/product.original_price) * 100)}%</span>
-                                            </c:if>
+                                            <h2 class="text-primary mb-0 me-3">35,990,000₫</h2>
+                                            <span class="text-muted text-decoration-line-through me-2">39,990,000₫</span>
+                                            <span class="badge bg-danger">-10%</span>
                                         </div>
                                     </div>
                                     
@@ -304,111 +325,95 @@
                                     <div class="product-details mb-4">
                                         <div class="row">
                                             <div class="col-6">
-                                                <p class="mb-2"><strong>Danh mục:</strong> ${product.category_id != null ? product.category_id.name : 'Không xác định'}</p>
-                                                <p class="mb-2"><strong>Mã sản phẩm:</strong> ${product.product_id}</p>
-                                                <c:if test="${isDigitalGoods}">
-                                                    <p class="mb-2"><strong>Loại:</strong> <span class="badge bg-info">Tài nguyên số</span></p>
-                                                </c:if>
+                                                <p class="mb-2"><strong>Danh mục:</strong> Điện thoại & Máy tính bảng</p>
+                                                <p class="mb-2"><strong>Mã sản phẩm:</strong> IP15PM256</p>
+                                                <p class="mb-2"><strong>Loại:</strong> <span class="badge bg-info">Hàng vật lý</span></p>
                                             </div>
                                             <div class="col-6">
                                                 <p class="mb-2"><strong>Tình trạng:</strong> 
-                                <c:choose>
-                                    <c:when test="${availableStock > 10}">
-                                                            <span class="text-success"><i class="fas fa-check-circle"></i> Còn hàng</span>
-                                    </c:when>
-                                    <c:when test="${availableStock > 0}">
-                                                            <span class="text-warning"><i class="fas fa-exclamation-triangle"></i> Sắp hết hàng</span>
-                                    </c:when>
-                                    <c:otherwise>
-                                                            <span class="text-danger"><i class="fas fa-times-circle"></i> Hết hàng</span>
-                                    </c:otherwise>
-                                </c:choose>
+                                                    <span class="text-success"><i class="fas fa-check-circle"></i> Còn hàng</span>
                                                 </p>
-                                                <p class="mb-2"><strong>Số lượng:</strong> <span class="text-primary">${availableStock} sản phẩm</span></p>
-                                                <c:if test="${isDigitalGoods}">
-                                                    <p class="mb-2"><strong>Giao hàng:</strong> <span class="text-success"><i class="fas fa-bolt"></i> Tức thì</span></p>
-                                                </c:if>
-                            </div>
-                            </div>
-                            </div>
-                            
-                            <!-- Seller Information -->
-                            <c:if test="${not empty product.seller_id}">
-                                <div class="seller-info mb-4 p-4 bg-light rounded-3 border">
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <h6 class="mb-0"><i class="fas fa-store me-2 text-primary"></i>Thông tin người bán</h6>
-                                        <span class="badge bg-success">Đã xác thực</span>
-                                    </div>
-                                    
-                                    <div class="row align-items-center">
-                                        <div class="col-auto">
-                                            <div class="seller-avatar">
-                                                <img src="${product.seller_id.avatar_url != null ? product.seller_id.avatar_url : '/views/assets/user/img/avatar.jpg'}" 
-                                                     class="rounded-circle border border-3 border-primary" width="60" height="60" alt="Seller Avatar">
+                                                <p class="mb-2"><strong>Số lượng:</strong> <span class="text-primary">25 sản phẩm</span></p>
+                                                <p class="mb-2"><strong>Giao hàng:</strong> <span class="text-success"><i class="fas fa-truck"></i> 1-3 ngày</span></p>
                                             </div>
                                         </div>
-                                        <div class="col">
-                                            <div class="seller-details">
-                                                <h6 class="mb-1 fw-bold">${product.seller_id.full_name}</h6>
-                                                <p class="mb-1 text-muted small">
-                                                    <i class="fas fa-envelope me-1"></i>${product.seller_id.email}
-                                                </p>
-                                                <div class="seller-stats d-flex gap-3">
-                                                    <div class="stat-item">
-                                                        <span class="text-primary fw-bold">4.8</span>
-                                                        <div class="stars">
-                                                            <i class="fas fa-star text-warning"></i>
-                                                            <i class="fas fa-star text-warning"></i>
-                                                            <i class="fas fa-star text-warning"></i>
-                                                            <i class="fas fa-star text-warning"></i>
-                                                            <i class="fas fa-star text-warning"></i>
-                                                        </div>
-                                                        <small class="text-muted">(1,250 đánh giá)</small>
+                                    </div>
+                            
+                            <!-- Seller Information -->
+                            <div class="seller-info mb-4 p-4 bg-light rounded-3 border">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h6 class="mb-0"><i class="fas fa-store me-2 text-primary"></i>Thông tin người bán</h6>
+                                    <span class="badge bg-success">Đã xác thực</span>
+                                </div>
+                                
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <div class="seller-avatar">
+                                            <img src="<%= request.getContextPath() %>/views/assets/user/img/avatar.jpg" 
+                                                 class="rounded-circle border border-3 border-primary" width="60" height="60" alt="Seller Avatar">
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="seller-details">
+                                            <h6 class="mb-1 fw-bold">Nguyễn Văn Minh</h6>
+                                            <p class="mb-1 text-muted small">
+                                                <i class="fas fa-envelope me-1"></i>minh.nguyen@example.com
+                                            </p>
+                                            <div class="seller-stats d-flex gap-3">
+                                                <div class="stat-item">
+                                                    <span class="text-primary fw-bold">4.8</span>
+                                                    <div class="stars">
+                                                        <i class="fas fa-star text-warning"></i>
+                                                        <i class="fas fa-star text-warning"></i>
+                                                        <i class="fas fa-star text-warning"></i>
+                                                        <i class="fas fa-star text-warning"></i>
+                                                        <i class="fas fa-star text-warning"></i>
                                                     </div>
-                                                    <div class="stat-item">
-                                                        <span class="text-success fw-bold">98%</span>
-                                                        <small class="text-muted d-block">Tỷ lệ hài lòng</small>
-                                                    </div>
-                                                    <div class="stat-item">
-                                                        <span class="text-info fw-bold">2,500+</span>
-                                                        <small class="text-muted d-block">Sản phẩm đã bán</small>
-                                                    </div>
+                                                    <small class="text-muted">(1,250 đánh giá)</small>
+                                                </div>
+                                                <div class="stat-item">
+                                                    <span class="text-success fw-bold">98%</span>
+                                                    <small class="text-muted d-block">Tỷ lệ hài lòng</small>
+                                                </div>
+                                                <div class="stat-item">
+                                                    <span class="text-info fw-bold">2,500+</span>
+                                                    <small class="text-muted d-block">Sản phẩm đã bán</small>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-auto">
-                                            <div class="seller-actions">
-                                                <button class="btn btn-outline-primary btn-sm mb-2" onclick="viewSellerProfile(${product.seller_id.user_id})">
-                                                    <i class="fas fa-user me-1"></i>Xem shop
-                                                </button>
-                                                <button class="btn btn-outline-success btn-sm" onclick="contactSeller(${product.seller_id.user_id})">
-                                                    <i class="fas fa-comments me-1"></i>Liên hệ
-                                                </button>
-                                            </div>
-                                        </div>
                                     </div>
-                                    
-                                    <!-- Seller Description -->
-                                    <div class="seller-description mt-3 pt-3 border-top">
-                                        <p class="mb-2 text-muted small">
-                                            <i class="fas fa-quote-left me-1"></i>
-                                            "Chuyên cung cấp tài nguyên digital chất lượng cao với giá cả hợp lý. 
-                                            Cam kết giao hàng nhanh chóng và hỗ trợ khách hàng 24/7."
-                                        </p>
-                                        <div class="d-flex gap-2">
-                                            <span class="badge bg-light text-dark">
-                                                <i class="fas fa-clock me-1"></i>Phản hồi trong 1h
-                                            </span>
-                                            <span class="badge bg-light text-dark">
-                                                <i class="fas fa-shipping-fast me-1"></i>Giao hàng tức thì
-                                            </span>
-                                            <span class="badge bg-light text-dark">
-                                                <i class="fas fa-shield-alt me-1"></i>Bảo hành 7 ngày
-                                            </span>
+                                    <div class="col-auto">
+                                        <div class="seller-actions">
+                                            <button class="btn btn-outline-primary btn-sm mb-2" onclick="viewSellerProfile('seller001')">
+                                                <i class="fas fa-user me-1"></i>Xem shop
+                                            </button>
+                                            <button class="btn btn-outline-success btn-sm" onclick="contactSeller('seller001')">
+                                                <i class="fas fa-comments me-1"></i>Liên hệ
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
-                            </c:if>
+                                
+                                <!-- Seller Description -->
+                                <div class="seller-description mt-3 pt-3 border-top">
+                                    <p class="mb-2 text-muted small">
+                                        <i class="fas fa-quote-left me-1"></i>
+                                        "Chuyên cung cấp điện thoại và phụ kiện chính hãng với giá cả hợp lý. 
+                                        Cam kết giao hàng nhanh chóng và hỗ trợ khách hàng 24/7."
+                                    </p>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-light text-dark">
+                                            <i class="fas fa-clock me-1"></i>Phản hồi trong 1h
+                                        </span>
+                                        <span class="badge bg-light text-dark">
+                                            <i class="fas fa-shipping-fast me-1"></i>Giao hàng nhanh
+                                        </span>
+                                        <span class="badge bg-light text-dark">
+                                            <i class="fas fa-shield-alt me-1"></i>Bảo hành 12 tháng
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                                     
                                     <!-- Quantity Selector -->
                                     <div class="quantity-section mb-4">
@@ -420,7 +425,7 @@
                                                 </button>
                                             </div>
                                             <input type="number" class="form-control form-control-sm text-center border-0" 
-                                                   value="1" min="1" max="${availableStock}" id="quantity">
+                                                   value="1" min="1" max="25" id="quantity">
                                             <div class="input-group-btn">
                                                 <button class="btn btn-sm btn-plus rounded-circle bg-light border" type="button">
                                                     <i class="fa fa-plus"></i>
@@ -431,46 +436,19 @@
 
                                     <!-- Action Buttons -->
                                     <div class="action-buttons mb-4">
-                                        <c:choose>
-                                            <c:when test="${isDigitalGoods}">
-                                                <!-- Digital Goods Buttons -->
-                                                <div class="row g-2">
-                                                    <div class="col-md-8">
-                                                        <button class="btn btn-success w-100 py-3" onclick="buyDigitalGoods()" 
-                                                                ${availableStock == 0 ? 'disabled' : ''}>
-                                                            <i class="fas fa-download me-2"></i>Mua và tải ngay
-                            </button>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <button class="btn btn-outline-primary w-100 py-3" onclick="addToCart()"
-                                                                ${availableStock == 0 ? 'disabled' : ''}>
-                                                            <i class="fas fa-shopping-cart me-2"></i>Thêm vào giỏ
-                            </button>
-                                                    </div>
-                                                </div>
-                                                <div class="alert alert-info mt-3">
-                                                    <i class="fas fa-info-circle me-2"></i>
-                                                    <strong>Tài nguyên số:</strong> Sau khi thanh toán, bạn sẽ nhận được mã kích hoạt, tài khoản hoặc file tải xuống ngay lập tức.
-                                                </div>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <!-- Physical Goods Buttons -->
-                                                <div class="row g-2">
-                                                    <div class="col-md-6">
-                                                        <button class="btn btn-primary w-100 py-3" onclick="buyNow()" 
-                                                                ${availableStock == 0 ? 'disabled' : ''}>
-                                                            <i class="fas fa-bolt me-2"></i>Mua ngay
-                            </button>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <button class="btn btn-outline-primary w-100 py-3" onclick="addToCart()"
-                                                                ${availableStock == 0 ? 'disabled' : ''}>
-                                                            <i class="fas fa-shopping-cart me-2"></i>Thêm vào giỏ
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </c:otherwise>
-                                        </c:choose>
+                                        <!-- Physical Goods Buttons -->
+                                        <div class="row g-2">
+                                            <div class="col-md-6">
+                                                <button class="btn btn-primary w-100 py-3" onclick="buyNow()">
+                                                    <i class="fas fa-bolt me-2"></i>Mua ngay
+                                                </button>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <button class="btn btn-outline-primary w-100 py-3" onclick="addToCart()">
+                                                    <i class="fas fa-shopping-cart me-2"></i>Thêm vào giỏ
+                                                </button>
+                                            </div>
+                                        </div>
                                         <div class="row g-2 mt-2">
                                             <div class="col-md-6">
                                                 <button class="btn btn-outline-danger w-100 py-2" onclick="toggleWishlist()" id="wishlistBtn">
@@ -509,7 +487,7 @@
                                             <i class="fas fa-info-circle me-2"></i>Mô tả sản phẩm
                                         </button>
                                         <button class="nav-link" type="button" role="tab" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" aria-controls="reviews" aria-selected="false">
-                                            <i class="fas fa-star me-2"></i>Đánh giá (${product.total_reviews})
+                                            <i class="fas fa-star me-2"></i>Đánh giá (127)
                                         </button>
                                         <button class="nav-link" type="button" role="tab" id="policies-tab" data-bs-toggle="tab" data-bs-target="#policies" aria-controls="policies" aria-selected="false">
                                             <i class="fas fa-shield-alt me-2"></i>Chính sách
@@ -523,7 +501,7 @@
                                             <div class="col-lg-8">
                                                 <h5 class="mb-3">Mô tả chi tiết</h5>
                                 <div class="product-description">
-                                                    <p class="lead">${product.description}</p>
+                                                    <p class="lead">iPhone 15 Pro Max 256GB với chip A17 Pro mạnh mẽ, camera 48MP và thiết kế titan cao cấp. Sản phẩm mới nhất từ Apple với nhiều tính năng đột phá.</p>
                                                     
                                                     <!-- Product Specifications -->
                                                     <div class="specifications mt-4">
@@ -531,60 +509,30 @@
                                                         <div class="table-responsive">
                                                             <table class="table table-striped">
                                                                 <tbody>
-                                                                    <c:choose>
-                                                                        <c:when test="${isDigitalGoods}">
-                                                                            <tr>
-                                                                                <td><strong>Loại tài nguyên</strong></td>
-                                                                                <td>${product.category_id != null ? product.category_id.name : 'Tài nguyên số'}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td><strong>Định dạng</strong></td>
-                                                                                <td>Digital / Số hóa</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td><strong>Giao hàng</strong></td>
-                                                                                <td><span class="text-success"><i class="fas fa-bolt"></i> Tức thì</span></td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td><strong>Hỗ trợ</strong></td>
-                                                                                <td>24/7 qua chat và email</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td><strong>Bảo hành</strong></td>
-                                                                                <td>7 ngày đổi trả nếu lỗi</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td><strong>Hướng dẫn</strong></td>
-                                                                                <td>Có kèm theo khi mua</td>
-                                                                            </tr>
-                                                                        </c:when>
-                                                                        <c:otherwise>
-                                                                            <tr>
-                                                                                <td><strong>Thương hiệu</strong></td>
-                                                                                <td>${product.brand != null ? product.brand : 'Không xác định'}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td><strong>Model</strong></td>
-                                                                                <td>${product.model != null ? product.model : 'Không xác định'}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td><strong>Màu sắc</strong></td>
-                                                                                <td>${product.color != null ? product.color : 'Không xác định'}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td><strong>Kích thước</strong></td>
-                                                                                <td>${product.dimensions != null ? product.dimensions : 'Không xác định'}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td><strong>Trọng lượng</strong></td>
-                                                                                <td>${product.weight != null ? product.weight : 'Không xác định'}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td><strong>Bảo hành</strong></td>
-                                                                                <td>${product.warranty != null ? product.warranty : '12 tháng'}</td>
-                                                                            </tr>
-                                                                        </c:otherwise>
-                                                                    </c:choose>
+                                                                    <tr>
+                                                                        <td><strong>Thương hiệu</strong></td>
+                                                                        <td>Apple</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td><strong>Model</strong></td>
+                                                                        <td>iPhone 15 Pro Max</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td><strong>Màu sắc</strong></td>
+                                                                        <td>Titanium Natural</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td><strong>Kích thước</strong></td>
+                                                                        <td>159.9 x 76.7 x 8.25 mm</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td><strong>Trọng lượng</strong></td>
+                                                                        <td>221g</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td><strong>Bảo hành</strong></td>
+                                                                        <td>12 tháng</td>
+                                                                    </tr>
                                                                 </tbody>
                                                             </table>
                                                         </div>
@@ -595,22 +543,10 @@
                                                 <div class="bg-light p-4 rounded">
                                                     <h6 class="mb-3">Thông tin bổ sung</h6>
                                                     <ul class="list-unstyled">
-                                                        <c:choose>
-                                                            <c:when test="${isDigitalGoods}">
-                                                                <li class="mb-2"><i class="fas fa-bolt text-success me-2"></i>Giao hàng tức thì</li>
-                                                                <li class="mb-2"><i class="fas fa-download text-success me-2"></i>Tải xuống ngay sau khi mua</li>
-                                                                <li class="mb-2"><i class="fas fa-shield-alt text-success me-2"></i>Bảo hành 7 ngày</li>
-                                                                <li class="mb-2"><i class="fas fa-headset text-success me-2"></i>Hỗ trợ 24/7</li>
-                                                                <li class="mb-2"><i class="fas fa-file-alt text-success me-2"></i>Hướng dẫn sử dụng</li>
-                                                                <li class="mb-2"><i class="fas fa-redo text-success me-2"></i>Đổi trả nếu lỗi</li>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <li class="mb-2"><i class="fas fa-truck text-success me-2"></i>Miễn phí vận chuyển</li>
-                                                                <li class="mb-2"><i class="fas fa-undo text-success me-2"></i>Đổi trả trong 30 ngày</li>
-                                                                <li class="mb-2"><i class="fas fa-shield-alt text-success me-2"></i>Bảo hành chính hãng</li>
-                                                                <li class="mb-2"><i class="fas fa-headset text-success me-2"></i>Hỗ trợ 24/7</li>
-                                                            </c:otherwise>
-                                                        </c:choose>
+                                                        <li class="mb-2"><i class="fas fa-truck text-success me-2"></i>Miễn phí vận chuyển</li>
+                                                        <li class="mb-2"><i class="fas fa-undo text-success me-2"></i>Đổi trả trong 30 ngày</li>
+                                                        <li class="mb-2"><i class="fas fa-shield-alt text-success me-2"></i>Bảo hành chính hãng</li>
+                                                        <li class="mb-2"><i class="fas fa-headset text-success me-2"></i>Hỗ trợ 24/7</li>
                                                     </ul>
                                                 </div>
                                 </div>
@@ -622,40 +558,54 @@
                                         <div class="row">
                                             <div class="col-lg-4">
                                                 <div class="rating-summary text-center p-4 bg-light rounded">
-                                                    <h2 class="text-primary mb-2">${product.average_rating}</h2>
+                                                    <h2 class="text-primary mb-2">4.8</h2>
                                                     <div class="stars mb-3">
-                                                <c:forEach begin="1" end="5" var="i">
-                                                            <i class="fa fa-star ${i <= product.average_rating ? 'text-warning' : 'text-muted'}"></i>
-                                                </c:forEach>
-                                            </div>
-                                                    <p class="text-muted">Dựa trên ${product.total_reviews} đánh giá</p>
+                                                        <i class="fa fa-star text-warning"></i>
+                                                        <i class="fa fa-star text-warning"></i>
+                                                        <i class="fa fa-star text-warning"></i>
+                                                        <i class="fa fa-star text-warning"></i>
+                                                        <i class="fa fa-star text-warning"></i>
+                                                    </div>
+                                                    <p class="text-muted">Dựa trên 127 đánh giá</p>
                                                     
                                                     <!-- Rating Distribution -->
                                                     <div class="rating-breakdown mt-4">
-                                        <c:forEach begin="5" end="1" step="-1" var="rating">
-                                            <div class="d-flex align-items-center mb-2">
-                                                <span class="me-2">${rating} <i class="fas fa-star text-warning"></i></span>
-                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
-                                                                    <c:choose>
-                                                                        <c:when test="${rating == 5}"><div class="progress-bar" style="width: 80%"></div></c:when>
-                                                                        <c:when test="${rating == 4}"><div class="progress-bar" style="width: 60%"></div></c:when>
-                                                                        <c:when test="${rating == 3}"><div class="progress-bar" style="width: 30%"></div></c:when>
-                                                                        <c:when test="${rating == 2}"><div class="progress-bar" style="width: 10%"></div></c:when>
-                                                                        <c:otherwise><div class="progress-bar" style="width: 5%"></div></c:otherwise>
-                                                                    </c:choose>
-                                                </div>
-                                                                <span class="text-muted small">
-                                                                    <c:choose>
-                                                                        <c:when test="${rating == 5}">80</c:when>
-                                                                        <c:when test="${rating == 4}">60</c:when>
-                                                                        <c:when test="${rating == 3}">30</c:when>
-                                                                        <c:when test="${rating == 2}">10</c:when>
-                                                                        <c:otherwise>5</c:otherwise>
-                                                                    </c:choose>
-                                                                </span>
-                                            </div>
-                                        </c:forEach>
-                                    </div>
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <span class="me-2">5 <i class="fas fa-star text-warning"></i></span>
+                                                            <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                                <div class="progress-bar" style="width: 80%"></div>
+                                                            </div>
+                                                            <span class="text-muted small">80</span>
+                                                        </div>
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <span class="me-2">4 <i class="fas fa-star text-warning"></i></span>
+                                                            <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                                <div class="progress-bar" style="width: 60%"></div>
+                                                            </div>
+                                                            <span class="text-muted small">60</span>
+                                                        </div>
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <span class="me-2">3 <i class="fas fa-star text-warning"></i></span>
+                                                            <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                                <div class="progress-bar" style="width: 30%"></div>
+                                                            </div>
+                                                            <span class="text-muted small">30</span>
+                                                        </div>
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <span class="me-2">2 <i class="fas fa-star text-warning"></i></span>
+                                                            <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                                <div class="progress-bar" style="width: 10%"></div>
+                                                            </div>
+                                                            <span class="text-muted small">10</span>
+                                                        </div>
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <span class="me-2">1 <i class="fas fa-star text-warning"></i></span>
+                                                            <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                                <div class="progress-bar" style="width: 5%"></div>
+                                                            </div>
+                                                            <span class="text-muted small">5</span>
+                                                        </div>
+                                                    </div>
                                 </div>
                                             </div>
                                             <div class="col-lg-8">
@@ -687,38 +637,74 @@
                                 
                                 <!-- Reviews List -->
                                 <div class="reviews-list">
-                                    <c:choose>
-                                        <c:when test="${not empty reviews}">
-                                            <c:forEach var="review" items="${reviews}">
-                                                                <div class="review-item border-bottom pb-3 mb-3">
-                                                                    <div class="d-flex align-items-start">
-                                                        <img src="${review.buyer_id.avatar_url != null ? review.buyer_id.avatar_url : '/views/assets/user/img/avatar.jpg'}" 
-                                                                             class="rounded-circle me-3" width="50" height="50" alt="Avatar">
-                                                                        <div class="flex-grow-1">
-                                                                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                                                                <div>
-                                                                                    <h6 class="mb-1">${review.buyer_id.full_name}</h6>
-                                                                                    <div class="stars">
-                                                            <c:forEach begin="1" end="5" var="i">
-                                                                                            <i class="fa fa-star ${i <= review.rating ? 'text-warning' : 'text-muted'}"></i>
-                                                            </c:forEach>
+                                    <div class="review-item border-bottom pb-3 mb-3">
+                                        <div class="d-flex align-items-start">
+                                            <img src="<%= request.getContextPath() %>/views/assets/user/img/avatar.jpg" 
+                                                 class="rounded-circle me-3" width="50" height="50" alt="Avatar">
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <div>
+                                                        <h6 class="mb-1">Trần Thị Hương</h6>
+                                                        <div class="stars">
+                                                            <i class="fa fa-star text-warning"></i>
+                                                            <i class="fa fa-star text-warning"></i>
+                                                            <i class="fa fa-star text-warning"></i>
+                                                            <i class="fa fa-star text-warning"></i>
+                                                            <i class="fa fa-star text-warning"></i>
                                                         </div>
-                                                                                </div>
-                                                                                <small class="text-muted">${review.createdAt}</small>
                                                     </div>
-                                                    <p class="mb-0">${review.comment}</p>
-                                                                        </div>
-                                                                    </div>
+                                                    <small class="text-muted">2 ngày trước</small>
                                                 </div>
-                                            </c:forEach>
-                                        </c:when>
-                                        <c:otherwise>
-                                                            <div class="text-center py-5">
-                                                                <i class="fas fa-comments fa-3x text-muted mb-3"></i>
-                                                                <p class="text-muted">Chưa có đánh giá nào. Hãy là người đầu tiên đánh giá sản phẩm này!</p>
-                                                            </div>
-                                        </c:otherwise>
-                                    </c:choose>
+                                                <p class="mb-0">Sản phẩm rất tốt, camera chụp ảnh đẹp, pin trâu. Giao hàng nhanh, đóng gói cẩn thận. Rất hài lòng!</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="review-item border-bottom pb-3 mb-3">
+                                        <div class="d-flex align-items-start">
+                                            <img src="<%= request.getContextPath() %>/views/assets/user/img/avatar.jpg" 
+                                                 class="rounded-circle me-3" width="50" height="50" alt="Avatar">
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <div>
+                                                        <h6 class="mb-1">Lê Văn Nam</h6>
+                                                        <div class="stars">
+                                                            <i class="fa fa-star text-warning"></i>
+                                                            <i class="fa fa-star text-warning"></i>
+                                                            <i class="fa fa-star text-warning"></i>
+                                                            <i class="fa fa-star text-warning"></i>
+                                                            <i class="fa fa-star text-muted"></i>
+                                                        </div>
+                                                    </div>
+                                                    <small class="text-muted">1 tuần trước</small>
+                                                </div>
+                                                <p class="mb-0">iPhone 15 Pro Max rất mượt mà, thiết kế đẹp. Chỉ có điều giá hơi cao nhưng chất lượng xứng đáng.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="review-item border-bottom pb-3 mb-3">
+                                        <div class="d-flex align-items-start">
+                                            <img src="<%= request.getContextPath() %>/views/assets/user/img/avatar.jpg" 
+                                                 class="rounded-circle me-3" width="50" height="50" alt="Avatar">
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <div>
+                                                        <h6 class="mb-1">Phạm Thị Mai</h6>
+                                                        <div class="stars">
+                                                            <i class="fa fa-star text-warning"></i>
+                                                            <i class="fa fa-star text-warning"></i>
+                                                            <i class="fa fa-star text-warning"></i>
+                                                            <i class="fa fa-star text-warning"></i>
+                                                            <i class="fa fa-star text-warning"></i>
+                                                        </div>
+                                                    </div>
+                                                    <small class="text-muted">2 tuần trước</small>
+                                                </div>
+                                                <p class="mb-0">Tuyệt vời! Camera chụp ảnh cực đẹp, màn hình sắc nét. Pin dùng được cả ngày. Shop phục vụ tốt!</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                                 </div>
                             </div>
@@ -778,6 +764,8 @@
                 </div>
             </div>
         </div>
+                    </c:otherwise>
+                </c:choose>
         <!-- Single Products End -->
 
         <!-- Similar Products Section -->
@@ -825,8 +813,8 @@
                                         <div class="d-flex align-items-center justify-content-between mb-3">
                                             <div>
                                                 <span class="h5 text-primary mb-0">45,000,000₫</span>
-            </div>
-        </div>
+                                            </div>
+                                        </div>
                                         <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(2)">
                                             <i class="fas fa-eye me-1"></i> Chi tiết
                                         </button>
@@ -1026,10 +1014,17 @@
 
         <!-- Global Variables -->
         <script>
-            const productId = <%= product.product_id != null ? product.product_id : 0 %>;
-            const maxQuantity = <%= availableStock != null ? availableStock : 0 %>;
+            var productId = 1;
+            var maxQuantity = 25;
+            
+            // Check if product data is available
+            if (productId === 0) {
+                console.error('Product data not found');
+                document.body.innerHTML = '<div class="container mt-5"><div class="alert alert-danger text-center"><h4>Sản phẩm không tồn tại</h4><p>Xin lỗi, sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p><a href="<%= request.getContextPath() %>/products" class="btn btn-primary">Quay lại cửa hàng</a></div></div>';
+            }
         </script>
-        
+
+
         <!-- Enhanced Product Detail Scripts -->
         <script>
             // Global variables
@@ -1137,7 +1132,7 @@
             // Social sharing functions
             function shareProduct() {
                 const url = window.location.href;
-                const title = '<%= product.name %>';
+                const title = 'iPhone 15 Pro Max 256GB';
                 const text = 'Xem sản phẩm này trên Gicungco Marketplace';
                 
                 if (navigator.share) {
