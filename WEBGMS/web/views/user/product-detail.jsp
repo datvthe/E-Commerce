@@ -1,4 +1,3 @@
-
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -6,10 +5,10 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>iPhone 15 Pro Max 256GB - Gicungco Marketplace</title>
+        <title>${empty product.name ? 'Sản phẩm' : product.name} - Gicungco Marketplace</title>
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <meta content="iPhone, smartphone, Apple, mobile" name="keywords">
-        <meta content="iPhone 15 Pro Max 256GB với chip A17 Pro mạnh mẽ, camera 48MP và thiết kế titan cao cấp" name="description">
+        <meta content="${empty product.description ? 'Chi tiết sản phẩm trên Gicungco' : product.description}" name="description">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -20,6 +19,17 @@
         <link href="<%= request.getContextPath() %>/views/assets/electro/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
         <link href="<%= request.getContextPath() %>/views/assets/electro/css/bootstrap.min.css" rel="stylesheet">
         <link href="<%= request.getContextPath() %>/views/assets/electro/css/style.css" rel="stylesheet">
+        <style>
+            /* Align seller action buttons on one line */
+            .seller-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap: nowrap; }
+            .seller-actions .btn { white-space: nowrap; }
+
+            /* Ensure all similar product cards align their CTA at the bottom */
+            .product-card { display: flex; flex-direction: column; height: 100%; }
+            .product-card .card-img-top { height: 220px; width: 100%; object-fit: contain; }
+            .product-card .card-body { display: flex; flex-direction: column; }
+            .product-card .btn { margin-top: auto; }
+        </style>
     </head>
     <body>
         <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
@@ -179,7 +189,7 @@
             <ol class="breadcrumb justify-content-center mb-0 wow fadeInUp" data-wow-delay="0.3s">
                 <li class="breadcrumb-item"><a href="<%= request.getContextPath() %>/home">Trang chủ</a></li>
                 <li class="breadcrumb-item"><a href="<%= request.getContextPath() %>/products">Sản phẩm</a></li>
-                <li class="breadcrumb-item active text-white">iPhone 15 Pro Max 256GB</li>
+                <li class="breadcrumb-item active text-white">${empty product.name ? 'Sản phẩm' : product.name}</li>
             </ol>
         </div>
         <!-- Single Page Header End -->
@@ -278,26 +288,29 @@
                         <div class="row g-4 single-product">
                             <div class="col-xl-6">
                                 <div class="single-carousel owl-carousel">
-                                    <div class="single-item" data-dot="<img class='img-fluid' src='<%= request.getContextPath() %>/views/assets/electro/img/product-1.png' alt='iPhone 15 Pro Max'>">
-                                        <div class="single-inner bg-light rounded">
-                                            <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-1.png" class="img-fluid rounded" alt="iPhone 15 Pro Max">
-                                        </div>
-                                    </div>
-                                    <div class="single-item" data-dot="<img class='img-fluid' src='<%= request.getContextPath() %>/views/assets/electro/img/product-2.png' alt='iPhone 15 Pro Max'>">
-                                        <div class="single-inner bg-light rounded">
-                                            <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-2.png" class="img-fluid rounded" alt="iPhone 15 Pro Max">
-                                        </div>
-                                    </div>
-                                    <div class="single-item" data-dot="<img class='img-fluid' src='<%= request.getContextPath() %>/views/assets/electro/img/product-3.png' alt='iPhone 15 Pro Max'>">
-                                        <div class="single-inner bg-light rounded">
-                                            <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-3.png" class="img-fluid rounded" alt="iPhone 15 Pro Max">
-                                        </div>
-                                    </div>
+                                    <c:choose>
+                                        <c:when test="${not empty images}">
+                                            <c:forEach var="image" items="${images}">
+                                                <div class="single-item" data-dot="<img class='img-fluid' src='${image.url}' alt='${image.alt_text != null ? image.alt_text : "Hình ảnh sản phẩm"}'>">
+                                                    <div class="single-inner bg-light rounded">
+                                                        <img src="${image.url}" class="img-fluid rounded" alt="${image.alt_text != null ? image.alt_text : "Hình ảnh sản phẩm"}">
+                                                    </div>
+                                                </div>
+                                            </c:forEach>
+                                        </c:when>
+                                        <c:otherwise>
+                                    <div class="single-item" data-dot="<img class='img-fluid' src='<%= request.getContextPath() %>/views/assets/electro/img/product-1.png' alt='${empty product.name ? "Hình ảnh sản phẩm" : product.name}'>">
+                                                <div class="single-inner bg-light rounded">
+                                            <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-1.png" class="img-fluid rounded" alt="${empty product.name ? "Hình ảnh sản phẩm" : product.name}">
+                                                </div>
+                                            </div>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                             </div>
                             <div class="col-xl-6">
                         <div class="product-info">
-                                    <h1 class="product-title mb-3">iPhone 15 Pro Max 256GB</h1>
+                                    <h1 class="product-title mb-3">${empty product.name ? 'Sản phẩm' : product.name}</h1>
                                     
                                     <!-- Product Rating & Reviews -->
                                     <div class="d-flex align-items-center mb-3">
@@ -384,7 +397,7 @@
                                     </div>
                                     <div class="col-auto">
                                         <div class="seller-actions">
-                                            <button class="btn btn-outline-primary btn-sm mb-2" onclick="viewSellerProfile('seller001')">
+                                            <button class="btn btn-outline-primary btn-sm" onclick="viewSellerProfile('seller001')">
                                                 <i class="fas fa-user me-1"></i>Xem shop
                                             </button>
                                             <button class="btn btn-outline-success btn-sm" onclick="contactSeller('seller001')">
@@ -438,14 +451,9 @@
                                     <div class="action-buttons mb-4">
                                         <!-- Physical Goods Buttons -->
                                         <div class="row g-2">
-                                            <div class="col-md-6">
+                                            <div class="col-md-12">
                                                 <button class="btn btn-primary w-100 py-3" onclick="buyNow()">
                                                     <i class="fas fa-bolt me-2"></i>Mua ngay
-                                                </button>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <button class="btn btn-outline-primary w-100 py-3" onclick="addToCart()">
-                                                    <i class="fas fa-shopping-cart me-2"></i>Thêm vào giỏ
                                                 </button>
                                             </div>
                                         </div>
@@ -1014,7 +1022,7 @@
 
         <!-- Global Variables -->
         <script>
-            var productId = 1;
+            var productId = parseInt("${empty product.product_id ? 1 : product.product_id}");
             var maxQuantity = 25;
             
             // Check if product data is available
@@ -1132,7 +1140,7 @@
             // Social sharing functions
             function shareProduct() {
                 const url = window.location.href;
-                const title = 'iPhone 15 Pro Max 256GB';
+                const title = "${empty product.name ? 'Sản phẩm' : product.name}";
                 const text = 'Xem sản phẩm này trên Gicungco Marketplace';
                 
                 if (navigator.share) {

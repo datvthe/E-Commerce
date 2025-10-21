@@ -1,13 +1,61 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 <!DOCTYPE html>
 <html>
     <head>
         <jsp:include page="/views/component/head.jspf" />
+        <meta charset="utf-8">
+        <title>Danh mục sản phẩm</title>
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <meta content="Khám phá hàng ngàn sản phẩm chất lượng cao" name="description">
-        
-        <!-- Products Page Styles -->
+
+        <!-- Favicon -->
+        <link href="<%= request.getContextPath() %>/views/assets/electro/img/favicon.ico" rel="icon">
+
+        <!-- Google Web Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+        <!-- Icon Font Stylesheet -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+        <!-- Libraries Stylesheet -->
+        <link href="<%= request.getContextPath() %>/views/assets/electro/lib/animate/animate.min.css" rel="stylesheet">
+        <link href="<%= request.getContextPath() %>/views/assets/electro/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+        <!-- Customized Bootstrap Stylesheet -->
+        <link href="<%= request.getContextPath() %>/views/assets/electro/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Template Stylesheet -->
+        <link href="<%= request.getContextPath() %>/views/assets/electro/css/style.css" rel="stylesheet">
+
         <style>
+            .pagination {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+                list-style: none;
+                padding-left: 0;
+                gap: 5px;
+            }
+            .pagination .page-item {
+                display: inline-block;
+            }
+            .pagination .page-link {
+                padding: 0.5rem 0.75rem;
+                border-radius: 5px;
+                text-decoration: none;
+            }
+            .pagination .page-item .active .page-link {
+                color: #fff;
+                border-color: #007bff;
+                background-color: #007bff;
+            }
+
             .product-card {
                 border: 1px solid #eee;
                 border-radius: 10px;
@@ -16,23 +64,23 @@
                 height: 100%;
                 background: white;
             }
-            
+
             .product-card:hover {
                 box-shadow: 0 5px 20px rgba(0,0,0,0.1);
                 transform: translateY(-5px);
             }
-            
+
             .product-image {
                 width: 100%;
                 height: 200px;
                 object-fit: cover;
                 background: #f8f9fa;
             }
-            
+
             .product-card-body {
                 padding: 15px;
             }
-            
+
             .product-title {
                 font-size: 1rem;
                 font-weight: 600;
@@ -44,40 +92,40 @@
                 -webkit-box-orient: vertical;
                 overflow: hidden;
             }
-            
+
             .product-title:hover {
                 color: #007bff;
             }
-            
+
             .product-price {
                 font-size: 1.1rem;
                 font-weight: 600;
                 color: #e74c3c;
                 margin-bottom: 10px;
             }
-            
+
             .product-rating {
                 display: flex;
                 align-items: center;
                 margin-bottom: 15px;
             }
-            
+
             .stars {
                 color: #ffc107;
                 font-size: 0.9rem;
                 margin-right: 5px;
             }
-            
+
             .rating-text {
                 color: #666;
                 font-size: 0.8rem;
             }
-            
+
             .product-actions {
                 display: flex;
                 gap: 10px;
             }
-            
+
             .btn-product {
                 flex: 1;
                 padding: 8px 12px;
@@ -89,53 +137,53 @@
                 border: none;
                 cursor: pointer;
             }
-            
+
             .btn-detail {
                 background: #007bff;
                 color: white;
             }
-            
+
             .btn-detail:hover {
                 background: #0056b3;
                 color: white;
             }
-            
-            
+
+
             .filters-section {
                 background: #f8f9fa;
                 padding: 20px;
                 border-radius: 10px;
                 margin-bottom: 30px;
             }
-            
+
             .pagination {
                 justify-content: center;
                 margin-top: 40px;
             }
-            
+
             .page-link {
                 color: #007bff;
                 border: 1px solid #dee2e6;
                 padding: 0.5rem 0.75rem;
             }
-            
+
             .page-link:hover {
                 color: #0056b3;
                 background-color: #e9ecef;
                 border-color: #dee2e6;
             }
-            
+
             .page-item.active .page-link {
                 background-color: #007bff;
                 border-color: #007bff;
             }
-            
+
             .breadcrumb {
                 background: transparent;
                 padding: 0;
                 margin-bottom: 20px;
             }
-            
+
             .breadcrumb-item + .breadcrumb-item::before {
                 content: ">";
                 color: #6c757d;
@@ -171,25 +219,29 @@
                 </div>
 
                 <!-- Filters Section -->
-                <div class="filters-section">
-                    <div class="row align-items-center">
+                <form action="products" method="get" class="filters-section mb-4">
+                    <div class="row align-items-end g-3">
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Tìm kiếm:</label>
-                            <input type="text" class="form-control" id="searchInput" placeholder="Nhập tên sản phẩm..." value="${search}">
+                            <input type="text" class="form-control" name="search"
+                                   placeholder="Nhập tên sản phẩm..." value="${search}">
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-bold">Danh mục:</label>
-                            <select class="form-select" id="categorySelect">
+                            <select name="category" class="form-select">
                                 <option value="">Tất cả danh mục</option>
-                                <option value="electronics" ${category == 'electronics' ? 'selected' : ''}>Điện tử</option>
-                                <option value="fashion" ${category == 'fashion' ? 'selected' : ''}>Thời trang</option>
-                                <option value="home" ${category == 'home' ? 'selected' : ''}>Gia dụng</option>
-                                <option value="sports" ${category == 'sports' ? 'selected' : ''}>Thể thao</option>
+                                <c:forEach var="categoryItem" items="${categories}">
+                                    <option value="${categoryItem.category_id}"
+                                            ${category == categoryItem.category_id ? 'selected' : ''}>
+                                        ${categoryItem.name}
+                                    </option>
+                                </c:forEach>
                             </select>
+
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-bold">Sắp xếp:</label>
-                            <select class="form-select" id="sortSelect">
+                            <select class="form-select" name="sort">
                                 <option value="">Mặc định</option>
                                 <option value="priceAsc" ${sort == 'priceAsc' ? 'selected' : ''}>Giá tăng dần</option>
                                 <option value="priceDesc" ${sort == 'priceDesc' ? 'selected' : ''}>Giá giảm dần</option>
@@ -199,44 +251,58 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-bold">Hiển thị:</label>
-                            <select class="form-select" id="pageSizeSelect">
+                            <select class="form-select" name="pageSize">
                                 <option value="12" ${pageSize == 12 ? 'selected' : ''}>12 sản phẩm</option>
                                 <option value="24" ${pageSize == 24 ? 'selected' : ''}>24 sản phẩm</option>
                                 <option value="48" ${pageSize == 48 ? 'selected' : ''}>48 sản phẩm</option>
                             </select>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold">&nbsp;</label>
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-primary" onclick="applyFilters()">
-                                    <i class="fas fa-search"></i> Tìm kiếm
-                                </button>
-                                <button class="btn btn-outline-secondary" onclick="clearFilters()">
-                                    <i class="fas fa-times"></i> Xóa bộ lọc
-                                </button>
-                            </div>
+                        <div class="col-md-3 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-grow-1">
+                                <i class="fas fa-search"></i> Tìm kiếm
+                            </button>
+                            <a href="products" class="btn btn-outline-secondary flex-grow-1">
+                                <i class="fas fa-times"></i> Xóa bộ lọc
+                            </a>
                         </div>
                     </div>
-                </div>
+                </form>
+
 
                 <!-- Products Grid -->
-                <div class="row g-4">
+                <div class="row g-4" id="productsContainer">
                     <c:choose>
                         <c:when test="${not empty products}">
                             <c:forEach var="product" items="${products}">
                                 <div class="col-sm-6 col-md-4 col-lg-3">
                                     <div class="product-card">
+
+                                        <!-- ✅ Find the primary image or fallback -->
+                                        <c:set var="primaryImage" value="" />
+                                        <c:forEach var="img" items="${product.productImages}">
+                                            <c:if test="${img.is_primary}">
+                                                <c:set var="primaryImage" value="${img.url}" />
+                                            </c:if>
+                                        </c:forEach>
+
+                                        <!-- ✅ If no primary found, use default -->
+                                        <c:if test="${empty primaryImage}">
+                                            <c:set var="primaryImage" value='${pageContext.request.contextPath}/views/assets/user/img/product-1.png' />
+                                        </c:if>
+
+
                                         <a href="<%= request.getContextPath() %>/product/${product.slug}">
-                                            <img src="<%= request.getContextPath() %>/views/assets/user/img/product-1.png" 
-                                                 alt="${product.name}" class="product-image">
+                                            <img src="${primaryImage}" alt="${product.name}" class="product-image">
                                         </a>
+
                                         <div class="product-card-body">
                                             <a href="<%= request.getContextPath() %>/product/${product.slug}" class="product-title">
                                                 ${product.name}
                                             </a>
                                             <div class="product-price">
-                                                ${product.price}₫
+                                                <fmt:formatNumber value="${product.price}" type="number" groupingUsed="true" maxFractionDigits="0" />₫
                                             </div>
+
                                             <div class="product-rating">
                                                 <div class="stars">
                                                     <c:forEach begin="1" end="5" var="i">
@@ -245,23 +311,16 @@
                                                 </div>
                                                 <span class="rating-text">(${product.total_reviews})</span>
                                             </div>
-                                            <div class="product-actions">
-                                                <a href="<%= request.getContextPath() %>/product/${product.slug}" 
-                                                   class="btn-product btn-detail">
-                                                    <i class="fas fa-eye"></i> Chi tiết
-                                                </a>
-                                                <!-- Action buttons removed -->
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </c:forEach>
                         </c:when>
+
                         <c:otherwise>
                             <div class="col-12 text-center py-5">
                                 <i class="fas fa-search fa-3x text-muted mb-3"></i>
                                 <h4 class="text-muted">Không tìm thấy sản phẩm nào</h4>
-                                <p class="text-muted">Hãy thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
                                 <button class="btn btn-primary" onclick="clearFilters()">Xóa bộ lọc</button>
                             </div>
                         </c:otherwise>
@@ -271,35 +330,26 @@
                 <!-- Pagination -->
                 <c:if test="${totalPages > 1}">
                     <nav aria-label="Products pagination">
-                        <ul class="pagination">
+                        <ul class="pagination mt-4">
                             <c:if test="${currentPage > 1}">
                                 <li class="page-item">
-                                    <a class="page-link" href="?page=${currentPage - 1}&category=${category}&sort=${sort}&search=${search}">
+                                    <a class="page-link" href="?page=${currentPage - 1}&category=${category}&sort=${sort}&search=${search}&pageSize=${pageSize}">
                                         <i class="fas fa-chevron-left"></i> Trước
                                     </a>
                                 </li>
                             </c:if>
-                            
+
                             <c:forEach begin="1" end="${totalPages}" var="pageNum">
-                                <c:choose>
-                                    <c:when test="${pageNum == currentPage}">
-                                        <li class="page-item active">
-                                            <span class="page-link">${pageNum}</span>
-                                        </li>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page=${pageNum}&category=${category}&sort=${sort}&search=${search}">
-                                                ${pageNum}
-                                            </a>
-                                        </li>
-                                    </c:otherwise>
-                                </c:choose>
+                                <li class="page-item ${pageNum == currentPage ? 'active' : ''}">
+                                    <a class="page-link" href="?page=${pageNum}&category=${category}&sort=${sort}&search=${search}&pageSize=${pageSize}">
+                                        ${pageNum}
+                                    </a>
+                                </li>
                             </c:forEach>
-                            
+
                             <c:if test="${currentPage < totalPages}">
                                 <li class="page-item">
-                                    <a class="page-link" href="?page=${currentPage + 1}&category=${category}&sort=${sort}&search=${search}">
+                                    <a class="page-link" href="?page=${currentPage + 1}&category=${category}&sort=${sort}&search=${search}&pageSize=${pageSize}">
                                         Sau <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>
@@ -310,61 +360,91 @@
             </div>
         </div>
 
-        <!-- Footer -->
         <jsp:include page="/views/component/footer.jsp" />
 
-        <!-- Products Page JavaScript -->
+        <!-- AJAX Logic (Not using right now) -->
         <script>
-            // Apply filters
-            function applyFilters() {
-                const search = document.getElementById('searchInput').value;
+            async function applyFilters() {
+                const search = document.getElementById('searchInput').value.trim();
                 const category = document.getElementById('categorySelect').value;
                 const sort = document.getElementById('sortSelect').value;
                 const pageSize = document.getElementById('pageSizeSelect').value;
-                
-                const params = new URLSearchParams();
-                if (search) params.append('search', search);
-                if (category) params.append('category', category);
-                if (sort) params.append('sort', sort);
-                if (pageSize) params.append('pageSize', pageSize);
-                
-                window.location.href = '?' + params.toString();
+
+                const params = new URLSearchParams({search, category, sort, pageSize});
+
+                try {
+                    const response = await fetch('<%= request.getContextPath() %>/products?' + params.toString(), {
+                        headers: {'X-Requested-With': 'XMLHttpRequest'}
+                    });
+
+                    if (!response.ok)
+                        throw new Error('Network error');
+
+                    const products = await response.json();
+                    console.log(products)
+                    renderProducts(products);
+                } catch (err) {
+                    console.error('Error fetching products:', err);
+                    showNotification("Không thể tải sản phẩm.", "error");
+                }
             }
-            
-            // Clear filters
+
             function clearFilters() {
-                window.location.href = '<%= request.getContextPath() %>/products';
+                document.getElementById('searchInput').value = '';
+                document.getElementById('categorySelect').value = '';
+                document.getElementById('sortSelect').value = '';
+                document.getElementById('pageSizeSelect').value = '12';
+                applyFilters();
             }
-            
-            // Action buttons JS removed
-            
-            // Show notification
+
+            function renderProducts(products) {
+                const container = document.getElementById('productsContainer');
+                container.innerHTML = '';
+
+                if (products.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-12 text-center py-5">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">Không tìm thấy sản phẩm nào</h4>
+                        </div>`;
+                    return;
+                }
+
+                products.forEach(p => {
+                    console.log(p)
+                    container.insertAdjacentHTML('beforeend', `
+                        <div class="col-sm-6 col-md-4 col-lg-3">
+                            <div class="product-card">
+                                <a href="${p.slug}">
+                                    <img src="${p.imageUrl}"
+                                         alt="${p.name}" class="product-image">
+                                </a>
+                                <div class="product-card-body">
+                                    <a href="${p.slug}" class="product-title">${p.name}</a>
+                                    <div class="product-price">${p.price}₫</div>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+
+            document.getElementById('searchInput').addEventListener('keypress', e => {
+                if (e.key === 'Enter')
+                    applyFilters();
+            });
+
             function showNotification(message, type) {
                 const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
                 const notification = `
-                    <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+                    <div class="alert ${alertClass} alert-dismissible fade show position-fixed"
                          style="top: 20px; right: 20px; z-index: 9999;">
-                        ${message}
+            ${message}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                `;
+                    </div>`;
                 document.body.insertAdjacentHTML('beforeend', notification);
-                
-                // Auto remove after 3 seconds
-                setTimeout(() => {
-                    const alert = document.querySelector('.alert');
-                    if (alert) {
-                        alert.remove();
-                    }
-                }, 3000);
+                setTimeout(() => document.querySelector('.alert')?.remove(), 3000);
             }
-            
-            // Enter key search
-            document.getElementById('searchInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    applyFilters();
-                }
-            });
         </script>
     </body>
 </html>

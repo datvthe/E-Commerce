@@ -7,6 +7,7 @@ package model.product;
 import model.user.Users;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
 
 public class Products {
 
@@ -23,6 +24,7 @@ public class Products {
     private ProductCategories category_id;
     private double average_rating;
     private int total_reviews;
+    private List<ProductImages> productImages;
     private Timestamp created_at;
     private Timestamp updated_at;
     private Timestamp deleted_at;
@@ -181,6 +183,14 @@ public class Products {
     public void setUpdatedAt(Timestamp updatedAt) { this.updated_at = updatedAt; }
     public Timestamp getDeletedAt() { return deleted_at; }
     public void setDeletedAt(Timestamp deletedAt) { this.deleted_at = deletedAt; }
+
+    public List<ProductImages> getProductImages() {
+        return productImages;
+    }
+
+    public void setProductImages(List<ProductImages> productImages) {
+        this.productImages = productImages;
+    }
 
     @Override
     public int hashCode() { return Long.hashCode(product_id); }
