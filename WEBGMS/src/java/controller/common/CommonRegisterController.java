@@ -47,6 +47,12 @@ public class CommonRegisterController extends HttpServlet {
                 return;
             }
 
+            if (password.length() < 8) {
+                request.getSession().setAttribute("error", "Mật khẩu phải có ít nhất 8 ký tự!");
+                response.sendRedirect(request.getContextPath() + "/register");
+                return;
+            }
+
             if (!password.equals(confirm)) {
                 request.getSession().setAttribute("error", "Mật khẩu xác nhận không khớp!");
                 response.sendRedirect(request.getContextPath() + "/register");

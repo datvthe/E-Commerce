@@ -212,12 +212,12 @@
 
                         <div class="form-group mb-3">
                             <label for="password" class="mb-1">Mật khẩu</label>
-                            <input type="password" class="form-control rounded-pill py-2" id="password" name="password" minlength="6" required>
+                            <input type="password" class="form-control rounded-pill py-2" id="password" name="password" minlength="8" required>
                         </div>
 
                         <div class="form-group mb-4">
                             <label for="confirm_password" class="mb-1">Xác nhận mật khẩu</label>
-                            <input type="password" class="form-control rounded-pill py-2" id="confirm_password" name="confirm_password" minlength="6" required>
+                            <input type="password" class="form-control rounded-pill py-2" id="confirm_password" name="confirm_password" minlength="8" required>
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100 rounded-pill py-2"><i class="fas fa-user-plus me-2"></i>Đăng ký</button>
@@ -337,9 +337,11 @@
                     }
                     
                     // Password validation
-                    if (password.length < 6) {
+                    if (password.length < 8) {
                         e.preventDefault();
-                        showWarningModal('Password Error!', 'Password must have at least 6 characters!');
+
+                        showWarningModal('Password Error!', 'Password must have at least 8 characters!');
+
                         document.getElementById('password').focus();
                         return;
                     }

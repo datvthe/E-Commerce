@@ -2,6 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
+
 package model.product;
 
 import model.user.Users;
@@ -10,7 +11,9 @@ import java.sql.Timestamp;
 
 public class Products {
 
-    public enum ProductStatus { DRAFT, PENDING, APPROVED, REJECTED, ACTIVE, INACTIVE }
+    public enum ProductStatus {
+        DRAFT, PENDING, APPROVED, REJECTED, ACTIVE, INACTIVE
+    }
 
     private long product_id;
     private Users seller_id;
@@ -26,11 +29,53 @@ public class Products {
     private Timestamp created_at;
     private Timestamp updated_at;
     private Timestamp deleted_at;
+    private int quantity; 
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public Products(long product_id, Users seller_id, String name, String slug, String description, BigDecimal price, String currency, String status, ProductCategories category_id, double average_rating, int total_reviews, Timestamp created_at, Timestamp updated_at, Timestamp deleted_at, int quantity) {
+        this.product_id = product_id;
+        this.seller_id = seller_id;
+        this.name = name;
+        this.slug = slug;
+        this.description = description;
+        this.price = price;
+        this.currency = currency;
+        this.status = status;
+        this.category_id = category_id;
+        this.average_rating = average_rating;
+        this.total_reviews = total_reviews;
+        this.created_at = created_at;
+        this.updated_at = updated_at;
+        this.deleted_at = deleted_at;
+        this.quantity = quantity;
+    }
 
     public Products() {
     }
 
-    public Products(long product_id, Users seller_id, String name, String slug, String description, BigDecimal price, String currency, String status, ProductCategories category_id, double average_rating, int total_reviews, Timestamp created_at, Timestamp updated_at, Timestamp deleted_at) {
+    public Products(
+            long product_id,
+            Users seller_id,
+            String name,
+            String slug,
+            String description,
+            BigDecimal price,
+            String currency,
+            String status,
+            ProductCategories category_id,
+            double average_rating,
+            int total_reviews,
+            Timestamp created_at,
+            Timestamp updated_at,
+            Timestamp deleted_at
+    ) {
         this.product_id = product_id;
         this.seller_id = seller_id;
         this.name = name;
@@ -103,8 +148,13 @@ public class Products {
         this.currency = currency;
     }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     // Type-safe helpers
     public ProductStatus getStatusEnum() {
@@ -167,18 +217,25 @@ public class Products {
     // Additional camelCase accessors
     public long getProductId() { return product_id; }
     public void setProductId(long productId) { this.product_id = productId; }
+
     public Users getSeller() { return seller_id; }
     public void setSeller(Users seller) { this.seller_id = seller; }
+
     public ProductCategories getCategory() { return category_id; }
     public void setCategory(ProductCategories category) { this.category_id = category; }
+
     public double getAverageRating() { return average_rating; }
     public void setAverageRating(double averageRating) { this.average_rating = averageRating; }
+
     public int getTotalReviews() { return total_reviews; }
     public void setTotalReviews(int totalReviews) { this.total_reviews = totalReviews; }
+
     public Timestamp getCreatedAt() { return created_at; }
     public void setCreatedAt(Timestamp createdAt) { this.created_at = createdAt; }
+
     public Timestamp getUpdatedAt() { return updated_at; }
     public void setUpdatedAt(Timestamp updatedAt) { this.updated_at = updatedAt; }
+
     public Timestamp getDeletedAt() { return deleted_at; }
     public void setDeletedAt(Timestamp deletedAt) { this.deleted_at = deletedAt; }
     
@@ -193,7 +250,9 @@ public class Products {
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     @Override
-    public int hashCode() { return Long.hashCode(product_id); }
+    public int hashCode() {
+        return Long.hashCode(product_id);
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -205,22 +264,21 @@ public class Products {
 
     @Override
     public String toString() {
-        return "Products{"
-                + "product_id=" + product_id
-                + ", seller_id=" + (seller_id == null ? null : seller_id.getUser_id())
-                + ", name=" + name
-                + ", slug=" + slug
-                + ", descriptionLength=" + (description == null ? 0 : description.length())
-                + ", price=" + price
-                + ", currency=" + currency
-                + ", status=" + status
-                + ", category_id=" + (category_id == null ? null : category_id.getCategory_id())
-                + ", average_rating=" + average_rating
-                + ", total_reviews=" + total_reviews
-                + ", created_at=" + created_at
-                + ", updated_at=" + updated_at
-                + ", deleted_at=" + deleted_at
-                + '}';
+        return "Products{" +
+                "product_id=" + product_id +
+                ", seller_id=" + (seller_id == null ? null : seller_id.getUser_id()) +
+                ", name=" + name +
+                ", slug=" + slug +
+                ", descriptionLength=" + (description == null ? 0 : description.length()) +
+                ", price=" + price +
+                ", currency=" + currency +
+                ", status=" + status +
+                ", category_id=" + (category_id == null ? null : category_id.getCategory_id()) +
+                ", average_rating=" + average_rating +
+                ", total_reviews=" + total_reviews +
+                ", created_at=" + created_at +
+                ", updated_at=" + updated_at +
+                ", deleted_at=" + deleted_at +
+                '}';
     }
-
 }
