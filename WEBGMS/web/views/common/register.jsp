@@ -342,7 +342,9 @@
                     // Password validation
                     if (password.length < 8) {
                         e.preventDefault();
+
                         showWarningModal('Password Error!', 'Password must have at least 8 characters!');
+
                         document.getElementById('password').focus();
                         return;
                     }
