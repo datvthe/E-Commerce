@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <meta charset="utf-8">
 <title>Gicungco Marketplace System</title>
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -14,17 +15,31 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
 <!-- Electro Bootstrap Assets (primary theme) -->
-<link href="<%= request.getContextPath() %>/views/assets/electro/lib/animate/animate.min.css" rel="stylesheet">
-<link href="<%= request.getContextPath() %>/views/assets/electro/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
-<link href="<%= request.getContextPath() %>/views/assets/electro/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+<c:if test="${requestScope.includeAnimateLib != false}">
+    <link href="<%= request.getContextPath() %>/views/assets/electro/lib/animate/animate.min.css" rel="stylesheet">
+</c:if>
+<c:if test="${requestScope.includeOwlCarousel != false}">
+    <link href="<%= request.getContextPath() %>/views/assets/electro/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+</c:if>
+<c:if test="${requestScope.includeLightbox != false}">
+    <link href="<%= request.getContextPath() %>/views/assets/electro/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+</c:if>
 <link href="<%= request.getContextPath() %>/views/assets/electro/css/bootstrap.min.css" rel="stylesheet">
 <link href="<%= request.getContextPath() %>/views/assets/electro/css/style.css" rel="stylesheet">
 
 <!-- Fallback to Electro copies under views/assets/electro when user assets are used -->
-<link href="<%= request.getContextPath() %>/views/assets/user/lib/animate/animate.min.css" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<link href="<%= request.getContextPath() %>/views/assets/user/lib/owlcarousel/assets/owl.carousel.min.css" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<c:if test="${requestScope.includeAnimateLib != false}">
+    <link href="<%= request.getContextPath() %>/views/assets/user/lib/animate/animate.min.css" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
+</c:if>
+<c:if test="${requestScope.includeOwlCarousel != false}">
+    <link href="<%= request.getContextPath() %>/views/assets/user/lib/owlcarousel/assets/owl.carousel.min.css" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
+</c:if>
 <noscript>
-    <link href="<%= request.getContextPath() %>/views/assets/user/lib/animate/animate.min.css" rel="stylesheet">
-    <link href="<%= request.getContextPath() %>/views/assets/user/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <c:if test="${requestScope.includeAnimateLib != false}">
+        <link href="<%= request.getContextPath() %>/views/assets/user/lib/animate/animate.min.css" rel="stylesheet">
+    </c:if>
+    <c:if test="${requestScope.includeOwlCarousel != false}">
+        <link href="<%= request.getContextPath() %>/views/assets/user/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    </c:if>
 </noscript>
 

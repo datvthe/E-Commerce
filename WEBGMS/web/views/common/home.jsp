@@ -96,6 +96,26 @@
                 background: linear-gradient(45deg, #218838, #1ea085);
                 transform: translateY(-1px);
             }
+            
+            /* Wishlist button styling */
+            .btn-outline-warning {
+                color: #fd7e14 !important;
+                border-color: #fd7e14 !important;
+            }
+            .btn-outline-warning:hover {
+                background-color: #fd7e14 !important;
+                border-color: #fd7e14 !important;
+                color: white !important;
+            }
+            
+            /* Badge styling for cart and wishlist counters */
+            .badge {
+                font-size: 0.6rem;
+                min-width: 18px;
+                height: 18px;
+                line-height: 18px;
+                padding: 0;
+            }
         </style>
     </head>
     <body>
@@ -119,24 +139,10 @@
                 </div>
                 <div class="col-lg-4 text-center text-lg-end">
                     <div class="d-inline-flex align-items-center" style="height: 45px;">
-                        <div class="dropdown">
-                            <a href="#" class="dropdown-toggle text-muted me-2" data-bs-toggle="dropdown"><small> VND</small></a>
-                            <div class="dropdown-menu rounded">
-                                <a href="#" class="dropdown-item"> USD</a>
-                                <a href="#" class="dropdown-item"> Euro</a>
-                            </div>
-                        </div>
-                        <div class="dropdown">
-                            <a href="#" class="dropdown-toggle text-muted mx-2" data-bs-toggle="dropdown"><small> English</small></a>
-                            <div class="dropdown-menu rounded">
-                                <a href="#" class="dropdown-item"> English</a>
-                                <a href="#" class="dropdown-item"> Turkish</a>
-                                <a href="#" class="dropdown-item"> Spanol</a>
-                                <a href="#" class="dropdown-item"> Italiano</a>
-            </div>
-                        </div>
+                        
                         <c:choose>
                             <c:when test="${not empty sessionScope.user}">
+                                <a href="<%= request.getContextPath() %>/wishlist" class="btn btn-outline-warning btn-sm px-3 me-2" data-bs-toggle="tooltip" title="Danh sách yêu thích"><i class="fas fa-heart me-1"></i>Wishlist</a>
                                 <a href="<%= request.getContextPath() %>/profile" class="btn btn-outline-info btn-sm px-3 me-2"><i class="bi bi-person me-1"></i>Tài khoản</a>
                                 <a href="#" class="btn btn-outline-danger btn-sm px-3" onclick="logout()"><i class="bi bi-box-arrow-right me-1"></i>Đăng xuất</a>
                             </c:when>
@@ -175,8 +181,30 @@
             </div>
                 <div class="col-md-4 col-lg-3 text-center text-lg-end">
                     <div class="d-inline-flex align-items-center">
-                        <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-random"></i></span></a>
-                        <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-heart"></i></span></a>
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.user}">
+                                <a href="<%= request.getContextPath() %>/cart" class="text-muted d-flex align-items-center justify-content-center me-3" data-bs-toggle="tooltip" title="Giỏ hàng">
+                                    <span class="rounded-circle btn-md-square border position-relative">
+                                        <i class="fas fa-shopping-cart"></i>
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">0</span>
+                                    </span>
+                                </a>
+                                <a href="<%= request.getContextPath() %>/wishlist" class="text-muted d-flex align-items-center justify-content-center me-3" data-bs-toggle="tooltip" title="Danh sách yêu thích">
+                                    <span class="rounded-circle btn-md-square border position-relative">
+                                        <i class="fas fa-heart"></i>
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning" id="wishlistCount">0</span>
+                                    </span>
+                                </a>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="<%= request.getContextPath() %>/login" class="text-muted d-flex align-items-center justify-content-center me-3" data-bs-toggle="tooltip" title="Đăng nhập để sử dụng giỏ hàng">
+                                    <span class="rounded-circle btn-md-square border"><i class="fas fa-shopping-cart"></i></span>
+                                </a>
+                                <a href="<%= request.getContextPath() %>/login" class="text-muted d-flex align-items-center justify-content-center me-3" data-bs-toggle="tooltip" title="Đăng nhập để sử dụng wishlist">
+                                    <span class="rounded-circle btn-md-square border"><i class="fas fa-heart"></i></span>
+                                </a>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </div>
             </div>
@@ -374,9 +402,11 @@
                                     <i class="fas fa-gift fa-4x"></i>
                                 </div>
                                 <div class="position-absolute top-0 end-0 p-2">
-                                    <button class="btn btn-sm btn-light rounded-circle">
+                                    <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(2, this)" data-bs-toggle="tooltip" title="Add to wishlist">
                                         <i class="fas fa-heart"></i>
                                     </button>
+                                </div>
+                                  </button>
                                 </div>
                                 <div class="position-absolute top-0 start-0 p-2">
                                     <span class="badge bg-success">Digital</span>
@@ -416,7 +446,7 @@
                                     <i class="fas fa-play-circle fa-4x"></i>
                                 </div>
                                 <div class="position-absolute top-0 end-0 p-2">
-                                    <button class="btn btn-sm btn-light rounded-circle">
+                                    <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(3, this)" data-bs-toggle="tooltip" title="Add to wishlist">
                                         <i class="fas fa-heart"></i>
                                     </button>
                                 </div>
@@ -458,7 +488,7 @@
                                     <i class="fas fa-laptop-code fa-4x"></i>
                                 </div>
                                 <div class="position-absolute top-0 end-0 p-2">
-                                    <button class="btn btn-sm btn-light rounded-circle">
+                                    <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(4, this)" data-bs-toggle="tooltip" title="Add to wishlist">
                                         <i class="fas fa-heart"></i>
                                     </button>
                                 </div>
@@ -606,6 +636,9 @@
                 </div>
             </div>
 
+        <%-- Include Notification Modal --%>
+        <%@ include file="notification-modal.jsp" %>
+        
         <!-- Back to Top -->
         <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
 
@@ -621,10 +654,35 @@
         <!-- Logout Function -->
         <script>
             function logout() {
-                if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                    // Direct redirect to logout endpoint
+                showWarningModal('Logout?', 'Are you sure you want to logout from your account?');
+                
+                // Update modal buttons for logout confirmation
+                const modal = document.getElementById('notificationModal');
+                const footerButton = modal.querySelector('.modal-footer .btn');
+                
+                // Replace the default button with confirm/cancel buttons
+                footerButton.outerHTML = `
+                    <button type="button" class="btn btn-secondary rounded-pill px-4 me-2" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-danger rounded-pill px-4" onclick="confirmLogout()">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </button>
+                `;
+            }
+            
+            function confirmLogout() {
+                // Close modal first
+                const modal = bootstrap.Modal.getInstance(document.getElementById('notificationModal'));
+                modal.hide();
+                
+                // Show loading message
+                showInfoModal('Processing...', 'Please wait, logging out!');
+                
+                // Redirect to logout after a short delay
+                setTimeout(() => {
                     window.location.href = '<%= request.getContextPath() %>/logout';
-                }
+                }, 1000);
             }
             
             function updateLogoutUI() {
@@ -859,9 +917,110 @@
                 }, 2000);
             }
             
+            // Initialize wishlist functionality
+            function loadWishlistCount() {
+                <c:if test="${not empty sessionScope.user}">
+                    $.ajax({
+                        url: '<%= request.getContextPath() %>/api/wishlist/count',
+                        method: 'GET',
+                        success: function(response) {
+                            if (response.success) {
+                                const wishlistCountElement = document.getElementById('wishlistCount');
+                                if (wishlistCountElement) {
+                                    wishlistCountElement.textContent = response.count;
+                                    if (response.count > 0) {
+                                        wishlistCountElement.style.display = 'inline-block';
+                                    } else {
+                                        wishlistCountElement.style.display = 'none';
+                                    }
+                                }
+                            }
+                        },
+                        error: function() {
+                            console.log('Could not load wishlist count');
+                        }
+                    });
+                </c:if>
+            }
+            
+            // Add to wishlist function for product cards
+            function toggleWishlist(productId, element) {
+                <c:choose>
+                    <c:when test="${not empty sessionScope.user}">
+                        $.ajax({
+                            url: '<%= request.getContextPath() %>/wishlist',
+                            method: 'POST',
+                            data: {
+                                action: 'toggle',
+                                productId: productId
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    // Update heart icon
+                                    const heartIcon = element.querySelector('i');
+                                    if (response.message.includes('added')) {
+                                        heartIcon.className = 'fas fa-heart text-danger';
+                                        element.setAttribute('title', 'Remove from wishlist');
+                                        showToast('Added to wishlist!', 'success');
+                                    } else {
+                                        heartIcon.className = 'fas fa-heart';
+                                        element.setAttribute('title', 'Add to wishlist');
+                                        showToast('Removed from wishlist!', 'success');
+                                    }
+                                    // Update wishlist count
+                                    loadWishlistCount();
+                                } else {
+                                    showToast('Error: ' + response.message, 'error');
+                                }
+                            },
+                            error: function() {
+                                showToast('Failed to update wishlist. Please try again.', 'error');
+                            }
+                        });
+                    </c:when>
+                    <c:otherwise>
+                        showWarningModal('Login Required', 'Please login to use wishlist feature.');
+                        // Update modal button to redirect to login
+                        setTimeout(function() {
+                            const modal = document.getElementById('notificationModal');
+                            const footerButton = modal.querySelector('.modal-footer .btn');
+                            footerButton.onclick = function() {
+                                window.location.href = '<%= request.getContextPath() %>/login';
+                            };
+                            footerButton.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Login Now';
+                        }, 100);
+                    </c:otherwise>
+                </c:choose>
+            }
+            
             // Initialize page
             document.addEventListener('DOMContentLoaded', function() {
                 console.log('Gicungco Marketplace - Buyer Homepage Loaded');
+                
+                // Initialize tooltips
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+                
+                // Load wishlist count for logged-in users
+                loadWishlistCount();
+                
+                // Handle server-side messages
+                <c:if test="${not empty sessionScope.message}">
+                    showSuccessModal('Notice!', '${sessionScope.message}');
+                    <c:remove var="message" scope="session" />
+                </c:if>
+                
+                <c:if test="${not empty sessionScope.success}">
+                    showSuccessModal('Success!', '${sessionScope.success}');
+                    <c:remove var="success" scope="session" />
+                </c:if>
+                
+                <c:if test="${not empty sessionScope.error}">
+                    showErrorModal('Error!', '${sessionScope.error}');
+                    <c:remove var="error" scope="session" />
+                </c:if>
             });
         </script>
     </body>

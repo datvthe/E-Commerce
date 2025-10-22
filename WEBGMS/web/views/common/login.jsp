@@ -279,6 +279,10 @@
                 </div>
             </div>
         </div>
+        
+        <%-- Include Notification Modal --%>
+        <%@ include file="notification-modal.jsp" %>
+        
         <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -288,5 +292,45 @@
         <script src="<%= request.getContextPath() %>/views/assets/electro/lib/counterup/counterup.min.js"></script>
         <script src="<%= request.getContextPath() %>/views/assets/electro/lib/owlcarousel/owl.carousel.min.js"></script>
         <script src="<%= request.getContextPath() %>/views/assets/electro/js/main.js"></script>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Handle server-side errors
+                <c:if test="${not empty sessionScope.error}">
+                    showErrorModal('Login Error!', '${sessionScope.error}');
+                    <c:remove var="error" scope="session" />
+                </c:if>
+                
+                <c:if test="${not empty sessionScope.success}">
+                    showSuccessModal('Login Success!', '${sessionScope.success}');
+                    <c:remove var="success" scope="session" />
+                </c:if>
+                
+                <c:if test="${not empty sessionScope.message}">
+                    showSuccessModal('Notice!', '${sessionScope.message}');
+                    <c:remove var="message" scope="session" />
+                </c:if>
+                
+                // Add form validation for login
+                const loginForm = document.querySelector('form[action*="/login"]');
+                if (loginForm) {
+                    loginForm.addEventListener('submit', function(e) {
+                        const account = document.getElementById('account').value.trim();
+                        const password = document.getElementById('password').value.trim();
+                        
+                        if (!account || !password) {
+                            e.preventDefault();
+                            showWarningModal('Missing Information!', 'Please enter both email/phone and password!');
+                            return;
+                        }
+                        
+                        // Show loading state
+                        const submitBtn = this.querySelector('button[type="submit"]');
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Logging in...';
+                    });
+                }
+            });
+        </script>
     </body>
 </html>

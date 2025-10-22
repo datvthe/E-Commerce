@@ -49,93 +49,307 @@
         </div>
         <!-- Spinner End -->
 
+        <!-- Enhanced Styles -->
+        <style>
+        .topbar-enhanced {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 2px solid #dee2e6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .topbar-link {
+            color: #6c757d !important;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .topbar-link:hover {
+            color: #0d6efd !important;
+            transform: translateY(-1px);
+        }
+        .phone-highlight {
+            background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+            color: white !important;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-weight: 600;
+            margin-left: 8px;
+            transition: all 0.3s ease;
+        }
+        .phone-highlight:hover {
+            transform: scale(1.05);
+            box-shadow: 0 3px 8px rgba(13, 110, 253, 0.3);
+        }
+        .user-dropdown .btn {
+            border-radius: 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .user-dropdown .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .separator {
+            color: #dee2e6;
+            margin: 0 8px;
+            font-weight: bold;
+        }
+        </style>
+        
         <!-- Topbar Start -->
-        <div class="container-fluid px-5 d-none border-bottom d-lg-block">
-            <div class="row gx-0 align-items-center">
+        <div class="container-fluid px-5 d-none border-bottom d-lg-block topbar-enhanced">
+            <div class="row gx-0 align-items-center py-2">
                 <div class="col-lg-4 text-center text-lg-start mb-lg-0">
                     <div class="d-inline-flex align-items-center" style="height: 45px;">
-                        <a href="#" class="text-muted me-2"> Hỗ trợ</a><small> / </small>
-                        <a href="#" class="text-muted mx-2"> Trợ giúp</a><small> / </small>
-                        <a href="#" class="text-muted ms-2"> Liên hệ</a>
+                        <i class="fas fa-headset me-2 text-primary"></i>
+                        <a href="#" class="topbar-link me-2"><i class="fas fa-life-ring me-1"></i> Hỗ trợ</a>
+                        <span class="separator">•</span>
+                        <a href="#" class="topbar-link mx-2"><i class="fas fa-question-circle me-1"></i> Trợ giúp</a>
+                        <span class="separator">•</span>
+                        <a href="#" class="topbar-link ms-2"><i class="fas fa-envelope me-1"></i> Liên hệ</a>
                     </div>
                 </div>
                 <div class="col-lg-4 text-center d-flex align-items-center justify-content-center">
-                    <small class="text-dark">Gọi chúng tôi:</small>
-                    <a href="#" class="text-muted">(+012) 1234 567890</a>
+                    <i class="fas fa-phone-alt me-2 text-success"></i>
+                    <small class="text-dark fw-bold me-2">Hotline 24/7:</small>
+                    <a href="tel:+0123456789" class="text-decoration-none phone-highlight">
+                        <i class="fas fa-phone me-1"></i>(+012) 1234 567890
+                    </a>
                 </div>
 
                 <div class="col-lg-4 text-center text-lg-end">
                     <div class="d-inline-flex align-items-center gap-2" style="height: 45px;">
-                        <span class="text-muted me-3"><small>VND</small></span>
-                        <span class="text-muted mx-2"><small>Tiếng Việt</small></span>
                         <c:choose>
                             <c:when test="${not empty sessionScope.user}">
-                                <div class="dropdown">
+                                <div class="dropdown user-dropdown">
                                     <button class="btn btn-outline-primary btn-sm px-3 dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                        <i class="bi bi-person me-1"></i>${sessionScope.user.full_name}
+                                        <i class="fas fa-user-circle me-1"></i>
+                                        <span class="fw-bold">${sessionScope.user.full_name}</span>
+                                        <i class="fas fa-caret-down ms-1"></i>
                                     </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="<%= request.getContextPath() %>/profile"><i class="fas fa-user me-2"></i>Hồ sơ cá nhân</a></li>
-                                        <li><a class="dropdown-item" href="<%= request.getContextPath() %>/orders"><i class="fas fa-shopping-bag me-2"></i>Đơn hàng</a></li>
-                                        <li><a class="dropdown-item" href="<%= request.getContextPath() %>/wishlist"><i class="fas fa-heart me-2"></i>Yêu thích</a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="border-radius: 12px;">
+                                        <li><h6 class="dropdown-header"><i class="fas fa-user me-2"></i>Tài khoản của tôi</h6></li>
+                                        <li><a class="dropdown-item py-2" href="<%= request.getContextPath() %>/profile">
+                                            <i class="fas fa-id-card me-2 text-primary"></i>Hồ sơ cá nhân
+                                        </a></li>
+                                        <li><a class="dropdown-item py-2" href="<%= request.getContextPath() %>/orders">
+                                            <i class="fas fa-shopping-bag me-2 text-success"></i>Đơn hàng của tôi
+                                        </a></li>
+                                        <li><a class="dropdown-item py-2" href="<%= request.getContextPath() %>/wishlist">
+                                            <i class="fas fa-heart me-2 text-danger"></i>Danh sách yêu thích
+                                        </a></li>
+                                        <li><hr class="dropdown-divider my-2"></li>
+                                        <li><a class="dropdown-item py-2 text-danger" href="#" onclick="logout()">
+                                            <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                        </a></li>
                                     </ul>
                                 </div>
                             </c:when>
                             <c:otherwise>
-                                <a href="<%= request.getContextPath() %>/login?force=1" class="btn btn-outline-primary btn-sm px-3"><i class="bi bi-person me-1"></i>Đăng nhập / Đăng ký</a>
+                                <a href="<%= request.getContextPath() %>/login?force=1" class="btn btn-primary btn-sm px-4" style="border-radius: 20px; font-weight: 600;">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Đăng nhập
+                                </a>
+                                <span class="mx-2 text-muted">|</span>
+                                <a href="<%= request.getContextPath() %>/register" class="btn btn-outline-primary btn-sm px-3" style="border-radius: 20px; font-weight: 600;">
+                                    <i class="fas fa-user-plus me-2"></i>Đăng ký
+                                </a>
                             </c:otherwise>
                         </c:choose>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="container-fluid px-5 py-4 d-none d-lg-block">
-            <div class="row gx-0 align-items-center text-center">
+        <style>
+        .logo-enhanced {
+            background: linear-gradient(135deg, #ffffff, #f8f9fa);
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        .brand-logo {
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .brand-logo:hover {
+            transform: scale(1.05);
+        }
+        .brand-logo h1 {
+            background: linear-gradient(135deg, #0d6efd, #6f42c1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+        .search-container {
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+        .search-container:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            border-color: #0d6efd;
+        }
+        .search-input {
+            border: none !important;
+            border-radius: 30px 0 0 30px !important;
+            padding: 15px 20px !important;
+            font-size: 16px;
+        }
+        .search-input:focus {
+            box-shadow: none !important;
+            border-color: transparent !important;
+        }
+        .search-select {
+            border: none !important;
+            border-left: 1px solid #dee2e6 !important;
+            padding: 15px 10px !important;
+            font-weight: 500;
+        }
+        .search-btn {
+            border-radius: 0 30px 30px 0 !important;
+            padding: 15px 20px !important;
+            background: linear-gradient(135deg, #0d6efd, #6f42c1) !important;
+            border: none !important;
+            transition: all 0.3s ease;
+        }
+        .search-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
+        }
+        .stats-item {
+            text-align: center;
+            padding: 10px;
+        }
+        .stats-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0d6efd;
+            display: block;
+        }
+        .stats-label {
+            font-size: 12px;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        </style>
+        
+        <div class="container-fluid px-5 py-4 d-none d-lg-block logo-enhanced">
+            <div class="row gx-0 align-items-center">
                 <div class="col-md-4 col-lg-3 text-center text-lg-start">
                     <div class="d-inline-flex align-items-center">
-                        <a href="" class="navbar-brand p-0">
-                            <h1 class="display-5 text-primary m-0"><i
-                                    class="fas fa-shopping-bag text-secondary me-2"></i>gicungco</h1>
-                            <!-- <img src="img/logo.png" alt="Logo"> -->
+                        <a href="<%= request.getContextPath() %>/home" class="navbar-brand p-0 brand-logo">
+                            <h1 class="display-5 m-0">
+                                <i class="fas fa-gamepad me-3" style="color: #ff6b6b;"></i>
+                                <span style="background: linear-gradient(135deg, #0d6efd, #6f42c1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">GameMarket</span>
+                            </h1>
+                            <small class="text-muted d-block mt-1" style="margin-left: 45px; font-size: 12px;">Premium Game Accounts</small>
                         </a>
                     </div>
                 </div>
                 <div class="col-md-4 col-lg-6 text-center">
-                    <div class="position-relative ps-4">
-                        <div class="d-flex border rounded-pill">
-                            <input class="form-control border-0 rounded-pill w-100 py-3" type="text"
-                                   data-bs-target="#dropdownToggle123" placeholder="Tìm kiếm sản phẩm">
-                            <select class="form-select text-dark border-0 border-start rounded-0 p-3" style="width: 200px;">
-                                <option value="All Category">All Category</option>
-                                <option value="Pest Control-2">Category 1</option>
-                                <option value="Pest Control-3">Category 2</option>
-                                <option value="Pest Control-4">Category 3</option>
-                                <option value="Pest Control-5">Category 4</option>
+                    <div class="position-relative">
+                        <div class="d-flex search-container">
+                            <input class="form-control search-input" type="text" 
+                                   placeholder="Tìm kiếm tài khoản game..." 
+                                   id="searchInput">
+                            <select class="form-select search-select" style="width: 180px;" id="categorySelect">
+                                <option value="all">Tất cả loại</option>
+                                <option value="moba">MOBA</option>
+                                <option value="fps">FPS</option>
+                                <option value="rpg">RPG</option>
+                                <option value="battle-royale">Battle Royale</option>
                             </select>
-                            <button type="button" class="btn btn-primary rounded-pill py-3 px-5" style="border: 0;"><i
-                                    class="fas fa-search"></i></button>
+                            <button type="button" class="btn btn-primary search-btn" onclick="performSearch()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <!-- Search suggestions dropdown -->
+                        <div id="searchSuggestions" class="position-absolute w-100 bg-white border border-top-0 rounded-bottom shadow-sm" style="top: 100%; z-index: 1050; display: none;">
+                            <div class="p-2">
+                                <small class="text-muted">Gợi ý tìm kiếm:</small>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4 col-lg-3 text-center text-lg-end">
-                    <div class="d-inline-flex align-items-center">
-                        <!-- Cart removed -->
+                    <div class="d-flex justify-content-center justify-content-lg-end">
+                        <div class="stats-item me-3">
+                            <span class="stats-number">1000+</span>
+                            <span class="stats-label">Tài khoản</span>
+                        </div>
+                        <div class="stats-item me-3">
+                            <span class="stats-number">500+</span>
+                            <span class="stats-label">Khách hàng</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-number">24/7</span>
+                            <span class="stats-label">Hỗ trợ</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <!-- Topbar End -->
 
+        <style>
+        .navbar-enhanced {
+            background: linear-gradient(135deg, #0d6efd, #6f42c1) !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border-top: 3px solid #ffd700;
+        }
+        .categories-dropdown {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border-radius: 25px;
+            padding: 12px 20px;
+            color: white;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .categories-dropdown:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(40, 167, 69, 0.3);
+        }
+        .nav-link-enhanced {
+            color: white !important;
+            font-weight: 600;
+            padding: 12px 18px !important;
+            border-radius: 20px;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .nav-link-enhanced:hover {
+            background: rgba(255,255,255,0.15) !important;
+            color: #ffd700 !important;
+            transform: translateY(-2px);
+        }
+        .nav-link-enhanced.active {
+            background: rgba(255,255,255,0.2) !important;
+            color: #ffd700 !important;
+        }
+        .phone-btn {
+            background: linear-gradient(135deg, #ffc107, #fd7e14) !important;
+            border: none !important;
+            border-radius: 25px !important;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .phone-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+        }
+        </style>
+        
         <!-- Navbar & Hero Start -->
         <div class="container-fluid nav-bar p-0">
-            <div class="row gx-0 bg-primary px-5 align-items-center">
+            <div class="row gx-0 navbar-enhanced px-5 align-items-center">
                 <div class="col-lg-3 d-none d-lg-block">
-                    <nav class="navbar navbar-light position-relative" style="width: 250px;">
-                        <button class="navbar-toggler border-0 fs-4 w-100 px-0 text-start" type="button"
+                    <nav class="navbar navbar-light position-relative" style="width: 280px;">
+                        <button class="navbar-toggler categories-dropdown fs-5 w-100 px-0 text-start" type="button"
                                 data-bs-toggle="collapse" data-bs-target="#allCat">
-                            <h4 class="m-0"><i class="fa fa-bars me-2"></i>All Categories</h4>
+                            <h5 class="m-0"><i class="fas fa-th-large me-2"></i>Tất cả danh mục</h5>
                         </button>
                         <div class="collapse navbar-collapse rounded-bottom" id="allCat">
                             <div class="navbar-nav ms-auto py-0">
@@ -188,9 +402,18 @@
                         </button>
                         <div class="collapse navbar-collapse" id="navbarCollapse">
                             <div class="navbar-nav ms-auto py-0">
-                                <a href="<%= request.getContextPath() %>/home" class="nav-item nav-link">Trang chủ</a>
-                                <a href="<%= request.getContextPath() %>/products" class="nav-item nav-link">Danh mục sản phẩm</a>
-                                <a href="<%= request.getContextPath() %>/promotions" class="nav-item nav-link">Khuyến mãi</a>
+                                <a href="<%= request.getContextPath() %>/home" class="nav-item nav-link nav-link-enhanced">
+                                    <i class="fas fa-home me-2"></i>Trang chủ
+                                </a>
+                                <a href="<%= request.getContextPath() %>/products" class="nav-item nav-link nav-link-enhanced">
+                                    <i class="fas fa-gamepad me-2"></i>Game Accounts
+                                </a>
+                                <a href="<%= request.getContextPath() %>/promotions" class="nav-item nav-link nav-link-enhanced">
+                                    <i class="fas fa-tags me-2"></i>Khuyến mãi
+                                </a>
+                                <a href="<%= request.getContextPath() %>/categories" class="nav-item nav-link nav-link-enhanced">
+                                    <i class="fas fa-th-list me-2"></i>Danh mục
+                                </a>
                                 
                                 <!-- Role-based navigation -->
                                 <jsp:include page="role-navigation.jsp" />
@@ -198,20 +421,32 @@
                                 <c:choose>
                                     <c:when test="${not empty sessionScope.user}">
                                         <div class="nav-item dropdown">
-                                            <a href="#" class="nav-link dropdown-toggle me-2" data-bs-toggle="dropdown">
-                                                <i class="fas fa-user me-1"></i>${sessionScope.user.full_name}
+                                            <a href="#" class="nav-link dropdown-toggle me-2 nav-link-enhanced" data-bs-toggle="dropdown">
+                                                <i class="fas fa-user-circle me-1"></i>
+                                                <span class="fw-bold">${sessionScope.user.full_name}</span>
                                             </a>
-                                            <div class="dropdown-menu">
-                                                <a class="dropdown-item" href="<%= request.getContextPath() %>/profile"><i class="fas fa-user me-2"></i>Hồ sơ cá nhân</a>
-                                                <a class="dropdown-item" href="<%= request.getContextPath() %>/orders"><i class="fas fa-shopping-bag me-2"></i>Đơn hàng</a>
-                                                <a class="dropdown-item" href="<%= request.getContextPath() %>/wishlist"><i class="fas fa-heart me-2"></i>Yêu thích</a>
-                                                <div class="dropdown-divider"></div>
-                                                <a class="dropdown-item" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a>
+                                            <div class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="border-radius: 12px; margin-top: 10px;">
+                                                <h6 class="dropdown-header"><i class="fas fa-user me-2"></i>Tài khoản</h6>
+                                                <a class="dropdown-item py-2" href="<%= request.getContextPath() %>/profile">
+                                                    <i class="fas fa-id-card me-2 text-primary"></i>Hồ sơ cá nhân
+                                                </a>
+                                                <a class="dropdown-item py-2" href="<%= request.getContextPath() %>/orders">
+                                                    <i class="fas fa-shopping-bag me-2 text-success"></i>Đơn hàng
+                                                </a>
+                                                <a class="dropdown-item py-2" href="<%= request.getContextPath() %>/wishlist">
+                                                    <i class="fas fa-heart me-2 text-danger"></i>Yêu thích
+                                                </a>
+                                                <div class="dropdown-divider my-2"></div>
+                                                <a class="dropdown-item py-2 text-danger" href="#" onclick="logout()">
+                                                    <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                                </a>
                                             </div>
                                         </div>
                                     </c:when>
                                     <c:otherwise>
-                                        <a href="<%= request.getContextPath() %>/login?force=1" class="nav-item nav-link me-2">Đăng nhập / Đăng ký</a>
+                                        <a href="<%= request.getContextPath() %>/login?force=1" class="nav-item nav-link me-2 nav-link-enhanced">
+                                            <i class="fas fa-sign-in-alt me-2"></i>Đăng nhập
+                                        </a>
                                     </c:otherwise>
                                 </c:choose>
                                 <div class="nav-item dropdown d-block d-lg-none mb-3">
@@ -253,8 +488,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <a href="#" class="btn btn-secondary rounded-pill py-2 px-4 px-lg-3 mb-3 mb-md-3 mb-lg-0"><i
-                                    class="fa fa-mobile-alt me-2"></i> +0123 456 7890</a>
+                            <a href="tel:+0123456789" class="btn phone-btn rounded-pill py-3 px-4 mb-3 mb-md-3 mb-lg-0">
+                                <i class="fas fa-phone-alt me-2"></i>
+                                <strong>Hotline: 0123 456 789</strong>
+                            </a>
                         </div>
                     </nav>
                 </div>
@@ -263,6 +500,133 @@
         <!-- Navbar & Hero End -->
 
         <script>
+            // Enhanced search functionality
+            function performSearch() {
+                const searchInput = document.getElementById('searchInput');
+                const categorySelect = document.getElementById('categorySelect');
+                const searchTerm = searchInput.value.trim();
+                const category = categorySelect.value;
+                
+                if (searchTerm === '') {
+                    showToast('Vui lòng nhập từ khóa tìm kiếm!', 'warning');
+                    return;
+                }
+                
+                // Show loading state
+                const searchBtn = document.querySelector('.search-btn');
+                const originalContent = searchBtn.innerHTML;
+                searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                searchBtn.disabled = true;
+                
+                // Simulate search (replace with actual search logic)
+                setTimeout(() => {
+                    const searchUrl = `<%= request.getContextPath() %>/products?search=${encodeURIComponent(searchTerm)}&category=${category}`;
+                    window.location.href = searchUrl;
+                }, 1000);
+            }
+            
+            // Search on Enter key
+            document.addEventListener('DOMContentLoaded', function() {
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    searchInput.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            performSearch();
+                        }
+                    });
+                    
+                    // Auto-suggestions (simple implementation)
+                    searchInput.addEventListener('input', function() {
+                        const value = this.value.toLowerCase();
+                        const suggestions = document.getElementById('searchSuggestions');
+                        
+                        if (value.length > 2) {
+                            // Show suggestions
+                            suggestions.style.display = 'block';
+                            suggestions.innerHTML = `
+                                <div class="p-2">
+                                    <small class="text-muted">Gợi ý tìm kiếm:</small>
+                                    <div class="mt-2">
+                                        <div class="suggestion-item p-2 border-bottom cursor-pointer" onclick="selectSuggestion('League of Legends')">
+                                            <i class="fas fa-search me-2 text-muted"></i>League of Legends
+                                        </div>
+                                        <div class="suggestion-item p-2 border-bottom cursor-pointer" onclick="selectSuggestion('PUBG Mobile')">
+                                            <i class="fas fa-search me-2 text-muted"></i>PUBG Mobile
+                                        </div>
+                                        <div class="suggestion-item p-2 cursor-pointer" onclick="selectSuggestion('Valorant')">
+                                            <i class="fas fa-search me-2 text-muted"></i>Valorant
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            suggestions.style.display = 'none';
+                        }
+                    });
+                    
+                    // Hide suggestions when clicking outside
+                    document.addEventListener('click', function(e) {
+                        const suggestions = document.getElementById('searchSuggestions');
+                        if (!e.target.closest('.search-container') && !e.target.closest('#searchSuggestions')) {
+                            suggestions.style.display = 'none';
+                        }
+                    });
+                }
+            });
+            
+            function selectSuggestion(text) {
+                document.getElementById('searchInput').value = text;
+                document.getElementById('searchSuggestions').style.display = 'none';
+                performSearch();
+            }
+            
+            // Enhanced toast notifications
+            function showToast(message, type = 'info') {
+                const toastContainer = document.querySelector('.position-fixed.top-0.end-0.p-3');
+                const toastId = 'toast-' + Date.now();
+                let bgClass, iconClass;
+                
+                switch(type) {
+                    case 'success':
+                        bgClass = 'bg-success';
+                        iconClass = 'fas fa-check-circle';
+                        break;
+                    case 'warning':
+                        bgClass = 'bg-warning';
+                        iconClass = 'fas fa-exclamation-triangle';
+                        break;
+                    case 'error':
+                        bgClass = 'bg-danger';
+                        iconClass = 'fas fa-times-circle';
+                        break;
+                    default:
+                        bgClass = 'bg-info';
+                        iconClass = 'fas fa-info-circle';
+                }
+                
+                const toastHtml = `
+                    <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true" style="border-radius: 12px;">
+                        <div class="d-flex">
+                            <div class="toast-body d-flex align-items-center">
+                                <i class="${iconClass} me-2"></i>
+                                ${message}
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                `;
+                
+                toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+                
+                const toastElement = document.getElementById(toastId);
+                const toast = new bootstrap.Toast(toastElement, {delay: 4000});
+                toast.show();
+                
+                toastElement.addEventListener('hidden.bs.toast', function() {
+                    toastElement.remove();
+                });
+            }
+            
             function logout() {
                 if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
                     fetch('<%= request.getContextPath() %>/logout?ajax=true', {
