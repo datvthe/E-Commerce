@@ -63,8 +63,6 @@ public class CommonHomeController extends HttpServlet {
             request.setAttribute("categories", categories);
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            categoryDAO.close();
         }
         
         request.getRequestDispatcher("views/common/home.jsp").forward(request, response);
