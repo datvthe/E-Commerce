@@ -165,30 +165,33 @@
                     </div>
                 </div>
                 <div class="col-md-4 col-lg-6 text-center">
-                    <div class="position-relative ps-4">
+                    <form action="<%= request.getContextPath() %>/products" method="get" class="position-relative ps-4">
                         <div class="d-flex border rounded-pill">
-                            <input class="form-control border-0 rounded-pill w-100 py-3" type="text" data-bs-target="#dropdownToggle123" placeholder="Tìm kiếm sản phẩm?">
-                            <select class="form-select text-dark border-0 border-start rounded-0 p-3" style="width: 200px;">
-                                <option value="All Category">Tất cả danh mục</option>
-                                <option value="Pest Control-2">Danh mục 1</option>
-                                <option value="Pest Control-3">Danh mục 2</option>
-                                <option value="Pest Control-4">Danh mục 3</option>
-                                <option value="Pest Control-5">Danh mục 4</option>
+                            <input class="form-control border-0 rounded-pill w-100 py-3" 
+                                   type="text" 
+                                   name="search" 
+                                   placeholder="Tìm kiếm sản phẩm..." 
+                                   value="${param.search}">
+                            <select class="form-select text-dark border-0 border-start rounded-0 p-3" 
+                                    name="category" 
+                                    style="width: 200px;">
+                                <option value="">Tất cả danh mục</option>
+                                <c:forEach var="cat" items="${categories}">
+                                    <option value="${cat.categoryId}" ${param.category == cat.categoryId ? 'selected' : ''}>
+                                        ${cat.name}
+                                    </option>
+                                </c:forEach>
                             </select>
-                            <button type="button" class="btn btn-primary rounded-pill py-3 px-5" style="border: 0;"><i class="fas fa-search"></i></button>
+                            <button type="submit" class="btn btn-primary rounded-pill py-3 px-5" style="border: 0;">
+                                <i class="fas fa-search"></i>
+                            </button>
                         </div>
-                    </div>
-            </div>
+                    </form>
+                </div>
                 <div class="col-md-4 col-lg-3 text-center text-lg-end">
                     <div class="d-inline-flex align-items-center">
                         <c:choose>
                             <c:when test="${not empty sessionScope.user}">
-                                <a href="<%= request.getContextPath() %>/cart" class="text-muted d-flex align-items-center justify-content-center me-3" data-bs-toggle="tooltip" title="Giỏ hàng">
-                                    <span class="rounded-circle btn-md-square border position-relative">
-                                        <i class="fas fa-shopping-cart"></i>
-                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">0</span>
-                                    </span>
-                                </a>
                                 <a href="<%= request.getContextPath() %>/wishlist" class="text-muted d-flex align-items-center justify-content-center me-3" data-bs-toggle="tooltip" title="Danh sách yêu thích">
                                     <span class="rounded-circle btn-md-square border position-relative">
                                         <i class="fas fa-heart"></i>
@@ -197,9 +200,6 @@
                                 </a>
                             </c:when>
                             <c:otherwise>
-                                <a href="<%= request.getContextPath() %>/login" class="text-muted d-flex align-items-center justify-content-center me-3" data-bs-toggle="tooltip" title="Đăng nhập để sử dụng giỏ hàng">
-                                    <span class="rounded-circle btn-md-square border"><i class="fas fa-shopping-cart"></i></span>
-                                </a>
                                 <a href="<%= request.getContextPath() %>/login" class="text-muted d-flex align-items-center justify-content-center me-3" data-bs-toggle="tooltip" title="Đăng nhập để sử dụng wishlist">
                                     <span class="rounded-circle btn-md-square border"><i class="fas fa-heart"></i></span>
                                 </a>
@@ -287,7 +287,7 @@
                                 <a href="<%= request.getContextPath() %>/products" class="btn btn-light btn-lg px-4">
                                     <i class="fas fa-shopping-bag me-2"></i>Mua ngay
                                 </a>
-                                <a href="#categories" class="btn btn-outline-light btn-lg px-4">
+                                <a href="<%= request.getContextPath() %>/categories" class="btn btn-outline-light btn-lg px-4">
                                     <i class="fas fa-th-large me-2"></i>Xem danh mục
                                 </a>
                             </div>
@@ -375,120 +375,122 @@
                 <!-- Search Bar -->
                 <div class="row justify-content-center mb-5">
                     <div class="col-lg-8">
-                        <div class="input-group input-group-lg">
-                            <input type="search" class="form-control" placeholder="Tìm kiếm tài nguyên digital..." id="searchInput">
-                            <select class="form-select" style="max-width: 200px;">
-                                <option value="">Tất cả danh mục</option>
-                                <option value="learning">Học tập</option>
-                                <option value="entertainment">Xem phim</option>
-                                <option value="software">Phần mềm</option>
-                                <option value="documents">Tài liệu</option>
-                                <option value="other">Khác</option>
-                            </select>
-                            <button class="btn btn-primary" type="button">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
+                        <form id="searchForm" onsubmit="performSearch(event)">
+                            <div class="input-group input-group-lg">
+                                <input type="search" class="form-control" placeholder="Tìm kiếm tài nguyên digital..." id="searchInput" name="search">
+                                <select class="form-select" style="max-width: 200px;" id="categorySelect" name="category">
+                                    <option value="">Tất cả danh mục</option>
+                                    <option value="learning">Học tập</option>
+                                    <option value="entertainment">Xem phim</option>
+                                    <option value="software">Phần mềm</option>
+                                    <option value="documents">Tài liệu</option>
+                                    <option value="other">Khác</option>
+                                </select>
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
                 
                 <!-- Product Grid -->
                 <div class="row g-4" id="productGrid">
-                    <!-- Digital Product 1 -->
-                    <div class="col-lg-3 col-md-6">
-                        <div class="product-card h-100 bg-white rounded-3 shadow-sm">
+                    <!-- Product 1: Thẻ cào Viettel -->
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="product-card h-100 bg-white rounded-3 shadow-sm overflow-hidden">
                             <div class="position-relative">
-                                <div class="product-image bg-primary text-white text-center py-5">
+                                <div class="product-image bg-gradient text-white text-center py-5" style="background: linear-gradient(135deg, #ff6b35, #f7931e);">
                                     <i class="fas fa-gift fa-4x"></i>
                                 </div>
                                 <div class="position-absolute top-0 end-0 p-2">
-                                    <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(2, this)" data-bs-toggle="tooltip" title="Add to wishlist">
+                                    <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(1, this)" data-bs-toggle="tooltip" title="Thêm vào wishlist">
                                         <i class="fas fa-heart"></i>
                                     </button>
                                 </div>
-                                  </button>
-                                </div>
                                 <div class="position-absolute top-0 start-0 p-2">
-                                    <span class="badge bg-success">Digital</span>
+                                    <span class="badge bg-danger">Bán chạy</span>
                                 </div>
                             </div>
-                            <div class="card-body d-flex flex-column">
-                                <h6 class="card-title fw-bold">Thẻ cào Viettel 100K</h6>
-                                <p class="text-muted small">Thẻ nạp điện thoại Viettel</p>
+                            <div class="card-body d-flex flex-column p-3">
+                                <h6 class="card-title fw-bold mb-1">Thẻ cào Viettel 100K</h6>
+                                <p class="text-muted small mb-2">Nạp trực tiếp tự động</p>
                                 <div class="d-flex align-items-center mb-2">
-                                    <div class="text-warning me-2">
+                                    <div class="text-warning me-2" style="font-size: 0.85rem;">
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
                                     </div>
-                                    <small class="text-muted">(1,250)</small>
+                                    <small class="text-muted">5.0 (1,250)</small>
                                 </div>
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div>
-                                        <span class="h5 text-primary mb-0">95,000₫</span>
-                                        <small class="text-success d-block"><i class="fas fa-bolt"></i> Giao tức thì</small>
+                                <div class="mb-2">
+                                    <div class="d-flex align-items-baseline">
+                                        <span class="h5 text-primary mb-0 fw-bold">95.000₫</span>
+                                        <del class="ms-2 text-muted small">100.000₫</del>
                                     </div>
+                                    <small class="text-success"><i class="fas fa-bolt"></i> Giao ngay lập tức</small>
                                 </div>
-                                <button class="btn btn-success w-100 mt-auto" onclick="viewProduct(1)">
-                                    <i class="fas fa-download me-1"></i> Mua ngay
+                                <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(1)">
+                                    <i class="fas fa-shopping-bag me-1"></i> Mua ngay
                                 </button>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Digital Product 2 -->
-                    <div class="col-lg-3 col-md-6">
-                        <div class="product-card h-100 bg-white rounded-3 shadow-sm">
+                    <!-- Product 2: Netflix Premium -->
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="product-card h-100 bg-white rounded-3 shadow-sm overflow-hidden">
                             <div class="position-relative">
-                                <div class="product-image bg-danger text-white text-center py-5">
+                                <div class="product-image bg-gradient text-white text-center py-5" style="background: linear-gradient(135deg, #e50914, #b20710);">
                                     <i class="fas fa-play-circle fa-4x"></i>
                                 </div>
                                 <div class="position-absolute top-0 end-0 p-2">
-                                    <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(3, this)" data-bs-toggle="tooltip" title="Add to wishlist">
+                                    <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(2, this)" data-bs-toggle="tooltip" title="Thêm vào wishlist">
                                         <i class="fas fa-heart"></i>
                                     </button>
                                 </div>
                                 <div class="position-absolute top-0 start-0 p-2">
-                                    <span class="badge bg-warning">Hot</span>
+                                    <span class="badge bg-warning text-dark">Hot</span>
                                 </div>
                             </div>
-                            <div class="card-body d-flex flex-column">
-                                <h6 class="card-title fw-bold">Netflix Premium 1 tháng</h6>
-                                <p class="text-muted small">Tài khoản Netflix Premium</p>
+                            <div class="card-body d-flex flex-column p-3">
+                                <h6 class="card-title fw-bold mb-1">Netflix Premium 1 tháng</h6>
+                                <p class="text-muted small mb-2">4K UHD, 4 thiết bị</p>
                                 <div class="d-flex align-items-center mb-2">
-                                    <div class="text-warning me-2">
+                                    <div class="text-warning me-2" style="font-size: 0.85rem;">
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
-                                        <i class="far fa-star"></i>
+                                        <i class="fas fa-star-half-alt"></i>
                                     </div>
-                                    <small class="text-muted">(890)</small>
+                                    <small class="text-muted">4.8 (890)</small>
                                 </div>
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div>
-                                        <span class="h5 text-primary mb-0">150,000₫</span>
-                                        <small class="text-success d-block"><i class="fas fa-bolt"></i> Giao tức thì</small>
+                                <div class="mb-2">
+                                    <div class="d-flex align-items-baseline">
+                                        <span class="h5 text-primary mb-0 fw-bold">120.000₫</span>
+                                        <del class="ms-2 text-muted small">180.000₫</del>
                                     </div>
+                                    <small class="text-success"><i class="fas fa-bolt"></i> Giao trong 5 phút</small>
                                 </div>
-                                <button class="btn btn-success w-100 mt-auto" onclick="viewProduct(2)">
-                                    <i class="fas fa-download me-1"></i> Mua ngay
+                                <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(2)">
+                                    <i class="fas fa-shopping-bag me-1"></i> Mua ngay
                                 </button>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Digital Product 3 -->
-                    <div class="col-lg-3 col-md-6">
-                        <div class="product-card h-100 bg-white rounded-3 shadow-sm">
+                    <!-- Product 3: Microsoft Office -->
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="product-card h-100 bg-white rounded-3 shadow-sm overflow-hidden">
                             <div class="position-relative">
-                                <div class="product-image bg-success text-white text-center py-5">
-                                    <i class="fas fa-laptop-code fa-4x"></i>
+                                <div class="product-image bg-gradient text-white text-center py-5" style="background: linear-gradient(135deg, #0078d4, #005a9e);">
+                                    <i class="fas fa-file-word fa-4x"></i>
                                 </div>
                                 <div class="position-absolute top-0 end-0 p-2">
-                                    <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(4, this)" data-bs-toggle="tooltip" title="Add to wishlist">
+                                    <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(3, this)" data-bs-toggle="tooltip" title="Thêm vào wishlist">
                                         <i class="fas fa-heart"></i>
                                     </button>
                                 </div>
@@ -496,69 +498,243 @@
                                     <span class="badge bg-info">Mới</span>
                                 </div>
                             </div>
-                            <div class="card-body d-flex flex-column">
-                                <h6 class="card-title fw-bold">Adobe Creative Cloud</h6>
-                                <p class="text-muted small">Bộ công cụ Adobe đầy đủ</p>
+                            <div class="card-body d-flex flex-column p-3">
+                                <h6 class="card-title fw-bold mb-1">Microsoft Office 365</h6>
+                                <p class="text-muted small mb-2">1 năm, 5 thiết bị</p>
                                 <div class="d-flex align-items-center mb-2">
-                                    <div class="text-warning me-2">
+                                    <div class="text-warning me-2" style="font-size: 0.85rem;">
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
                                     </div>
-                                    <small class="text-muted">(2,100)</small>
+                                    <small class="text-muted">5.0 (2,100)</small>
                                 </div>
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div>
-                                        <span class="h5 text-primary mb-0">850,000₫</span>
-                                        <small class="text-success d-block"><i class="fas fa-bolt"></i> Giao tức thì</small>
+                                <div class="mb-2">
+                                    <div class="d-flex align-items-baseline">
+                                        <span class="h5 text-primary mb-0 fw-bold">450.000₫</span>
+                                        <del class="ms-2 text-muted small">599.000₫</del>
                                     </div>
+                                    <small class="text-success"><i class="fas fa-bolt"></i> Key bản quyền vĩnh viễn</small>
                                 </div>
-                                <button class="btn btn-success w-100 mt-auto" onclick="viewProduct(3)">
-                                    <i class="fas fa-download me-1"></i> Mua ngay
+                                <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(3)">
+                                    <i class="fas fa-shopping-bag me-1"></i> Mua ngay
                                 </button>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Digital Product 4 -->
-                    <div class="col-lg-3 col-md-6">
-                        <div class="product-card h-100 bg-white rounded-3 shadow-sm">
+                    <!-- Product 4: Spotify Premium -->
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="product-card h-100 bg-white rounded-3 shadow-sm overflow-hidden">
                             <div class="position-relative">
-                                <div class="product-image bg-warning text-white text-center py-5">
-                                    <i class="fas fa-file-alt fa-4x"></i>
+                                <div class="product-image bg-gradient text-white text-center py-5" style="background: linear-gradient(135deg, #1ed760, #1db954);">
+                                    <i class="fas fa-music fa-4x"></i>
                                 </div>
                                 <div class="position-absolute top-0 end-0 p-2">
-                                    <button class="btn btn-sm btn-light rounded-circle">
+                                    <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(4, this)" data-bs-toggle="tooltip" title="Thêm vào wishlist">
                                         <i class="fas fa-heart"></i>
                                     </button>
                                 </div>
                                 <div class="position-absolute top-0 start-0 p-2">
-                                    <span class="badge bg-primary">Best</span>
+                                    <span class="badge bg-success">Giá tốt</span>
                                 </div>
                             </div>
-                            <div class="card-body d-flex flex-column">
-                                <h6 class="card-title fw-bold">Template PowerPoint Pro</h6>
-                                <p class="text-muted small">500+ template chuyên nghiệp</p>
+                            <div class="card-body d-flex flex-column p-3">
+                                <h6 class="card-title fw-bold mb-1">Spotify Premium</h6>
+                                <p class="text-muted small mb-2">3 tháng, không quảng cáo</p>
                                 <div class="d-flex align-items-center mb-2">
-                                    <div class="text-warning me-2">
+                                    <div class="text-warning me-2" style="font-size: 0.85rem;">
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
                                         <i class="fas fa-star"></i>
-                                        <i class="far fa-star"></i>
+                                        <i class="fas fa-star"></i>
                                     </div>
-                                    <small class="text-muted">(680)</small>
+                                    <small class="text-muted">4.9 (1,580)</small>
                                 </div>
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div>
-                                        <span class="h5 text-primary mb-0">250,000₫</span>
-                                        <small class="text-success d-block"><i class="fas fa-bolt"></i> Giao tức thì</small>
+                                <div class="mb-2">
+                                    <div class="d-flex align-items-baseline">
+                                        <span class="h5 text-primary mb-0 fw-bold">85.000₫</span>
+                                        <del class="ms-2 text-muted small">120.000₫</del>
                                     </div>
+                                    <small class="text-success"><i class="fas fa-bolt"></i> Giao tự động 24/7</small>
                                 </div>
-                                <button class="btn btn-success w-100 mt-auto" onclick="viewProduct(4)">
-                                    <i class="fas fa-download me-1"></i> Mua ngay
+                                <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(4)">
+                                    <i class="fas fa-shopping-bag me-1"></i> Mua ngay
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 5: Canva Pro -->
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="product-card h-100 bg-white rounded-3 shadow-sm overflow-hidden">
+                            <div class="position-relative">
+                                <div class="product-image bg-gradient text-white text-center py-5" style="background: linear-gradient(135deg, #00c4cc, #7d2ae8);">
+                                    <i class="fas fa-palette fa-4x"></i>
+                                </div>
+                                <div class="position-absolute top-0 end-0 p-2">
+                                    <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(5, this)" data-bs-toggle="tooltip" title="Thêm vào wishlist">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                </div>
+                                <div class="position-absolute top-0 start-0 p-2">
+                                    <span class="badge bg-primary">Pro</span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column p-3">
+                                <h6 class="card-title fw-bold mb-1">Canva Pro 1 năm</h6>
+                                <p class="text-muted small mb-2">Full tính năng thiết kế</p>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="text-warning me-2" style="font-size: 0.85rem;">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star-half-alt"></i>
+                                    </div>
+                                    <small class="text-muted">4.7 (945)</small>
+                                </div>
+                                <div class="mb-2">
+                                    <div class="d-flex align-items-baseline">
+                                        <span class="h5 text-primary mb-0 fw-bold">199.000₫</span>
+                                        <del class="ms-2 text-muted small">299.000₫</del>
+                                    </div>
+                                    <small class="text-success"><i class="fas fa-bolt"></i> Kích hoạt ngay</small>
+                                </div>
+                                <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(5)">
+                                    <i class="fas fa-shopping-bag me-1"></i> Mua ngay
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 6: YouTube Premium -->
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="product-card h-100 bg-white rounded-3 shadow-sm overflow-hidden">
+                            <div class="position-relative">
+                                <div class="product-image bg-gradient text-white text-center py-5" style="background: linear-gradient(135deg, #ff0000, #cc0000);">
+                                    <i class="fab fa-youtube fa-4x"></i>
+                                </div>
+                                <div class="position-absolute top-0 end-0 p-2">
+                                    <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(6, this)" data-bs-toggle="tooltip" title="Thêm vào wishlist">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                </div>
+                                <div class="position-absolute top-0 start-0 p-2">
+                                    <span class="badge bg-danger">Trending</span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column p-3">
+                                <h6 class="card-title fw-bold mb-1">YouTube Premium</h6>
+                                <p class="text-muted small mb-2">2 tháng, không QC</p>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="text-warning me-2" style="font-size: 0.85rem;">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <small class="text-muted">4.9 (1,340)</small>
+                                </div>
+                                <div class="mb-2">
+                                    <div class="d-flex align-items-baseline">
+                                        <span class="h5 text-primary mb-0 fw-bold">95.000₫</span>
+                                        <del class="ms-2 text-muted small">140.000₫</del>
+                                    </div>
+                                    <small class="text-success"><i class="fas fa-bolt"></i> Giao ngay lập tức</small>
+                                </div>
+                                <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(6)">
+                                    <i class="fas fa-shopping-bag me-1"></i> Mua ngay
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 7: Grammarly Premium -->
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="product-card h-100 bg-white rounded-3 shadow-sm overflow-hidden">
+                            <div class="position-relative">
+                                <div class="product-image bg-gradient text-white text-center py-5" style="background: linear-gradient(135deg, #15c39a, #00b386);">
+                                    <i class="fas fa-spell-check fa-4x"></i>
+                                </div>
+                                <div class="position-absolute top-0 end-0 p-2">
+                                    <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(7, this)" data-bs-toggle="tooltip" title="Thêm vào wishlist">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                </div>
+                                <div class="position-absolute top-0 start-0 p-2">
+                                    <span class="badge bg-info">Học tập</span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column p-3">
+                                <h6 class="card-title fw-bold mb-1">Grammarly Premium</h6>
+                                <p class="text-muted small mb-2">1 năm, kiểm tra ngữ pháp AI</p>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="text-warning me-2" style="font-size: 0.85rem;">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <small class="text-muted">5.0 (680)</small>
+                                </div>
+                                <div class="mb-2">
+                                    <div class="d-flex align-items-baseline">
+                                        <span class="h5 text-primary mb-0 fw-bold">350.000₫</span>
+                                        <del class="ms-2 text-muted small">499.000₫</del>
+                                    </div>
+                                    <small class="text-success"><i class="fas fa-bolt"></i> Giao tự động</small>
+                                </div>
+                                <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(7)">
+                                    <i class="fas fa-shopping-bag me-1"></i> Mua ngay
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 8: Adobe Photoshop -->
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="product-card h-100 bg-white rounded-3 shadow-sm overflow-hidden">
+                            <div class="position-relative">
+                                <div class="product-image bg-gradient text-white text-center py-5" style="background: linear-gradient(135deg, #31a8ff, #0066cc);">
+                                    <i class="fas fa-image fa-4x"></i>
+                                </div>
+                                <div class="position-absolute top-0 end-0 p-2">
+                                    <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(8, this)" data-bs-toggle="tooltip" title="Thêm vào wishlist">
+                                        <i class="fas fa-heart"></i>
+                                    </button>
+                                </div>
+                                <div class="position-absolute top-0 start-0 p-2">
+                                    <span class="badge bg-warning text-dark">Best Seller</span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column p-3">
+                                <h6 class="card-title fw-bold mb-1">Adobe Photoshop CC</h6>
+                                <p class="text-muted small mb-2">1 năm, bản quyền chính hãng</p>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="text-warning me-2" style="font-size: 0.85rem;">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <small class="text-muted">5.0 (3,200)</small>
+                                </div>
+                                <div class="mb-2">
+                                    <div class="d-flex align-items-baseline">
+                                        <span class="h5 text-primary mb-0 fw-bold">650.000₫</span>
+                                        <del class="ms-2 text-muted small">899.000₫</del>
+                                    </div>
+                                    <small class="text-success"><i class="fas fa-bolt"></i> Kích hoạt trọn đời</small>
+                                </div>
+                                <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(8)">
+                                    <i class="fas fa-shopping-bag me-1"></i> Mua ngay
                                 </button>
                             </div>
                         </div>
@@ -824,7 +1000,30 @@
             
             function searchProduct(query) {
                 document.getElementById('searchInput').value = query;
-                applyFilters();
+                performSearch();
+            }
+            
+            // Perform search - redirect to products page with search query
+            function performSearch(event) {
+                if (event) {
+                    event.preventDefault();
+                }
+                
+                const searchInput = document.getElementById('searchInput').value.trim();
+                const categorySelect = document.getElementById('categorySelect').value;
+                
+                // Build URL parameters
+                const params = new URLSearchParams();
+                if (searchInput) {
+                    params.append('search', searchInput);
+                }
+                if (categorySelect) {
+                    params.append('category', categorySelect);
+                }
+                
+                // Redirect to products page with search parameters
+                const url = '<%= request.getContextPath() %>/products' + (params.toString() ? '?' + params.toString() : '');
+                window.location.href = url;
             }
             
             // Filter and Sort Functions
@@ -1006,21 +1205,37 @@
                 // Load wishlist count for logged-in users
                 loadWishlistCount();
                 
-                // Handle server-side messages
+                // Handle server-side messages - with duplicate prevention
+                const notificationShown = sessionStorage.getItem('notificationShown');
+                
                 <c:if test="${not empty sessionScope.message}">
-                    showSuccessModal('Notice!', '${sessionScope.message}');
+                    if (!notificationShown || notificationShown !== 'message_${sessionScope.message}') {
+                        showSuccessModal('Notice!', '${sessionScope.message}');
+                        sessionStorage.setItem('notificationShown', 'message_${sessionScope.message}');
+                    }
                     <c:remove var="message" scope="session" />
                 </c:if>
                 
                 <c:if test="${not empty sessionScope.success}">
-                    showSuccessModal('Success!', '${sessionScope.success}');
+                    if (!notificationShown || notificationShown !== 'success_${sessionScope.success}') {
+                        showSuccessModal('Success!', '${sessionScope.success}');
+                        sessionStorage.setItem('notificationShown', 'success_${sessionScope.success}');
+                    }
                     <c:remove var="success" scope="session" />
                 </c:if>
                 
                 <c:if test="${not empty sessionScope.error}">
-                    showErrorModal('Error!', '${sessionScope.error}');
+                    if (!notificationShown || notificationShown !== 'error_${sessionScope.error}') {
+                        showErrorModal('Error!', '${sessionScope.error}');
+                        sessionStorage.setItem('notificationShown', 'error_${sessionScope.error}');
+                    }
                     <c:remove var="error" scope="session" />
                 </c:if>
+                
+                // Clear the notification flag after modal is shown
+                setTimeout(() => {
+                    sessionStorage.removeItem('notificationShown');
+                }, 5000);
             });
         </script>
     </body>

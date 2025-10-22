@@ -43,8 +43,32 @@ public class ProductsController extends HttpServlet {
         
         int pageSize = 12; // 12 products per page
         
-        // Get products
-        List<Products> products = productDAO.getAllProducts(page, pageSize);
+        // Get products based on search and category filters
+        List<Products> products;
+        if (searchParam != null && !searchParam.trim().isEmpty()) {
+            // Search with optional category filter
+            Long categoryId = null;
+            if (categoryParam != null && !categoryParam.trim().isEmpty()) {
+                try {
+                    categoryId = Long.parseLong(categoryParam);
+                } catch (NumberFormatException e) {
+                    // Invalid category ID, ignore
+                }
+            }
+            products = productDAO.searchProducts(searchParam, categoryId, page, pageSize);
+        } else if (categoryParam != null && !categoryParam.trim().isEmpty()) {
+            // Filter by category only
+            try {
+                Long categoryId = Long.parseLong(categoryParam);
+                products = productDAO.getProductsByCategory(categoryId, page, pageSize);
+            } catch (NumberFormatException e) {
+                // Invalid category ID, show all products
+                products = productDAO.getAllProducts(page, pageSize);
+            }
+        } else {
+            // No filters, show all products
+            products = productDAO.getAllProducts(page, pageSize);
+        }
         
         // Get primary images for each product
         for (Products product : products) {

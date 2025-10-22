@@ -181,6 +181,16 @@ public class Products {
     public void setUpdatedAt(Timestamp updatedAt) { this.updated_at = updatedAt; }
     public Timestamp getDeletedAt() { return deleted_at; }
     public void setDeletedAt(Timestamp deletedAt) { this.deleted_at = deletedAt; }
+    
+    // Additional properties for wishlist display
+    private String category_name; // For displaying category name in wishlist
+    private String imageUrl; // For displaying product image
+    
+    public String getCategory_name() { return category_name; }
+    public void setCategory_name(String category_name) { this.category_name = category_name; }
+    
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     @Override
     public int hashCode() { return Long.hashCode(product_id); }
