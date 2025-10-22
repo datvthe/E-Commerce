@@ -310,6 +310,11 @@
                     </c:choose>
                 </div>
                 <div class="d-none d-lg-flex ms-2">
+
+                    <a class="btn btn-primary position-relative" href="<%= request.getContextPath() %>/seller/register">
+                        <i class="fas fa-shopping-cart me-1"></i>Đăng kí bán hàng
+                        
+
                     <a class="btn btn-outline-primary ms-2 position-relative" href="<%= request.getContextPath() %>/wishlist">
                         <i class="fas fa-heart me-1"></i>Yêu thích
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="wishlistCount">0</span>
@@ -350,35 +355,58 @@
                     <div class="card-body p-0">
                         <div class="profile-stats">
                             <div class="row">
-                                <div class="col-6">
-                                    <div class="stat-item">
-                                        <div class="stat-number" data-count="0">0</div>
-                                        <div class="stat-label">Đơn hàng</div>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="stat-item">
-                                        <div class="stat-number" data-count="0">0</div>
-                                        <div class="stat-label">Yêu thích</div>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="stat-item">
-                                        <div class="stat-number" data-count="0">0</div>
-                                        <div class="stat-label">Đánh giá</div>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="stat-item">
-                                        <div class="stat-number" data-count="0">0₫</div>
-                                        <div class="stat-label">Đã chi</div>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="col-6">
+                        <div class="stat-item">
+                            <div class="stat-number" data-count="0">0</div>
+                            <div class="stat-label">Đã mua</div>
                         </div>
                     </div>
+
+                    <!-- Đã bán -->
+                    <div class="col-6">
+                        <div class="stat-item">
+                            <div class="stat-number" data-count="0">0</div>
+                            <div class="stat-label">Đã bán</div>
+                        </div>
+                    </div>
+
+                    <!-- Số bài viết -->
+                    <div class="col-6">
+                        <div class="stat-item">
+                            <div class="stat-number" data-count="0">0</div>
+                            <div class="stat-label">Số bài viết</div>
+                        </div>
+                    </div>
+
+                    <!-- Số gian hàng -->
+                    <div class="col-6">
+                        <div class="stat-item">
+                            <div class="stat-number" data-count="0">0</div>
+                            <div class="stat-label">Số gian hàng</div>
+                        </div>
+                    </div>
+
+                    <!-- Số dư -->
+                    <div class="col-6">
+                        <div class="stat-item">
+                            <div class="stat-number" data-count="0">0₫</div>
+                            <div class="stat-label">Số dư</div>
+                        </div>
+                    </div>
+
+                    <!-- Đã chi -->
+                    <div class="col-6">
+                        <div class="stat-item">
+                            <div class="stat-number" data-count="0">0₫</div>
+                            <div class="stat-label">Đã chi</div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
+        </div>
+    </div>
+</div>
 
             <!-- Profile Details -->
             <div class="col-lg-8">
