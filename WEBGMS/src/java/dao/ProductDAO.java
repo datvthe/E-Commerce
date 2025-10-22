@@ -42,6 +42,8 @@ public class ProductDAO extends DBConnection {
                 product.setPrice(rs.getBigDecimal("price"));
                 product.setCurrency(rs.getString("currency"));
                 product.setStatus(rs.getString("status"));
+                product.setIs_digital(rs.getInt("is_digital"));
+                product.setDelivery_time(rs.getString("delivery_time"));
                 product.setAverage_rating(rs.getDouble("average_rating"));
                 product.setTotal_reviews(rs.getInt("total_reviews"));
                 product.setCreated_at(rs.getTimestamp("created_at"));
@@ -100,6 +102,8 @@ public class ProductDAO extends DBConnection {
                 product.setPrice(rs.getBigDecimal("price"));
                 product.setCurrency(rs.getString("currency"));
                 product.setStatus(rs.getString("status"));
+                product.setIs_digital(rs.getInt("is_digital"));
+                product.setDelivery_time(rs.getString("delivery_time"));
                 product.setAverage_rating(rs.getDouble("average_rating"));
                 product.setTotal_reviews(rs.getInt("total_reviews"));
                 product.setCreated_at(rs.getTimestamp("created_at"));

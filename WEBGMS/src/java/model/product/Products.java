@@ -21,6 +21,8 @@ public class Products {
     private BigDecimal price;
     private String currency;
     private String status; // kept for compatibility; use getStatusEnum/setStatusEnum for type-safety
+    private int is_digital;
+    private String delivery_time;
     private ProductCategories category_id;
     private double average_rating;
     private int total_reviews;
@@ -164,6 +166,22 @@ public class Products {
 
     public void setDeleted_at(Timestamp deleted_at) {
         this.deleted_at = deleted_at;
+    }
+
+    public int getIs_digital() {
+        return is_digital;
+    }
+
+    public void setIs_digital(int is_digital) {
+        this.is_digital = is_digital;
+    }
+
+    public String getDelivery_time() {
+        return delivery_time;
+    }
+
+    public void setDelivery_time(String delivery_time) {
+        this.delivery_time = delivery_time;
     }
 
     // Additional camelCase accessors
