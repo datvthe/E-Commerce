@@ -97,4 +97,70 @@ public class ProductImageDAO extends DBConnection {
         return false;
     }
 
+    /**
+     * Update primary image for a product
+     */
+    public boolean updatePrimaryImage(long productId, String imageUrl, String altText) {
+        String sql = "UPDATE product_images SET is_primary = 0 WHERE product_id = ?";
+        String insertSql = "INSERT INTO product_images (product_id, url, alt_text, is_primary) VALUES (?, ?, ?, 1)";
+        
+        try (Connection conn = getConnection()) {
+            conn.setAutoCommit(false);
+            
+            try (PreparedStatement ps1 = conn.prepareStatement(sql);
+                 PreparedStatement ps2 = conn.prepareStatement(insertSql)) {
+                
+                // Set all existing images as non-primary
+                ps1.setLong(1, productId);
+                ps1.executeUpdate();
+                
+                // Insert new primary image
+                ps2.setLong(1, productId);
+                ps2.setString(2, imageUrl);
+                ps2.setString(3, altText);
+                ps2.executeUpdate();
+                
+                conn.commit();
+                return true;
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
+            }
+        } catch (Exception e) {
+            System.err.println("Error updating primary image: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Delete image by ID
+     */
+    public boolean deleteImage(int imageId) {
+        String sql = "DELETE FROM product_images WHERE image_id = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, imageId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error deleting image: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Delete all images for a product
+     */
+    public boolean deleteImagesByProductId(long productId) {
+        String sql = "DELETE FROM product_images WHERE product_id = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, productId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Error deleting images by product ID: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }

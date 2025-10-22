@@ -45,7 +45,7 @@ public class ChangePasswordController extends HttpServlet {
                 return;
             }
 
-            if (newPassword.length() < 6) {
+            if (newPassword.length() < 8) {
                 response.sendRedirect(request.getContextPath() + "/profile?error=password_too_short");
                 return;
             }

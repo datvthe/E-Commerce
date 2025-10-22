@@ -103,6 +103,27 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const successToast = new bootstrap.Toast(document.getElementById('successToast'));
                 const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+                
+                // Password form validation
+                const passwordForm = document.querySelector('form[action*="change_password"]');
+                if (passwordForm) {
+                    passwordForm.addEventListener('submit', function(e) {
+                        const newPassword = document.querySelector('input[name="new_password"]').value;
+                        const confirmPassword = document.querySelector('input[name="confirm_password"]').value;
+                        
+                        if (newPassword.length < 8) {
+                            e.preventDefault();
+                            alert('Mật khẩu mới phải có ít nhất 8 ký tự!');
+                            return false;
+                        }
+                        
+                        if (newPassword !== confirmPassword) {
+                            e.preventDefault();
+                            alert('Mật khẩu xác nhận không khớp!');
+                            return false;
+                        }
+                    });
+                }
                 const errorBody = document.querySelector('#errorToast .toast-body');
 
                 if (urlParams.get('success') === 'password_changed') {
@@ -116,7 +137,7 @@
                     } else if (error === 'password_mismatch') {
                         errorBody.innerHTML = '<i class="fa fa-exclamation-circle me-2"></i>Mật khẩu mới và xác nhận không khớp!';
                     } else if (error === 'password_too_short') {
-                        errorBody.innerHTML = '<i class="fa fa-exclamation-circle me-2"></i>Mật khẩu mới phải có ít nhất 6 ký tự!';
+                        errorBody.innerHTML = '<i class="fa fa-exclamation-circle me-2"></i>Mật khẩu mới phải có ít nhất 8 ký tự!';
                     } else if (error === 'update_failed') {
                         errorBody.innerHTML = '<i class="fa fa-exclamation-circle me-2"></i>Không thể cập nhật mật khẩu. Vui lòng thử lại!';
                     } else {
@@ -240,7 +261,7 @@
                                 <h4>0</h4><p>Số bài viết</p>
                             </div>
                             <div class="col-6">
-                                <h4>0</h4><p>Số gian hàng</p>
+                                <h4>${activeProducts != null ? activeProducts : 0}</h4><p>Số gian hàng</p>
                             </div>
                             <div class="col-6">
                                 <h4 style="color:#6c63ff;">
@@ -322,12 +343,12 @@
 
                                     <div class="mb-3">
                                         <label>Mật khẩu mới</label>
-                                        <input type="password" class="form-control" name="new_password" required>
+                                        <input type="password" class="form-control" name="new_password" minlength="8" required>
                                     </div>
 
                                     <div class="mb-3">
                                         <label>Xác nhận mật khẩu mới</label>
-                                        <input type="password" class="form-control" name="confirm_password" required>
+                                        <input type="password" class="form-control" name="confirm_password" minlength="8" required>
                                     </div>
 
                                     <button class="btn btn-primary" type="submit">

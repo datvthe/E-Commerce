@@ -83,5 +83,31 @@ public class SellerDAO {
     return null;
 }
 
+    public boolean updateSeller(Seller seller) {
+        String sql = "UPDATE sellers SET full_name=?, email=?, phone=?, shop_name=?, shop_description=?, " +
+                     "main_category=?, bank_name=?, bank_account=?, account_owner=?, updated_at=NOW() " +
+                     "WHERE user_id=?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, seller.getFullName());
+            ps.setString(2, seller.getEmail());
+            ps.setString(3, seller.getPhone());
+            ps.setString(4, seller.getShopName());
+            ps.setString(5, seller.getShopDescription());
+            ps.setString(6, seller.getMainCategory());
+            ps.setString(7, seller.getBankName());
+            ps.setString(8, seller.getBankAccount());
+            ps.setString(9, seller.getAccountOwner());
+            ps.setLong(10, seller.getUserId());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 }

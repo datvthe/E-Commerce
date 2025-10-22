@@ -2,7 +2,11 @@ package controller.common;
 
 import dao.UsersDAO;
 import dao.WalletDAO;
+import dao.SellerDAO;
+import dao.ProductDAO;
+import dao.OrderDAO;
 import model.user.Users;
+import model.seller.Seller;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -49,6 +53,35 @@ public class ProfileController extends HttpServlet {
             WalletDAO walletDAO = new WalletDAO();
             double walletBalance = walletDAO.getBalance(user.getUser_id());
             request.setAttribute("walletBalance", walletBalance);
+
+            // ✅ Lấy thống kê shop nếu user là seller
+            try {
+                SellerDAO sellerDAO = new SellerDAO();
+                Seller seller = sellerDAO.getSellerByUserId(user.getUser_id());
+                if (seller != null) {
+                    // Lấy thống kê sản phẩm
+                    ProductDAO productDAO = new ProductDAO();
+                    int totalProducts = productDAO.getProductCountBySeller(user.getUser_id());
+                    int activeProducts = productDAO.getProductCountBySellerWithStatus(user.getUser_id(), "active");
+                    
+                    // Lấy thống kê đơn hàng
+                    OrderDAO orderDAO = new OrderDAO();
+                    int totalOrders = orderDAO.getOrderCountBySeller(user.getUser_id(), null);
+                    int pendingOrders = orderDAO.getOrderCountBySeller(user.getUser_id(), "pending");
+                    
+                    request.setAttribute("seller", seller);
+                    request.setAttribute("totalProducts", totalProducts);
+                    request.setAttribute("activeProducts", activeProducts);
+                    request.setAttribute("totalOrders", totalOrders);
+                    request.setAttribute("pendingOrders", pendingOrders);
+                }
+            } catch (Exception e) {
+                // Nếu không phải seller hoặc có lỗi, set giá trị mặc định
+                request.setAttribute("totalProducts", 0);
+                request.setAttribute("activeProducts", 0);
+                request.setAttribute("totalOrders", 0);
+                request.setAttribute("pendingOrders", 0);
+            }
 
             // ✅ Truyền user và số dư sang JSP
             request.setAttribute("user", user);
@@ -175,7 +208,7 @@ private void changePassword(HttpServletRequest request, HttpServletResponse resp
         }
 
         // 🔹 Kiểm tra độ dài mật khẩu
-        if (newPassword.length() < 6) {
+        if (newPassword.length() < 8) {
             response.sendRedirect(request.getContextPath() + "/profile?error=password_too_short");
             return;
         }

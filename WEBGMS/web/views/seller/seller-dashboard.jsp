@@ -18,34 +18,7 @@
                 margin: 0;
             }
 
-            /* Sidebar */
-            .sidebar {
-                width: 260px;
-                height: 100vh;
-                background-color: #ff7b00;
-                color: white;
-                position: fixed;
-                left: 0;
-                top: 0;
-                padding: 25px 15px;
-            }
-            .sidebar h4 {
-                font-weight: 700;
-                text-align: center;
-                margin-bottom: 30px;
-            }
-            .sidebar a {
-                display: block;
-                color: white;
-                text-decoration: none;
-                padding: 12px 15px;
-                border-radius: 8px;
-                margin-bottom: 8px;
-                transition: all 0.3s ease;
-            }
-            .sidebar a:hover, .sidebar a.active {
-                background-color: #e36c00;
-            }
+            /* Sidebar styles are now in component/seller-sidebar.jsp */
 
             /* Main content */
             .main {
@@ -86,6 +59,7 @@
                 background-color: #e36c00;
             }
 
+
             .stat-box {
                 background: white;
                 border-radius: 12px;
@@ -108,16 +82,10 @@
     </head>
     <body>
 
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <h4><i class="bi bi-shop"></i> Gicungco Seller</h4>
-            <a href="${pageContext.request.contextPath}/seller/dashboard" class="active"><i class="bi bi-house-door me-2"></i>Trang chủ</a>
-            <a href="${pageContext.request.contextPath}/seller/products"><i class="bi bi-box-seam me-2"></i>Quản lý sản phẩm</a>
-            <a href="${pageContext.request.contextPath}/seller/orders"><i class="bi bi-receipt me-2"></i>Đơn hàng</a>
-            <a href="${pageContext.request.contextPath}/seller/statistics"><i class="bi bi-graph-up-arrow me-2"></i>Thống kê doanh thu</a>
-            <a href="${pageContext.request.contextPath}/seller/withdraw"><i class="bi bi-wallet2 me-2"></i>Lịch sử rút tiền</a>
-            <a href="${pageContext.request.contextPath}/seller/edit"><i class="bi bi-pencil-square me-2"></i>Chỉnh sửa thông tin</a>
-        </div>
+        <!-- Include Sidebar Component -->
+        <jsp:include page="../component/seller-sidebar.jsp">
+            <jsp:param name="activePage" value="dashboard" />
+        </jsp:include>
 
         <!-- Main content -->
         <div class="main">
@@ -160,26 +128,26 @@
             <div class="row mb-4">
                 <div class="col-md-3">
                     <div class="stat-box">
-                        <div class="stat-number">125</div>
-                        <div class="stat-label">Sản phẩm</div>
+                        <div class="stat-number">${totalProducts}</div>
+                        <div class="stat-label">Tổng sản phẩm</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stat-box">
-                        <div class="stat-number">48</div>
-                        <div class="stat-label">Đơn hàng</div>
+                        <div class="stat-number">${activeProducts}</div>
+                        <div class="stat-label">Sản phẩm hoạt động</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stat-box">
-                        <div class="stat-number">12.3tr</div>
-                        <div class="stat-label">Doanh thu tháng</div>
+                        <div class="stat-number">${totalOrders}</div>
+                        <div class="stat-label">Tổng đơn hàng</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stat-box">
-                        <div class="stat-number">5</div>
-                        <div class="stat-label">Lần rút tiền</div>
+                        <div class="stat-number">${pendingOrders}</div>
+                        <div class="stat-label">Đơn chờ xử lý</div>
                     </div>
                 </div>
             </div>
@@ -194,11 +162,11 @@
                     <a href="${pageContext.request.contextPath}/seller/orders" class="btn btn-orange">
                         <i class="bi bi-receipt me-1"></i> Xem đơn hàng
                     </a>
-                    <a href="${pageContext.request.contextPath}/seller/statistics" class="btn btn-orange">
-                        <i class="bi bi-graph-up-arrow me-1"></i> Xem thống kê
+                    <a href="${pageContext.request.contextPath}/seller/orders" class="btn btn-orange">
+                        <i class="bi bi-graph-up-arrow me-1"></i> Xem doanh thu
                     </a>
-                    <a href="${pageContext.request.contextPath}/seller/edit" class="btn btn-orange">
-                        <i class="bi bi-pencil-square me-1"></i> Cập nhật thông tin shop
+                    <a href="${pageContext.request.contextPath}/seller/profile" class="btn btn-orange">
+                        <i class="bi bi-person-gear me-1"></i> Chỉnh sửa thông tin shop
                     </a>
                 </div>
             </div>

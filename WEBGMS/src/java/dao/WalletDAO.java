@@ -167,4 +167,34 @@ public boolean deductBalance(int userId, double amount) {
     }
     return false;
 }
+
+    /** ✅ Lấy số dư của người dùng (BigDecimal) */
+    public java.math.BigDecimal getBalanceByUserId(int userId) {
+        String sql = "SELECT balance FROM wallets WHERE user_id = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getBigDecimal("balance");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return java.math.BigDecimal.ZERO;
+    }
+
+    /** ✅ Đếm số lần rút tiền của user */
+    public int getWithdrawCountByUserId(int userId) {
+        String sql = "SELECT COUNT(*) FROM transactions WHERE user_id = ? AND type = 'WITHDRAW'";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }

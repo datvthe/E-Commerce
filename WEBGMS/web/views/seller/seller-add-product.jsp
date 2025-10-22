@@ -10,47 +10,18 @@
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
-            display: flex;
             min-height: 100vh;
             background-color: #fff8f2;
         }
 
-        /* Sidebar */
-        .sidebar {
-            width: 250px;
-            background-color: #ff6600;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-        }
-
-        .sidebar h2 {
-            font-size: 20px;
-            margin-bottom: 25px;
-            font-weight: 700;
-        }
-
-        .sidebar a {
-            color: white;
-            text-decoration: none;
-            padding: 10px 12px;
-            border-radius: 8px;
-            transition: background 0.2s;
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-        }
-
-        .sidebar a:hover, .sidebar a.active {
-            background-color: rgba(255, 255, 255, 0.15);
-        }
+        /* Sidebar styles are now in component/seller-sidebar.jsp */
 
         /* Main content */
         .main {
-            flex: 1;
+            margin-left: 260px;
             padding: 40px;
             background-color: #fff8f2;
+            min-height: 100vh;
         }
 
         .card {
@@ -163,15 +134,10 @@
 </head>
 <body>
 
-<!-- Sidebar -->
-<div class="sidebar">
-    <h2>Giicungco Seller</h2>
-    <a href="${pageContext.request.contextPath}/seller/dashboard">🏠 Trang chủ</a>
-    <a href="${pageContext.request.contextPath}/seller/products" class="active">📦 Quản lý sản phẩm</a>
-    <a href="${pageContext.request.contextPath}/seller/orders">🧾 Đơn hàng</a>
-    <a href="${pageContext.request.contextPath}/seller/withdraw">💸 Lịch sử rút tiền</a>
-    <a href="${pageContext.request.contextPath}/seller/profile">⚙️ Hồ sơ</a>
-</div>
+<!-- Include Sidebar Component -->
+<jsp:include page="../component/seller-sidebar.jsp">
+    <jsp:param name="activePage" value="products" />
+</jsp:include>
 
 <!-- Main Content -->
 <div class="main">
@@ -193,7 +159,7 @@
             <label>Số lượng (tồn kho):</label>
             <input type="number" name="quantity" min="1" value="1" required>
 
-            <label>Danh mục:</label>
+            <label>Danh mục (ưu tiên sản phẩm số: Netflix, ChatGPT, thẻ cào...):</label>
             <select name="category_id" required>
                 <option value="">-- Chọn danh mục --</option>
                 <c:forEach var="c" items="${categories}">
@@ -201,11 +167,11 @@
                 </c:forEach>
             </select>
 
-            <label>Ảnh sản phẩm:</label>
+            <label>Ảnh sản phẩm (JPG/PNG/WEBP, ≤ 10MB):</label>
             <div class="upload-box" onclick="document.getElementById('image').click()">
                 📸 Nhấn để chọn ảnh sản phẩm
             </div>
-            <input type="file" id="image" name="image" accept="image/*" style="display:none;" required onchange="previewImage(event)">
+            <input type="file" id="image" name="image" accept="image/png,image/jpeg,image/webp" style="display:none;" required onchange="previewImage(event)">
 
             <div class="image-preview" id="preview"></div>
 
