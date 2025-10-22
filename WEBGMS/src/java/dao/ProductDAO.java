@@ -48,7 +48,7 @@ public class ProductDAO extends DBConnection {
                 // Set category
                 if (rs.getLong("category_id") > 0) {
                     ProductCategories category = new ProductCategories();
-                    category.setCategory_id(rs.getLong("category_id"));
+                    category.setCategory_id(rs.getInt("category_id"));
                     category.setName(rs.getString("category_name"));
                     category.setSlug(rs.getString("category_slug"));
                     product.setCategory_id(category);
@@ -104,9 +104,9 @@ public class ProductDAO extends DBConnection {
                 product.setUpdated_at(rs.getTimestamp("updated_at"));
 
                 // Set category
-                if (rs.getLong("category_id") > 0) {
+                if (rs.getInt("category_id") > 0) {
                     ProductCategories category = new ProductCategories();
-                    category.setCategory_id(rs.getLong("category_id"));
+                    category.setCategory_id(rs.getInt("category_id"));
                     category.setName(rs.getString("category_name"));
                     category.setSlug(rs.getString("category_slug"));
                     product.setCategory_id(category);
@@ -256,4 +256,96 @@ public class ProductDAO extends DBConnection {
         }
         return 0;
     }
+
+    public List<Products> getProductsBySellerId(int sellerId) {
+        List<Products> list = new ArrayList<>();
+        String sql = "SELECT * FROM products WHERE seller_id = ? ORDER BY created_at DESC";
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, sellerId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Products p = new Products();
+
+                // 🧩 Gán thông tin cơ bản
+                p.setProduct_id(rs.getLong("product_id"));
+                p.setName(rs.getString("name"));
+                p.setSlug(rs.getString("slug"));
+                p.setDescription(rs.getString("description"));
+
+                // 💰 Đúng kiểu dữ liệu BigDecimal
+                p.setPrice(rs.getBigDecimal("price"));
+
+                // 🪙 Loại tiền (nếu có)
+                p.setCurrency(rs.getString("currency"));
+
+                // 🧱 Liên kết category nếu cần
+                ProductCategories category = new ProductCategories();
+                try {
+                    category.setCategory_id(rs.getInt("category_id"));
+                } catch (Exception ignored) {
+                }
+                p.setCategory_id(category);
+
+                // 👨‍💼 Seller object
+                Users seller = new Users();
+                seller.setUser_id(rs.getInt("seller_id"));
+                p.setSeller_id(seller);
+
+                // ⭐ Thông tin đánh giá
+                p.setAverage_rating(rs.getDouble("average_rating"));
+                p.setTotal_reviews(rs.getInt("total_reviews"));
+
+                // 📅 Thời gian tạo/cập nhật
+                p.setCreated_at(rs.getTimestamp("created_at"));
+                p.setUpdated_at(rs.getTimestamp("updated_at"));
+
+                // ⚙️ Trạng thái
+                p.setStatus(rs.getString("status"));
+
+                list.add(p);
+            }
+
+        } catch (Exception e) {
+            System.err.println("❌ Lỗi lấy danh sách sản phẩm theo seller_id: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    public boolean insertProduct(Products p) {
+    String sql = "INSERT INTO products (seller_id, name, description, price, currency, category_id, status, created_at) "
+               + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+    try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, p.getSeller_id().getUser_id());
+        ps.setString(2, p.getName());
+        ps.setString(3, p.getDescription());
+        ps.setBigDecimal(4, p.getPrice());
+        ps.setString(5, p.getCurrency());
+        ps.setInt(6, p.getCategory_id() != null ? p.getCategory_id().getCategory_id() : 0);
+
+        ps.setString(7, p.getStatus());
+        ps.setTimestamp(8, p.getCreated_at());
+
+        return ps.executeUpdate() > 0;
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+    public long getLastInsertedId() {
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement("SELECT LAST_INSERT_ID()");
+         ResultSet rs = ps.executeQuery()) {
+        if (rs.next()) return rs.getLong(1);
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
+
 }

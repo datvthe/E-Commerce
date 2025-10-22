@@ -22,8 +22,7 @@ public class ProductImageDAO extends DBConnection {
                 + "WHERE product_id = ? "
                 + "ORDER BY is_primary DESC, image_id ASC";
 
-        try (Connection conn = DBConnection.getConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, productId);
             ResultSet rs = ps.executeQuery();
@@ -31,11 +30,11 @@ public class ProductImageDAO extends DBConnection {
             while (rs.next()) {
                 ProductImages image = new ProductImages();
                 image.setImage_id(rs.getInt("image_id"));
-                
+
                 Products product = new Products();
                 product.setProduct_id(productId);
                 image.setProduct_id(product);
-                
+
                 image.setUrl(rs.getString("url"));
                 image.setAlt_text(rs.getString("alt_text"));
                 image.setIs_primary(rs.getBoolean("is_primary"));
@@ -57,8 +56,7 @@ public class ProductImageDAO extends DBConnection {
                 + "WHERE product_id = ? AND is_primary = 1 "
                 + "LIMIT 1";
 
-        try (Connection conn = DBConnection.getConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, productId);
             ResultSet rs = ps.executeQuery();
@@ -66,11 +64,11 @@ public class ProductImageDAO extends DBConnection {
             if (rs.next()) {
                 image = new ProductImages();
                 image.setImage_id(rs.getInt("image_id"));
-                
+
                 Products product = new Products();
                 product.setProduct_id(productId);
                 image.setProduct_id(product);
-                
+
                 image.setUrl(rs.getString("url"));
                 image.setAlt_text(rs.getString("alt_text"));
                 image.setIs_primary(rs.getBoolean("is_primary"));
@@ -81,5 +79,22 @@ public class ProductImageDAO extends DBConnection {
         }
         return image;
     }
-}
 
+    public boolean insertProductImage(ProductImages img) {
+        String sql = "INSERT INTO product_images (product_id, url, alt_text, is_primary) VALUES (?, ?, ?, ?)";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setLong(1, img.getProduct_id().getProduct_id());
+            // ID sản phẩm
+            ps.setString(2, img.getUrl());           // Đường dẫn ảnh
+            ps.setString(3, img.getAlt_text());      // Mô tả alt text
+            ps.setBoolean(4, img.isIs_primary());    // Ảnh chính hay phụ
+
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+}

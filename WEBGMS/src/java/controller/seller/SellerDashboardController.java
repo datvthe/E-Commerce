@@ -1,39 +1,50 @@
 package controller.seller;
 
-import dao.ProductDAO;
-import dao.OrderDAO;
-import jakarta.servlet.*;
+import dao.SellerDAO;
+import dao.WalletDAO;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import model.seller.Seller;
+import model.user.Users;
 
+@WebServlet("/seller/dashboard")
 public class SellerDashboardController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Lấy ID người bán từ session
-        Integer sellerId = (Integer) request.getSession().getAttribute("userId");
+        HttpSession session = request.getSession();
+        Users user = (Users) session.getAttribute("user");
 
-        // Nếu chưa login, tạm cho test bằng sellerId = 1
-            HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
+        // 🧩 Nếu chưa đăng nhập → quay về login
+        if (user == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        
 
-        ProductDAO productDao = new ProductDAO();
-        OrderDAO orderDao = new OrderDAO();
+        SellerDAO sellerDAO = new SellerDAO();
+        WalletDAO walletDAO = new WalletDAO();
 
-        int totalProducts = productDao.countBySeller(sellerId);
-        int totalOrders = orderDao.countBySeller(sellerId);
-        double todayRevenue = orderDao.revenueToday(sellerId);
+        // 🟢 Lấy seller theo user_id hiện tại
+        Seller seller = sellerDAO.getSellerByUserId(user.getUser_id());
 
-        request.setAttribute("totalProducts", totalProducts);
-        request.setAttribute("totalOrders", totalOrders);
-        request.setAttribute("todayRevenue", todayRevenue);
+        if (seller == null) {
+            // ❌ Nếu user chưa có shop → quay về trang đăng ký
+            response.sendRedirect(request.getContextPath() + "/seller/register");
+            return;
+        }
 
+        // ✅ Lấy số dư ví chính xác của user hiện tại
+        double balance = walletDAO.getBalance(user.getUser_id());
+
+        // Gửi dữ liệu sang JSP
+        request.setAttribute("seller", seller);
+        request.setAttribute("walletBalance", balance);
+
+        // Mở trang cửa hàng
         request.getRequestDispatcher("/views/seller/seller-dashboard.jsp").forward(request, response);
     }
 }
