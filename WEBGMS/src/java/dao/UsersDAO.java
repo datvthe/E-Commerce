@@ -8,6 +8,8 @@ import util.PasswordUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UsersDAO extends DBConnection {
 
@@ -143,7 +145,7 @@ public class UsersDAO extends DBConnection {
      * ✅ Update user info
      */
     public boolean updateUser(Users user) {
-        String sql = "UPDATE users SET full_name = ?, email = ?, phone_number = ?, address = ?, gender = ?, date_of_birth = ?, avatar_url = ?, updated_at = NOW() WHERE user_id = ?";
+        String sql = "UPDATE users SET full_name = ?, email = ?, phone_number = ?, address = ?, gender = ?, date_of_birth = ?, avatar_url = ?, status = ?, updated_at = NOW() WHERE user_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -160,7 +162,8 @@ public class UsersDAO extends DBConnection {
             }
 
             ps.setString(7, user.getAvatar_url());
-            ps.setInt(8, user.getUser_id());
+            ps.setString(8, user.getStatus());
+            ps.setInt(9, user.getUser_id());
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -339,5 +342,166 @@ public class UsersDAO extends DBConnection {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    // ===== Additional methods used by controllers =====
+
+    public boolean isEmailExists(String email) {
+        String sql = "SELECT 1 FROM users WHERE email = ? LIMIT 1";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean isPhoneExists(String phoneNumber) {
+        String sql = "SELECT 1 FROM users WHERE phone_number = ? LIMIT 1";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, phoneNumber);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean deleteUser(int userId) {
+        String sql = "DELETE FROM users WHERE user_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateUserStatus(int userId, String status) {
+        String sql = "UPDATE users SET status = ?, updated_at = NOW() WHERE user_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public List<Users> getAllUsers(int page, int pageSize) {
+        List<Users> list = new ArrayList<>();
+        int offset = (page - 1) * pageSize;
+        String sql = "SELECT * FROM users ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, pageSize);
+            ps.setInt(2, offset);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapUser(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int getTotalUsers() {
+        String sql = "SELECT COUNT(*) FROM users";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<Users> searchUsers(String keyword, String status, String role, int page, int pageSize) {
+        List<Users> list = new ArrayList<>();
+        int offset = (page - 1) * pageSize;
+        StringBuilder sql = new StringBuilder("SELECT * FROM users WHERE 1=1");
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" AND (full_name LIKE ? OR email LIKE ? OR phone_number LIKE ?)");
+        }
+        if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
+            sql.append(" AND status = ?");
+        }
+        if (role != null && !role.trim().isEmpty() && !"all".equalsIgnoreCase(role)) {
+            // Use users.default_role for filtering to avoid extra joins
+            sql.append(" AND default_role = ?");
+        }
+        sql.append(" ORDER BY created_at DESC LIMIT ? OFFSET ?");
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int idx = 1;
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                String like = "%" + keyword + "%";
+                ps.setString(idx++, like);
+                ps.setString(idx++, like);
+                ps.setString(idx++, like);
+            }
+            if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
+                ps.setString(idx++, status);
+            }
+            if (role != null && !role.trim().isEmpty() && !"all".equalsIgnoreCase(role)) {
+                ps.setString(idx++, role);
+            }
+            ps.setInt(idx++, pageSize);
+            ps.setInt(idx, offset);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapUser(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int countUsers(String keyword, String status, String role) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM users WHERE 1=1");
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" AND (full_name LIKE ? OR email LIKE ? OR phone_number LIKE ?)");
+        }
+        if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
+            sql.append(" AND status = ?");
+        }
+        if (role != null && !role.trim().isEmpty() && !"all".equalsIgnoreCase(role)) {
+            sql.append(" AND default_role = ?");
+        }
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int idx = 1;
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                String like = "%" + keyword + "%";
+                ps.setString(idx++, like);
+                ps.setString(idx++, like);
+                ps.setString(idx++, like);
+            }
+            if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
+                ps.setString(idx++, status);
+            }
+            if (role != null && !role.trim().isEmpty() && !"all".equalsIgnoreCase(role)) {
+                ps.setString(idx++, role);
+            }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
