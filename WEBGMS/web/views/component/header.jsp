@@ -488,6 +488,9 @@
                                     </div>
                                 </div>
                             </div>
+                            <a href="<%= request.getContextPath() %>/views/chat/chat.jsp" class="nav-item nav-link nav-link-enhanced me-2" title="Tin nhắn">
+                                <i class="fas fa-comments me-2"></i>Chat
+                            </a>
                             <a href="tel:+0123456789" class="btn phone-btn rounded-pill py-3 px-4 mb-3 mb-md-3 mb-lg-0">
                                 <i class="fas fa-phone-alt me-2"></i>
                                 <strong>Hotline: 0123 456 789</strong>
@@ -498,6 +501,21 @@
             </div>
         </div>
         <!-- Navbar & Hero End -->
+
+        <!-- Chat Widget Include & Assets -->
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/chat-widget.css" />
+        <jsp:include page="chat-widget.jsp" />
+        <script src="${pageContext.request.contextPath}/assets/js/chat-widget.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/aibot-widget.js"></script>
+        <script>
+            window.addEventListener('DOMContentLoaded', function(){
+                try {
+                    const userId = ${sessionScope.user != null ? sessionScope.user.user_id : -1};
+                    const userRole = '${sessionScope.user != null ? sessionScope.user.default_role : "guest"}';
+                    initChatWidget('<%= request.getContextPath() %>', userId, userRole);
+                } catch(e) {}
+            });
+        </script>
 
         <script>
             // Enhanced search functionality

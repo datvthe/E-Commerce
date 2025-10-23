@@ -254,7 +254,10 @@
                                 </div>
                                 <a href="#" class="nav-item nav-link">Tin tức</a>
                                 <a href="#" class="nav-item nav-link">Chia sẻ</a>
-                                <a href="<%= request.getContextPath() %>/contact" class="nav-item nav-link me-2">Hỗ trợ</a>
+                                <a href="<%= request.getContextPath() %>/contact" class="nav-item nav-link">Hỗ trợ</a>
+                                <a href="<%= request.getContextPath() %>/views/chat/chat.jsp" class="nav-item nav-link me-2">
+                                    <i class="fas fa-comments me-1"></i>Chat
+                                </a>
                                 <div class="nav-item dropdown d-block d-lg-none mb-3">
                                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Tất cả danh mục</a>
                                     <div class="dropdown-menu m-0">
@@ -1236,8 +1239,23 @@
                 setTimeout(() => {
                     sessionStorage.removeItem('notificationShown');
                 }, 5000);
+                
+                // Initialize chat widget
+                try {
+                    const userId = ${sessionScope.user != null ? sessionScope.user.user_id : -1};
+                    const userRole = '${sessionScope.user != null ? sessionScope.user.default_role : "guest"}';
+                    initChatWidget('<%= request.getContextPath() %>', userId, userRole);
+                } catch(e) {
+                    console.log('Chat widget not loaded:', e);
+                }
             });
         </script>
+        
+        <!-- Chat Widget Assets -->
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/chat-widget.css" />
+        <jsp:include page="../component/chat-widget.jsp" />
+        <script src="<%= request.getContextPath() %>/assets/js/chat-widget.js"></script>
+        <script src="<%= request.getContextPath() %>/assets/js/aibot-widget.js"></script>
     </body>
 </html>
 
