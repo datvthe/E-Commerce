@@ -7,10 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import service.GoogleAuthService;
-import service.RoleBasedAccessControl;
 import model.user.Users;
-import model.user.UserRoles;
-import dao.UsersDAO;
 
 import java.io.IOException;
 
@@ -47,27 +44,14 @@ public class GoogleAuthCallbackController extends HttpServlet {
                 // Login successful
                 HttpSession session = request.getSession();
                 session.setAttribute("user", user);
-                session.setAttribute("message", "Đăng nhập Google thành công!");
+                session.setAttribute("userRole", user.getDefault_role());
                 
-                // Get user role and initialize RBAC
-                UsersDAO userDAO = new UsersDAO();
-                UserRoles userRole = userDAO.getRoleByUserId((int) user.getUser_id());
+                // Google OAuth login successful - redirect directly
+                System.out.println("Google OAuth - Login successful for: " + user.getEmail());
                 
-                if (userRole != null) {
-                    // Initialize RBAC in session
-                    RoleBasedAccessControl rbac = new RoleBasedAccessControl();
-                    session.setAttribute("rbac", rbac);
-                    session.setAttribute("userRole", userRole);
-                    
-                    int roleId = userRole.getRole_id().getRole_id();
-                    
-                    // Redirect based on role ID
-                    String redirectUrl = getRedirectPathByRole(roleId);
-                    response.sendRedirect(request.getContextPath() + redirectUrl);
-                } else {
-                    // No role found, redirect to home
-                    response.sendRedirect(request.getContextPath() + "/home");
-                }
+                // Redirect based on user role
+                String redirectUrl = getRedirectUrlByRole(user.getDefault_role());
+                response.sendRedirect(request.getContextPath() + redirectUrl);
                 
             } else {
                 // Login failed
@@ -83,10 +67,19 @@ public class GoogleAuthCallbackController extends HttpServlet {
     }
     
     /**
-     * Get redirect path based on role ID
+     * Get redirect URL based on user role
      */
-    private String getRedirectPathByRole(int roleId) {
-        RoleBasedAccessControl rbac = new RoleBasedAccessControl();
-        return rbac.getRedirectPathByRole(roleId);
+    private String getRedirectUrlByRole(String role) {
+        switch (role) {
+            case "admin":
+                return "/admin/dashboard";
+            case "seller":
+                return "/seller/dashboard";
+            case "moderator":
+                return "/moderator/dashboard";
+            case "customer":
+            default:
+                return "/home";
+        }
     }
 }

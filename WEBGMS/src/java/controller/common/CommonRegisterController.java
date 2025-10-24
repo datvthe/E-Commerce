@@ -78,8 +78,9 @@ public class CommonRegisterController extends HttpServlet {
                 return;
             }
 
-            // Create user (password will be hashed in createUser method)
-            Users created = usersDAO.createUser(fullName, email, password, phone);
+            // Hash the password before storing
+            String hashedPassword = util.PasswordUtil.hashPassword(password);
+            Users created = usersDAO.createUser(fullName, email, hashedPassword, phone);
             if (created == null) {
                 request.getSession().setAttribute("error", "Tạo tài khoản thất bại!");
                 response.sendRedirect(request.getContextPath() + "/register");
