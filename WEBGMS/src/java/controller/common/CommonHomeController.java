@@ -6,11 +6,14 @@ package controller.common;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import dao.CategoryDAO;
+import model.Category;
 
 @WebServlet(name = "HomeController", urlPatterns = {"/home"})
 public class CommonHomeController extends HttpServlet {
@@ -53,6 +56,15 @@ public class CommonHomeController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // Load categories for search dropdown
+        CategoryDAO categoryDAO = new CategoryDAO();
+        try {
+            List<Category> categories = categoryDAO.getParentCategories();
+            request.setAttribute("categories", categories);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
         request.getRequestDispatcher("views/common/home.jsp").forward(request, response);
     }
 
