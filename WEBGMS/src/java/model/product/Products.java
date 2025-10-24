@@ -8,6 +8,7 @@ package model.product;
 import model.user.Users;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
 
 public class Products {
 
@@ -23,9 +24,12 @@ public class Products {
     private BigDecimal price;
     private String currency;
     private String status; // kept for compatibility; use getStatusEnum/setStatusEnum for type-safety
+    private int is_digital;
+    private String delivery_time;
     private ProductCategories category_id;
     private double average_rating;
     private int total_reviews;
+    private List<ProductImages> productImages;
     private Timestamp created_at;
     private Timestamp updated_at;
     private Timestamp deleted_at;
@@ -218,6 +222,22 @@ public class Products {
         this.deleted_at = deleted_at;
     }
 
+    public int getIs_digital() {
+        return is_digital;
+    }
+
+    public void setIs_digital(int is_digital) {
+        this.is_digital = is_digital;
+    }
+
+    public String getDelivery_time() {
+        return delivery_time;
+    }
+
+    public void setDelivery_time(String delivery_time) {
+        this.delivery_time = delivery_time;
+    }
+
     // Additional camelCase accessors
     public long getProductId() { return product_id; }
     public void setProductId(long productId) { this.product_id = productId; }
@@ -259,6 +279,14 @@ public class Products {
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public List<ProductImages> getProductImages() {
+        return productImages;
+    }
+
+    public void setProductImages(List<ProductImages> productImages) {
+        this.productImages = productImages;
+    }
 
     @Override
     public int hashCode() {
