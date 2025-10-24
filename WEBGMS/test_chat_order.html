@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Order Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .message { border: 1px solid #ccc; margin: 5px 0; padding: 10px; }
+        .message-id { font-weight: bold; color: #007bff; }
+        .message-content { margin: 5px 0; }
+        .message-time { color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>Chat Message Order Test</h1>
+    <button onclick="testChatOrder()">Test Chat Order</button>
+    <div id="results"></div>
+
+    <script>
+        function testChatOrder() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h2>Loading messages...</h2>';
+            
+            // Test with room ID 9 (from your database)
+            fetch('/WEBGMS/chat/messages/9')
+                .then(response => response.json())
+                .then(messages => {
+                    console.log('Raw messages from server:', messages);
+                    
+                    let html = '<h2>Chat Messages Order Test</h2>';
+                    html += '<p><strong>Total messages:</strong> ' + messages.length + '</p>';
+                    
+                    messages.forEach((msg, index) => {
+                        html += `
+                            <div class="message">
+                                <div class="message-id">Message ID: ${msg.messageId}</div>
+                                <div class="message-content"><strong>Content:</strong> ${msg.content || msg.messageContent}</div>
+                                <div class="message-time">
+                                    <strong>Raw Time:</strong> ${msg.createdAt}<br>
+                                    <strong>Sender:</strong> ${msg.senderRole} (ID: ${msg.senderId})
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    resultsDiv.innerHTML = html;
+                    
+                    // Log the order to console
+                    console.log('Message order from server:');
+                    messages.forEach((msg, index) => {
+                        console.log(`${index + 1}. ID: ${msg.messageId}, Content: "${msg.content || msg.messageContent}"`);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    resultsDiv.innerHTML = '<h2>Error loading messages: ' + error.message + '</h2>';
+                });
+        }
+    </script>
+</body>
+</html>
+
