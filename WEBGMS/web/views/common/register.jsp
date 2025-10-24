@@ -100,10 +100,7 @@
                 </div>
                 <div class="col-md-4 col-lg-3 text-center text-lg-end">
                     <div class="d-inline-flex align-items-center">
-                        <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-random"></i></span></a>
-                        <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-heart"></i></span></a>
-                        <a href="#" class="text-muted d-flex align-items-center justify-content-center"><span class="rounded-circle btn-md-square border"><i class="fas fa-shopping-cart"></i></span>
-                            <span class="text-dark ms-2">0₫</span></a>
+                        <a href="<%= request.getContextPath() %>/login" class="text-muted d-flex align-items-center justify-content-center me-3" data-bs-toggle="tooltip" title="Wishlist"><span class="rounded-circle btn-md-square border"><i class="fas fa-heart"></i></span></a>
                     </div>
                 </div>
             </div>
@@ -363,16 +360,29 @@
                     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating account...';
                 });
                 
-                // Handle server-side errors
+                // Handle server-side errors - with duplicate prevention
+                const notificationShown = sessionStorage.getItem('notificationShown');
+                
                 <c:if test="${not empty sessionScope.error}">
-                    showErrorModal('Registration Error!', '${sessionScope.error}');
+                    if (!notificationShown || notificationShown !== 'error_${sessionScope.error}') {
+                        showErrorModal('Registration Error!', '${sessionScope.error}');
+                        sessionStorage.setItem('notificationShown', 'error_${sessionScope.error}');
+                    }
                     <c:remove var="error" scope="session" />
                 </c:if>
                 
                 <c:if test="${not empty sessionScope.success}">
-                    showSuccessModal('Registration Success!', '${sessionScope.success}');
+                    if (!notificationShown || notificationShown !== 'success_${sessionScope.success}') {
+                        showSuccessModal('Registration Success!', '${sessionScope.success}');
+                        sessionStorage.setItem('notificationShown', 'success_${sessionScope.success}');
+                    }
                     <c:remove var="success" scope="session" />
                 </c:if>
+                
+                // Clear the notification flag after modal is shown
+                setTimeout(() => {
+                    sessionStorage.removeItem('notificationShown');
+                }, 5000);
             });
         </script>
     </body>
