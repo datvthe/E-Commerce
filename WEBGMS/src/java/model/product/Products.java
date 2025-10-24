@@ -31,6 +31,10 @@ public class Products {
     private Timestamp deleted_at;
     private int quantity; 
 
+    // Helper fields for joined data (wishlist projections)
+    private String category_name;
+    private String imageUrl;
+
     public int getQuantity() {
         return quantity;
     }
@@ -246,6 +250,13 @@ public class Products {
     public String getCategory_name() { return category_name; }
     public void setCategory_name(String category_name) { this.category_name = category_name; }
     
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    // Wishlist projection helpers
+    public String getCategory_name() { return category_name; }
+    public void setCategory_name(String category_name) { this.category_name = category_name; }
+
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 

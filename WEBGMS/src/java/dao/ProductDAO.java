@@ -424,7 +424,7 @@ public class ProductDAO extends DBConnection {
             ps.setBigDecimal(4, p.getPrice());
             ps.setString(5, p.getCurrency());
             if (p.getCategory_id() != null && p.getCategory_id().getCategory_id() > 0) {
-                ps.setInt(6, p.getCategory_id().getCategory_id());
+                ps.setLong(6, p.getCategory_id().getCategory_id());
             } else {
                 ps.setNull(6, java.sql.Types.INTEGER);
             }
@@ -465,7 +465,11 @@ public class ProductDAO extends DBConnection {
             ps.setString(2, product.getDescription());
             ps.setBigDecimal(3, product.getPrice());
             ps.setString(4, product.getCurrency());
-            ps.setInt(5, product.getCategory_id() != null ? product.getCategory_id().getCategory_id() : 0);
+            if (product.getCategory_id() != null) {
+                ps.setLong(5, product.getCategory_id().getCategory_id());
+            } else {
+                ps.setNull(5, java.sql.Types.INTEGER);
+            }
             ps.setString(6, product.getStatus());
             ps.setInt(7, product.getQuantity());
             ps.setTimestamp(8, product.getUpdated_at());

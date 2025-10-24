@@ -8,6 +8,8 @@ import util.PasswordUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UsersDAO extends DBConnection {
 
@@ -143,7 +145,7 @@ public class UsersDAO extends DBConnection {
      * ✅ Update user info
      */
     public boolean updateUser(Users user) {
-        String sql = "UPDATE users SET full_name = ?, email = ?, phone_number = ?, address = ?, gender = ?, date_of_birth = ?, avatar_url = ?, updated_at = NOW() WHERE user_id = ?";
+        String sql = "UPDATE users SET full_name = ?, email = ?, phone_number = ?, address = ?, gender = ?, date_of_birth = ?, avatar_url = ?, status = ?, updated_at = NOW() WHERE user_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -160,7 +162,8 @@ public class UsersDAO extends DBConnection {
             }
 
             ps.setString(7, user.getAvatar_url());
-            ps.setInt(8, user.getUser_id());
+            ps.setString(8, user.getStatus());
+            ps.setInt(9, user.getUser_id());
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
