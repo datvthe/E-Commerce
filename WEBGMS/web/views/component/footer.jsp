@@ -91,18 +91,44 @@ pageEncoding="UTF-8"%>
 </div>
 <!-- Footer End -->
 
-<!-- Back to Top -->
-<a href="#" class="btn btn-primary btn-lg-square back-to-top"
-  ><i class="bi bi-arrow-up"></i
-></a>
-
 <!-- Electro Bootstrap Scripts -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="<%= request.getContextPath() %>/views/assets/electro/lib/wow/wow.min.js"></script>
-<script src="<%= request.getContextPath() %>/views/assets/electro/lib/easing/easing.min.js"></script>
-<script src="<%= request.getContextPath() %>/views/assets/electro/lib/waypoints/waypoints.min.js"></script>
-<script src="<%= request.getContextPath() %>/views/assets/electro/lib/counterup/counterup.min.js"></script>
-<script src="<%= request.getContextPath() %>/views/assets/electro/lib/owlcarousel/owl.carousel.min.js"></script>
-<script src="<%= request.getContextPath() %>/views/assets/electro/lib/lightbox/js/lightbox.min.js"></script>
-<script src="<%= request.getContextPath() %>/views/assets/electro/js/main.js"></script>
+<!-- jQuery (CDN fallback because local copy not bundled) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+<c:if test="${requestScope.includeAnimateLib != false}">
+    <script src="<%= request.getContextPath() %>/views/assets/electro/lib/wow/wow.min.js" defer></script>
+</c:if>
+<c:if test="${requestScope.includeEasing != false}">
+    <script src="<%= request.getContextPath() %>/views/assets/electro/lib/easing/easing.min.js" defer></script>
+</c:if>
+<c:if test="${requestScope.includeWaypoints != false}">
+    <script src="<%= request.getContextPath() %>/views/assets/electro/lib/waypoints/waypoints.min.js" defer></script>
+</c:if>
+<c:if test="${requestScope.includeCounterup != false}">
+    <script src="<%= request.getContextPath() %>/views/assets/electro/lib/counterup/counterup.min.js" defer></script>
+</c:if>
+<c:if test="${requestScope.includeOwlCarousel != false}">
+    <script src="<%= request.getContextPath() %>/views/assets/electro/lib/owlcarousel/owl.carousel.min.js" defer></script>
+</c:if>
+<c:if test="${requestScope.includeLightbox != false}">
+    <script src="<%= request.getContextPath() %>/views/assets/electro/lib/lightbox/js/lightbox.min.js" defer></script>
+</c:if>
+<script src="<%= request.getContextPath() %>/views/assets/electro/js/main.js" defer></script>
+
+<!-- Chat Widget for All Pages -->
+<link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/chat-widget.css" />
+<jsp:include page="chat-widget.jsp" />
+<script src="<%= request.getContextPath() %>/assets/js/chat-widget.js"></script>
+<script src="<%= request.getContextPath() %>/assets/js/aibot-widget.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            const userId = ${sessionScope.user != null ? sessionScope.user.user_id : -1};
+            const userRole = '${sessionScope.user != null ? sessionScope.user.default_role : "guest"}';
+            if (typeof initChatWidget === 'function') {
+                initChatWidget('<%= request.getContextPath() %>', userId, userRole);
+            }
+        } catch(e) {
+            console.log('Chat widget init error:', e);
+        }
+    });
+</script>

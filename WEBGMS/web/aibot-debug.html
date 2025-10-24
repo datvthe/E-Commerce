@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Bot Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .debug-section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 15px 0;
+            background: #f9f9f9;
+        }
+        .debug-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .log {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        input[type="text"] {
+            padding: 8px;
+            width: 300px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🤖 AI Bot Debug Page</h1>
+    
+    <div class="debug-section">
+        <h3>Step 1: Initialize AI Bot</h3>
+        <button onclick="testInit()">Test Initialize</button>
+        <div id="initResult"></div>
+    </div>
+
+    <div class="debug-section">
+        <h3>Step 2: Send Message</h3>
+        <input type="text" id="messageInput" placeholder="Type a message..." value="Hello">
+        <button onclick="testSendMessage()">Send Test Message</button>
+        <div id="sendResult"></div>
+    </div>
+
+    <div class="debug-section">
+        <h3>Step 3: Escalate to Admin</h3>
+        <button onclick="testEscalate()">Test Connect to Admin</button>
+        <div id="escalateResult"></div>
+    </div>
+
+    <div class="debug-section">
+        <h3>Debug Log</h3>
+        <button onclick="clearLog()">Clear Log</button>
+        <div id="debugLog" class="log"></div>
+    </div>
+
+    <script>
+        let roomId = null;
+        const contextPath = '/WEBGMS';
+        console.log('Debug page loaded on port 9999');
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('debugLog');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.style.color = type === 'error' ? 'red' : type === 'success' ? 'green' : 'black';
+            entry.textContent = new Date().toLocaleTimeString() + ' - ' + message;
+            logDiv.insertBefore(entry, logDiv.firstChild);
+        }
+
+        function clearLog() {
+            document.getElementById('debugLog').innerHTML = '';
+        }
+
+        function showResult(elementId, message, isError = false) {
+            const el = document.getElementById(elementId);
+            el.className = isError ? 'error' : 'success';
+            el.innerHTML = message;
+        }
+
+        async function testInit() {
+            log('Testing initialization...');
+            showResult('initResult', 'Testing...', false);
+            
+            try {
+                const response = await fetch(contextPath + '/aibot/init');
+                log('Response status: ' + response.status);
+                
+                const data = await response.json();
+                log('Response data: ' + JSON.stringify(data, null, 2));
+                
+                if (data.success) {
+                    roomId = data.roomId;
+                    showResult('initResult', 
+                        '✅ SUCCESS!<br>' +
+                        'Room ID: ' + data.roomId + '<br>' +
+                        'Room Name: ' + data.roomName + '<br>' +
+                        'Room Type: ' + data.roomType
+                    );
+                    log('Initialization successful! Room ID: ' + roomId, 'success');
+                } else {
+                    showResult('initResult', '❌ FAILED: ' + data.error, true);
+                    log('Initialization failed: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showResult('initResult', '❌ ERROR: ' + error.message, true);
+                log('Initialization error: ' + error.message, 'error');
+            }
+        }
+
+        async function testSendMessage() {
+            if (!roomId) {
+                showResult('sendResult', '❌ Please initialize first!', true);
+                return;
+            }
+
+            const message = document.getElementById('messageInput').value;
+            log('Sending message: ' + message);
+            showResult('sendResult', 'Sending...', false);
+
+            try {
+                const response = await fetch(contextPath + '/aibot/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        roomId: roomId,
+                        message: message
+                    })
+                });
+
+                log('Response status: ' + response.status);
+                const data = await response.json();
+                log('Response data: ' + JSON.stringify(data, null, 2));
+
+                if (data.success) {
+                    showResult('sendResult',
+                        '✅ SUCCESS!<br>' +
+                        '<strong>Your message:</strong> ' + data.userMessage.messageContent + '<br>' +
+                        '<strong>AI response:</strong> ' + data.aiResponse.messageContent
+                    );
+                    log('Message sent successfully!', 'success');
+                } else {
+                    showResult('sendResult', '❌ FAILED: ' + data.error, true);
+                    log('Send failed: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showResult('sendResult', '❌ ERROR: ' + error.message, true);
+                log('Send error: ' + error.message, 'error');
+            }
+        }
+
+        async function testEscalate() {
+            if (!roomId) {
+                showResult('escalateResult', '❌ Please initialize first!', true);
+                return;
+            }
+
+            log('Testing escalation to admin...');
+            showResult('escalateResult', 'Testing...', false);
+
+            try {
+                const response = await fetch(contextPath + '/aibot/escalate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        aiBotRoomId: roomId
+                    })
+                });
+
+                log('Response status: ' + response.status);
+                const data = await response.json();
+                log('Response data: ' + JSON.stringify(data, null, 2));
+
+                if (data.success) {
+                    showResult('escalateResult',
+                        '✅ SUCCESS!<br>' +
+                        'Admin Room ID: ' + data.adminRoomId + '<br>' +
+                        'Room Name: ' + data.roomName + '<br>' +
+                        'Message: ' + data.message
+                    );
+                    log('Escalation successful!', 'success');
+                } else {
+                    showResult('escalateResult', '❌ FAILED: ' + data.error, true);
+                    log('Escalation failed: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showResult('escalateResult', '❌ ERROR: ' + error.message, true);
+                log('Escalation error: ' + error.message, 'error');
+            }
+        }
+
+        // Auto-test on page load
+        window.onload = function() {
+            log('Debug page loaded. Click "Test Initialize" to start.');
+        };
+    </script>
+</body>
+</html>

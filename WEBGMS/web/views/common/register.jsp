@@ -100,10 +100,7 @@
                 </div>
                 <div class="col-md-4 col-lg-3 text-center text-lg-end">
                     <div class="d-inline-flex align-items-center">
-                        <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-random"></i></span></a>
-                        <a href="#" class="text-muted d-flex align-items-center justify-content-center me-3"><span class="rounded-circle btn-md-square border"><i class="fas fa-heart"></i></span></a>
-                        <a href="#" class="text-muted d-flex align-items-center justify-content-center"><span class="rounded-circle btn-md-square border"><i class="fas fa-shopping-cart"></i></span>
-                            <span class="text-dark ms-2">0₫</span></a>
+                        <a href="<%= request.getContextPath() %>/login" class="text-muted d-flex align-items-center justify-content-center me-3" data-bs-toggle="tooltip" title="Wishlist"><span class="rounded-circle btn-md-square border"><i class="fas fa-heart"></i></span></a>
                     </div>
                 </div>
             </div>
@@ -180,11 +177,6 @@
                     <form action="<%= request.getContextPath() %>/register" method="post" class="border p-4 rounded bg-white wow fadeInUp" data-wow-delay="0.1s">
                         <h3 class="mb-4 text-center">Tạo tài khoản</h3>
 
-                        <c:if test="${not empty sessionScope.error}">
-                            <div class="alert alert-danger">${sessionScope.error}</div>
-                            <c:remove var="error" scope="session" />
-                        </c:if>
-
                         <div class="form-group mb-3">
                             <label for="full_name" class="mb-1">Họ và tên</label>
                             <input type="text" class="form-control rounded-pill py-2" id="full_name" name="full_name" required>
@@ -220,12 +212,12 @@
 
                         <div class="form-group mb-3">
                             <label for="password" class="mb-1">Mật khẩu</label>
-                            <input type="password" class="form-control rounded-pill py-2" id="password" name="password" minlength="6" required>
+                            <input type="password" class="form-control rounded-pill py-2" id="password" name="password" minlength="8" required>
                         </div>
 
                         <div class="form-group mb-4">
                             <label for="confirm_password" class="mb-1">Xác nhận mật khẩu</label>
-                            <input type="password" class="form-control rounded-pill py-2" id="confirm_password" name="confirm_password" minlength="6" required>
+                            <input type="password" class="form-control rounded-pill py-2" id="confirm_password" name="confirm_password" minlength="8" required>
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100 rounded-pill py-2"><i class="fas fa-user-plus me-2"></i>Đăng ký</button>
@@ -294,6 +286,10 @@
                 </div>
             </div>
         </div>
+        
+        <%-- Include Notification Modal --%>
+        <%@ include file="notification-modal.jsp" %>
+        
         <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -335,15 +331,17 @@
                     // Phone validation
                     if (phone.length < 9 || phone.length > 10) {
                         e.preventDefault();
-                        showAlert('Số điện thoại phải có 9-10 chữ số!', 'warning');
+                        showWarningModal('Input Error!', 'Phone number must have 9-10 digits!');
                         phoneInput.focus();
                         return;
                     }
                     
                     // Password validation
-                    if (password.length < 6) {
+                    if (password.length < 8) {
                         e.preventDefault();
-                        showAlert('Mật khẩu phải có ít nhất 6 ký tự!', 'warning');
+
+                        showWarningModal('Password Error!', 'Password must have at least 8 characters!');
+
                         document.getElementById('password').focus();
                         return;
                     }
@@ -351,7 +349,7 @@
                     // Confirm password validation
                     if (password !== confirmPassword) {
                         e.preventDefault();
-                        showAlert('Mật khẩu xác nhận không khớp!', 'warning');
+                        showWarningModal('Password Mismatch!', 'Confirm password does not match the entered password!');
                         document.getElementById('confirm_password').focus();
                         return;
                     }
@@ -359,34 +357,32 @@
                     // Show loading state
                     const submitBtn = form.querySelector('button[type="submit"]');
                     submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang tạo tài khoản...';
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating account...';
                 });
                 
-                // Alert function
-                function showAlert(message, type) {
-                    const alertDiv = document.createElement('div');
-                    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-                    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-                    
-                    let iconClass = 'info-circle';
-                    if (type === 'success') iconClass = 'check-circle';
-                    else if (type === 'warning') iconClass = 'exclamation-triangle';
-                    else if (type === 'error') iconClass = 'times-circle';
-                    
-                    alertDiv.innerHTML = `
-                        <i class="fas fa-${iconClass} me-2"></i>
-                        ${message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    `;
-                    
-                    document.body.appendChild(alertDiv);
-                    
-                    setTimeout(() => {
-                        if (alertDiv.parentNode) {
-                            alertDiv.remove();
-                        }
-                    }, 5000);
-                }
+                // Handle server-side errors - with duplicate prevention
+                const notificationShown = sessionStorage.getItem('notificationShown');
+                
+                <c:if test="${not empty sessionScope.error}">
+                    if (!notificationShown || notificationShown !== 'error_${sessionScope.error}') {
+                        showErrorModal('Registration Error!', '${sessionScope.error}');
+                        sessionStorage.setItem('notificationShown', 'error_${sessionScope.error}');
+                    }
+                    <c:remove var="error" scope="session" />
+                </c:if>
+                
+                <c:if test="${not empty sessionScope.success}">
+                    if (!notificationShown || notificationShown !== 'success_${sessionScope.success}') {
+                        showSuccessModal('Registration Success!', '${sessionScope.success}');
+                        sessionStorage.setItem('notificationShown', 'success_${sessionScope.success}');
+                    }
+                    <c:remove var="success" scope="session" />
+                </c:if>
+                
+                // Clear the notification flag after modal is shown
+                setTimeout(() => {
+                    sessionStorage.removeItem('notificationShown');
+                }, 5000);
             });
         </script>
     </body>

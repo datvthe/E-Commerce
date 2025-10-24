@@ -166,28 +166,21 @@ public class GoogleAuthService {
      */
     public Users processGoogleLogin(String code) {
         try {
-            System.out.println("Processing Google OAuth login with code: " + code.substring(0, Math.min(10, code.length())) + "...");
-            
             // Get access token
             String accessToken = getAccessToken(code);
             if (accessToken == null) {
-                System.out.println("Failed to get access token");
                 return null;
             }
-            System.out.println("Access token obtained successfully");
             
             // Get user info from Google
             GoogleUserInfo googleUser = getUserInfo(accessToken);
             if (googleUser == null) {
-                System.out.println("Failed to get user info from Google");
                 return null;
             }
-            System.out.println("User info obtained: " + googleUser.getEmail());
             
             // Check if user exists by Google ID
             Users existingUser = getUserByGoogleId(googleUser.getId());
             if (existingUser != null) {
-                System.out.println("User found by Google ID: " + existingUser.getEmail());
                 // Update Google auth info
                 updateGoogleAuthInfo(existingUser.getUser_id(), googleUser, accessToken);
                 return existingUser;
@@ -196,26 +189,20 @@ public class GoogleAuthService {
             // Check if user exists by email
             existingUser = usersDAO.getUserByEmail(googleUser.getEmail());
             if (existingUser != null) {
-                System.out.println("User found by email, linking Google account: " + existingUser.getEmail());
                 // Link Google account to existing user
                 linkGoogleAccount(existingUser.getUser_id(), googleUser, accessToken);
                 return existingUser;
             }
             
             // Create new user
-            System.out.println("Creating new user for: " + googleUser.getEmail());
             Users newUser = createUserFromGoogle(googleUser);
             if (newUser != null) {
-                System.out.println("New user created successfully: " + newUser.getEmail());
                 // Save Google auth info
                 saveGoogleAuthInfo(newUser.getUser_id(), googleUser, accessToken);
                 return newUser;
-            } else {
-                System.out.println("Failed to create new user");
             }
             
         } catch (Exception e) {
-            System.out.println("Error in processGoogleLogin: " + e.getMessage());
             e.printStackTrace();
         }
         
@@ -289,7 +276,6 @@ public class GoogleAuthService {
             if (rowsAffected > 0) {
                 try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        int userId = generatedKeys.getInt(1);
                         return getUserByGoogleId(googleUser.getId());
                     }
                 }

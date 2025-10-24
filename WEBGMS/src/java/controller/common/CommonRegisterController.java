@@ -47,6 +47,12 @@ public class CommonRegisterController extends HttpServlet {
                 return;
             }
 
+            if (password.length() < 8) {
+                request.getSession().setAttribute("error", "Mật khẩu phải có ít nhất 8 ký tự!");
+                response.sendRedirect(request.getContextPath() + "/register");
+                return;
+            }
+
             if (!password.equals(confirm)) {
                 request.getSession().setAttribute("error", "Mật khẩu xác nhận không khớp!");
                 response.sendRedirect(request.getContextPath() + "/register");
@@ -72,9 +78,8 @@ public class CommonRegisterController extends HttpServlet {
                 return;
             }
 
-            // Hash the password before storing
-            String hashedPassword = util.PasswordUtil.hashPassword(password);
-            Users created = usersDAO.createUser(fullName, email, hashedPassword, phone);
+            // Create user (password will be hashed in createUser method)
+            Users created = usersDAO.createUser(fullName, email, password, phone);
             if (created == null) {
                 request.getSession().setAttribute("error", "Tạo tài khoản thất bại!");
                 response.sendRedirect(request.getContextPath() + "/register");

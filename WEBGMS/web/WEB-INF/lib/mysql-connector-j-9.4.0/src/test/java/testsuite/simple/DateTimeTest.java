@@ -1869,4 +1869,2743 @@ public class DateTimeTest extends BaseTestCase {
                                         assertThrows(props, tVarchar, orig_lt, MysqlType.DATETIME, senderTz,
                                                 ".*Conversion from java.time.LocalTime to DATETIME is not supported.");
                                         assertThrows(props, tVarchar, orig_lt, MysqlType.TIMESTAMP, senderTz,
-                                            
+                                                ".*Conversion from java.time.LocalTime to TIMESTAMP is not supported.");
+                                        assertThrows(props, tVarchar, orig_lt, MysqlType.YEAR, senderTz,
+                                                ".*Conversion from java.time.LocalTime to YEAR is not supported.");
+
+                                        /* Into YEAR field */
+
+                                        if (useSSPS && withFract) {
+                                            setObjectFromTz(props, tYear, orig_lt, null, senderTz, expYearDef);
+                                            setObjectFromTz(props, tYear, orig_lt, MysqlType.TIME, senderTz, expYearDef);
+                                        } else {
+                                            assertThrows(props, tYear, orig_lt, null, senderTz, dataTruncatedErr);
+                                            assertThrows(props, tYear, orig_lt, MysqlType.TIME, senderTz, dataTruncatedErr);
+                                        }
+                                        assertThrows(props, tYear, orig_lt, MysqlType.CHAR, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, orig_lt, MysqlType.VARCHAR, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, orig_lt, MysqlType.TINYTEXT, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, orig_lt, MysqlType.TEXT, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, orig_lt, MysqlType.MEDIUMTEXT, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, orig_lt, MysqlType.LONGTEXT, senderTz, dataTruncatedErr);
+
+                                        /* Into DATE field */
+
+                                        if (useSSPS) {
+                                            if (withFract) {
+                                                setObjectFromTz(props, tDate, orig_lt, null, senderTz, expDateDef);
+                                                setObjectFromTz(props, tDate, orig_lt, MysqlType.TIME, senderTz, expDateDef);
+                                            } else {
+                                                assertThrows(props, tDate, orig_lt, null, senderTz, dataTruncatedErr);
+                                                assertThrows(props, tDate, orig_lt, MysqlType.TIME, senderTz, dataTruncatedErr);
+                                            }
+                                        } else {
+                                            assertThrows(props, tDate, orig_lt, null, senderTz, expDateErr6);
+                                            assertThrows(props, tDate, orig_lt, MysqlType.TIME, senderTz, expDateErr6);
+                                        }
+                                        assertThrows(props, tDate, orig_lt, MysqlType.CHAR, senderTz, expDateErr9);
+                                        assertThrows(props, tDate, orig_lt, MysqlType.VARCHAR, senderTz, expDateErr9);
+                                        assertThrows(props, tDate, orig_lt, MysqlType.TINYTEXT, senderTz, expDateErr9);
+                                        assertThrows(props, tDate, orig_lt, MysqlType.TEXT, senderTz, expDateErr9);
+                                        assertThrows(props, tDate, orig_lt, MysqlType.MEDIUMTEXT, senderTz, expDateErr9);
+                                        assertThrows(props, tDate, orig_lt, MysqlType.LONGTEXT, senderTz, expDateErr9);
+
+                                        /* Into TIME field */
+
+                                        setObjectFromTz(props, tTime, orig_lt, null, senderTz, expTime6);
+                                        setObjectFromTz(props, tTime, lt_120000, MysqlType.CHAR, senderTz, expTimeNoMs);
+                                        setObjectFromTz(props, tTime, orig_lt, MysqlType.CHAR, senderTz, expTime6);
+                                        setObjectFromTz(props, tTime, orig_lt, MysqlType.VARCHAR, senderTz, expTime6);
+                                        setObjectFromTz(props, tTime, orig_lt, MysqlType.TINYTEXT, senderTz, expTime6);
+                                        setObjectFromTz(props, tTime, orig_lt, MysqlType.TEXT, senderTz, expTime6);
+                                        setObjectFromTz(props, tTime, orig_lt, MysqlType.MEDIUMTEXT, senderTz, expTime6);
+                                        setObjectFromTz(props, tTime, orig_lt, MysqlType.LONGTEXT, senderTz, expTime6);
+                                        setObjectFromTz(props, tTime, lt_120000, MysqlType.TIME, senderTz, expTimeNoMs);
+                                        setObjectFromTz(props, tTime, orig_lt, MysqlType.TIME, senderTz, expTime6);
+
+                                        /* Into DATETIME field */
+
+                                        if (useSSPS) {
+                                            if (withFract) {
+                                                setObjectFromTz(props, tDatetime, orig_lt, null, senderTz, expDatetimeDef);
+                                                setObjectFromTz(props, tDatetime, orig_lt, MysqlType.TIME, senderTz, expDatetimeDef);
+                                            } else {
+                                                assertThrows(props, tDatetime, orig_lt, null, senderTz, dataTruncatedErr);
+                                                assertThrows(props, tDatetime, orig_lt, MysqlType.TIME, senderTz, dataTruncatedErr);
+                                            }
+                                        } else {
+                                            assertThrows(props, tDatetime, orig_lt, null, senderTz, expDatetimeErr6);
+                                            assertThrows(props, tDatetime, orig_lt, MysqlType.TIME, senderTz, expDatetimeErr6);
+                                        }
+                                        assertThrows(props, tDatetime, orig_lt, MysqlType.CHAR, senderTz, expDatetimeErr9);
+                                        assertThrows(props, tDatetime, orig_lt, MysqlType.VARCHAR, senderTz, expDatetimeErr9);
+                                        assertThrows(props, tDatetime, orig_lt, MysqlType.TINYTEXT, senderTz, expDatetimeErr9);
+                                        assertThrows(props, tDatetime, orig_lt, MysqlType.TEXT, senderTz, expDatetimeErr9);
+                                        assertThrows(props, tDatetime, orig_lt, MysqlType.MEDIUMTEXT, senderTz, expDatetimeErr9);
+                                        assertThrows(props, tDatetime, orig_lt, MysqlType.LONGTEXT, senderTz, expDatetimeErr9);
+
+                                        /* Into TIMESTAMP field */
+
+                                        if (useSSPS && withFract) {
+                                            setObjectFromTz(props, tTimestamp, orig_lt, null, senderTz, expDefTimestamp, expDefUnixTs);
+                                            setObjectFromTz(props, tTimestamp, lt_120000, null, senderTz, expDefTimestampNoMs, expDefUnixTsNoMs);
+                                            setObjectFromTz(props, tTimestamp, orig_lt, MysqlType.TIME, senderTz, expDefTimestamp, expDefUnixTs);
+                                        } else {
+                                            assertThrows(props, tTimestamp, orig_lt, null, senderTz, expDatetimeErr6);
+                                            assertThrows(props, tTimestamp, lt_120000, null, senderTz, incorrectDatetimeErr.replace("X", expTimeNoMs));
+                                            assertThrows(props, tTimestamp, orig_lt, MysqlType.TIME, senderTz, expDatetimeErr6);
+                                        }
+                                        assertThrows(props, tTimestamp, orig_lt, MysqlType.CHAR, senderTz, expDatetimeErr9);
+                                        assertThrows(props, tTimestamp, orig_lt, MysqlType.VARCHAR, senderTz, expDatetimeErr9);
+                                        assertThrows(props, tTimestamp, orig_lt, MysqlType.TINYTEXT, senderTz, expDatetimeErr9);
+                                        assertThrows(props, tTimestamp, orig_lt, MysqlType.TEXT, senderTz, expDatetimeErr9);
+                                        assertThrows(props, tTimestamp, orig_lt, MysqlType.MEDIUMTEXT, senderTz, expDatetimeErr9);
+                                        assertThrows(props, tTimestamp, orig_lt, MysqlType.LONGTEXT, senderTz, expDatetimeErr9);
+
+                                        /* Into VARCHAR field */
+
+                                        String expTime2 = useSSPS ? expTimeNoMs : expTime6; // TODO milliseconds are ignored by server. Bug ?
+
+                                        setObjectFromTz(props, tVarchar, orig_lt, null, senderTz, expTime2);
+                                        setObjectFromTz(props, tVarchar, orig_lt, MysqlType.TIME, senderTz, expTime2);
+                                        setObjectFromTz(props, tVarchar, orig_lt, MysqlType.CHAR, senderTz, expTime9);
+                                        setObjectFromTz(props, tVarchar, orig_lt, MysqlType.VARCHAR, senderTz, expTime9);
+                                        setObjectFromTz(props, tVarchar, orig_lt, MysqlType.TINYTEXT, senderTz, expTime9);
+                                        setObjectFromTz(props, tVarchar, orig_lt, MysqlType.TEXT, senderTz, expTime9);
+                                        setObjectFromTz(props, tVarchar, orig_lt, MysqlType.MEDIUMTEXT, senderTz, expTime9);
+                                        setObjectFromTz(props, tVarchar, orig_lt, MysqlType.LONGTEXT, senderTz, expTime9);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    closeConnections();
+                }
+            } finally {
+                closeConnections();
+            }
+        }
+    }
+
+    @Test
+    public void testLocalDateTimeSetters() throws Exception {
+        boolean withFract = versionMeetsMinimum(5, 6, 4); // fractional seconds are not supported in previous versions
+
+        createTable(tYear, "(id INT, d YEAR)");
+        createTable(tDate, "(id INT, d DATE)");
+        createTable(tTime, withFract ? "(id INT, d TIME(6))" : "(id INT, d TIME)");
+        createTable(tDatetime, withFract ? "(id INT, d DATETIME(6))" : "(id INT, d DATETIME)");
+        createTable(tTimestamp, withFract ? "(id INT, d TIMESTAMP(6))" : "(id INT, d TIMESTAMP)");
+        createTable(tVarchar, "(id INT, d VARCHAR(30))");
+
+        id = 0;
+
+        Properties props = new Properties();
+        props.setProperty(PropertyKey.sslMode.getKeyName(), "DISABLED");
+        props.setProperty(PropertyKey.allowPublicKeyRetrieval.getKeyName(), "true");
+        props.setProperty(PropertyKey.cacheDefaultTimeZone.getKeyName(), "false");
+        props.setProperty(PropertyKey.connectionTimeZone.getKeyName(), "SERVER");
+
+        TimeZone serverTz;
+        try (Connection testConn = getConnectionWithProps(props)) {
+            serverTz = ((MysqlConnection) testConn).getSession().getServerSession().getSessionTimeZone();
+        }
+
+        for (TimeZone senderTz : this.senderTimeZones) {
+            try {
+                for (String connectionTZ : this.connectionTimeZones) {
+                    initConnections(senderTz, connectionTZ);
+
+                    for (boolean forceConnectionTimeZoneToSession : new boolean[] { false, true }) {
+                        for (boolean preserveInstants : new boolean[] { false, true }) {
+                            for (boolean useSSPS : new boolean[] { false, true }) {
+                                for (boolean sendFractionalSeconds : new boolean[] { false, true }) {
+                                    for (boolean sendTimeFract : new boolean[] { false, true }) {
+
+                                        System.out.println("connTimeZone=" + connectionTZ + "; forceConnTimeZoneToSession=" + forceConnectionTimeZoneToSession
+                                                + "; preserveInstants=" + preserveInstants + "; useServerPrepStmts=" + useSSPS + "; sendFractSeconds="
+                                                + sendFractionalSeconds + "; sendFractSecondsForTime=" + sendTimeFract);
+
+                                        if (connectionTZ == null) {
+                                            props.remove(PropertyKey.connectionTimeZone.getKeyName());
+                                        } else {
+                                            props.setProperty(PropertyKey.connectionTimeZone.getKeyName(), connectionTZ);
+                                        }
+                                        props.setProperty(PropertyKey.forceConnectionTimeZoneToSession.getKeyName(), "" + forceConnectionTimeZoneToSession);
+                                        props.setProperty(PropertyKey.preserveInstants.getKeyName(), "" + preserveInstants);
+                                        props.setProperty(PropertyKey.useServerPrepStmts.getKeyName(), "" + useSSPS);
+                                        props.setProperty(PropertyKey.sendFractionalSecondsForTime.getKeyName(), "" + sendTimeFract);
+                                        props.setProperty(PropertyKey.sendFractionalSeconds.getKeyName(), "" + sendFractionalSeconds);
+
+                                        TimeZone connTz = connectionTZ == null || "LOCAL".equals(connectionTZ) ? senderTz
+                                                : "SERVER".equals(connectionTZ) ? serverTz : TimeZone.getTimeZone(connectionTZ);
+                                        TimeZone sessionTz = forceConnectionTimeZoneToSession ? connTz : serverTz;
+
+                                        DateTimeFormatter dateTimeFmt = withFract && sendFractionalSeconds ? DATETIME_FORMATTER_WITH_MICROS_NO_OFFCET
+                                                : TimeUtil.DATETIME_FORMATTER_NO_FRACT_NO_OFFSET;
+                                        DateTimeFormatter dateTimeFmtForChars = withFract && sendFractionalSeconds
+                                                ? TimeUtil.DATETIME_FORMATTER_WITH_NANOS_NO_OFFSET
+                                                : TimeUtil.DATETIME_FORMATTER_NO_FRACT_NO_OFFSET;
+                                        DateTimeFormatter timeFmt = withFract && sendFractionalSeconds ? TIME_FORMATTER_WITH_MICROS_NO_OFFCET
+                                                : TimeUtil.TIME_FORMATTER_NO_FRACT_NO_OFFSET;
+
+                                        LocalDateTime orig_ldt = withFract ? ldt_20200101_120000_123456 : ldt_20200101_120000_123456.withNano(0);
+
+                                        ZonedDateTime zdt_20200101_120000_123456_at_senderTz = orig_ldt.atZone(senderTz.toZoneId());
+
+                                        ZonedDateTime zdt_20200101_120000_123456_on_wire = (sendFractionalSeconds ? zdt_20200101_120000_123456_at_senderTz
+                                                : zdt_20200101_120000_123456_at_senderTz.withNano(0)).withZoneSameLocal(sessionTz.toZoneId());
+                                        ZonedDateTime zdt_no_date_120000_123456_on_wire = LocalDate.now(sessionTz.toZoneId())
+                                                .atTime((sendFractionalSeconds ? zdt_20200101_120000_123456_at_senderTz
+                                                        : zdt_20200101_120000_123456_at_senderTz.withNano(0)).toLocalTime())
+                                                .atZone(sessionTz.toZoneId());
+                                        ZonedDateTime zdt_20200101_no_time_on_wire = zdt_20200101_120000_123456_on_wire.withHour(0).withMinute(0).withSecond(0)
+                                                .withNano(0);
+
+                                        String expYear = zdt_20200101_120000_123456_on_wire.format(YEAR_FORMATTER);
+                                        String expYearDef = zdt_no_date_120000_123456_on_wire.format(YEAR_FORMATTER);
+
+                                        String expDate = zdt_20200101_120000_123456_on_wire.format(TimeUtil.DATE_FORMATTER);
+                                        String expDateDef = zdt_no_date_120000_123456_on_wire
+                                                .format(useSSPS ? TimeUtil.DATE_FORMATTER : DateTimeFormatter.ofPattern("20HH-mm-ss"));
+
+                                        String expTimeNoMs = zdt_20200101_120000_123456_on_wire.format(TimeUtil.TIME_FORMATTER_NO_FRACT_NO_OFFSET);
+                                        String expTime = zdt_20200101_120000_123456_on_wire.format(timeFmt);
+
+                                        String expDatetime = zdt_20200101_120000_123456_on_wire.format(dateTimeFmt);
+                                        String expDatetimeChars = zdt_20200101_120000_123456_on_wire.format(dateTimeFmtForChars);
+                                        String expDatetimeDef = LocalDate.now(sessionTz.toZoneId()).atTime(zdt_20200101_120000_123456_on_wire.toLocalTime())
+                                                .atZone(sessionTz.toZoneId())
+                                                .format(useSSPS ? dateTimeFmt : DateTimeFormatter.ofPattern("20HH-mm-ss 00:00:00"));
+                                        String expDatetimeNoTime = zdt_20200101_120000_123456_on_wire
+                                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd 00:00:00"));
+
+                                        String expTimestamp = zdt_20200101_120000_123456_on_wire.withZoneSameInstant(tz_UTC.toZoneId()).format(dateTimeFmt);
+                                        String expDefTimestamp = zdt_no_date_120000_123456_on_wire.withZoneSameInstant(tz_UTC.toZoneId()).format(dateTimeFmt);
+                                        String expTimestampNoTime = zdt_20200101_no_time_on_wire.withZoneSameInstant(tz_UTC.toZoneId()).format(dateTimeFmt);
+
+                                        String expDefUnixTs = zdt_no_date_120000_123456_on_wire.toEpochSecond()
+                                                + (zdt_no_date_120000_123456_on_wire.getNano() > 0
+                                                        ? "." + TimeUtil.formatNanos(zdt_no_date_120000_123456_on_wire.getNano(), 6)
+                                                        : "");
+                                        String expFullUnixTs = zdt_20200101_120000_123456_on_wire.toEpochSecond()
+                                                + (zdt_20200101_120000_123456_on_wire.getNano() > 0
+                                                        ? "." + TimeUtil.formatNanos(zdt_20200101_120000_123456_on_wire.getNano(), 6)
+                                                        : "");
+                                        String expUnixTsFromDate = zdt_20200101_no_time_on_wire.toEpochSecond() + "";
+
+                                        /* Into YEAR field */
+
+                                        if (useSSPS && withFract) {
+                                            setObjectFromTz(props, tYear, orig_ldt, null, senderTz, expYear);
+                                            setObjectFromTz(props, tYear, orig_ldt, MysqlType.DATE, senderTz, expYear);
+                                            setObjectFromTz(props, tYear, orig_ldt, MysqlType.TIME, senderTz, expYearDef);
+                                            setObjectFromTz(props, tYear, orig_ldt, MysqlType.DATETIME, senderTz, expYear);
+                                            setObjectFromTz(props, tYear, orig_ldt, MysqlType.TIMESTAMP, senderTz, expYear);
+                                        } else {
+                                            assertThrows(props, tYear, orig_ldt, null, senderTz, dataTruncatedErr);
+                                            assertThrows(props, tYear, orig_ldt, MysqlType.DATE, senderTz, dataTruncatedErr);
+                                            assertThrows(props, tYear, orig_ldt, MysqlType.TIME, senderTz, dataTruncatedErr);
+                                            assertThrows(props, tYear, orig_ldt, MysqlType.DATETIME, senderTz, dataTruncatedErr);
+                                            assertThrows(props, tYear, orig_ldt, MysqlType.TIMESTAMP, senderTz, dataTruncatedErr);
+                                        }
+                                        assertThrows(props, tYear, orig_ldt, MysqlType.CHAR, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, orig_ldt, MysqlType.VARCHAR, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, orig_ldt, MysqlType.TINYTEXT, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, orig_ldt, MysqlType.TEXT, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, orig_ldt, MysqlType.MEDIUMTEXT, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, orig_ldt, MysqlType.LONGTEXT, senderTz, dataTruncatedErr);
+
+                                        setObjectFromTz(props, tYear, orig_ldt, MysqlType.YEAR, senderTz, expYear);
+
+                                        /* Into DATE field */
+
+                                        setObjectFromTz(props, tDate, orig_ldt, null, senderTz, expDate);
+                                        setObjectFromTz(props, tDate, orig_ldt, MysqlType.DATE, senderTz, expDate);
+                                        setObjectFromTz(props, tDate, orig_ldt, MysqlType.CHAR, senderTz, expDate);
+                                        setObjectFromTz(props, tDate, orig_ldt, MysqlType.VARCHAR, senderTz, expDate);
+                                        setObjectFromTz(props, tDate, orig_ldt, MysqlType.TINYTEXT, senderTz, expDate);
+                                        setObjectFromTz(props, tDate, orig_ldt, MysqlType.TEXT, senderTz, expDate);
+                                        setObjectFromTz(props, tDate, orig_ldt, MysqlType.MEDIUMTEXT, senderTz, expDate);
+                                        setObjectFromTz(props, tDate, orig_ldt, MysqlType.LONGTEXT, senderTz, expDate);
+                                        if (useSSPS) {
+                                            if (withFract) {
+                                                setObjectFromTz(props, tDate, orig_ldt, MysqlType.TIME, senderTz, expDateDef);
+                                            } else {
+                                                assertThrows(props, tDate, orig_ldt, MysqlType.TIME, senderTz, dataTruncatedErr);
+                                            }
+                                        } else {
+                                            assertThrows(props, tDate, orig_ldt, MysqlType.TIME, senderTz, incorrectDateErr.replace("X", expTime));
+                                        }
+                                        setObjectFromTz(props, tDate, orig_ldt, MysqlType.DATETIME, senderTz, expDate);
+                                        setObjectFromTz(props, tDate, orig_ldt, MysqlType.TIMESTAMP, senderTz, expDate);
+
+                                        assertThrows(props, tDate, orig_ldt, MysqlType.YEAR, senderTz, incorrectDateErr.replace("X", expYear));
+
+                                        /* Into TIME field */
+
+                                        setObjectFromTz(props, tTime, orig_ldt, null, senderTz, expTime);
+                                        if (useSSPS) {
+                                            setObjectFromTz(props, tTime, orig_ldt, MysqlType.DATE, senderTz, s_000000_000000);
+                                        } else {
+                                            assertThrows(props, tTime, orig_ldt, MysqlType.DATE, senderTz, incorrectTimeErr.replace("X", expDate));
+                                        }
+                                        setObjectFromTz(props, tTime, orig_ldt, MysqlType.CHAR, senderTz, expTime);
+                                        setObjectFromTz(props, tTime, orig_ldt, MysqlType.VARCHAR, senderTz, expTime);
+                                        setObjectFromTz(props, tTime, orig_ldt, MysqlType.TINYTEXT, senderTz, expTime);
+                                        setObjectFromTz(props, tTime, orig_ldt, MysqlType.TEXT, senderTz, expTime);
+                                        setObjectFromTz(props, tTime, orig_ldt, MysqlType.MEDIUMTEXT, senderTz, expTime);
+                                        setObjectFromTz(props, tTime, orig_ldt, MysqlType.LONGTEXT, senderTz, expTime);
+                                        setObjectFromTz(props, tTime, orig_ldt, MysqlType.TIME, senderTz, expTime);
+                                        setObjectFromTz(props, tTime, orig_ldt, MysqlType.DATETIME, senderTz, expTime);
+                                        setObjectFromTz(props, tTime, orig_ldt, MysqlType.TIMESTAMP, senderTz, expTime);
+                                        setObjectFromTz(props, tTime, orig_ldt, MysqlType.YEAR, senderTz, expYear); // TIME takes numbers as a short notation, thus it works here
+                                        setObjectFromTz(props, tTime, orig_ldt, MysqlType.YEAR, senderTz,
+                                                "00:" + expYear.substring(0, 2) + ":" + expYear.substring(2)); // TIME takes numbers as a short notation, thus it works here
+
+                                        /* Into DATETIME field */
+
+                                        setObjectFromTz(props, tDatetime, orig_ldt, null, senderTz, expDatetime);
+                                        setObjectFromTz(props, tDatetime, orig_ldt, MysqlType.DATE, senderTz, expDatetimeNoTime);
+                                        setObjectFromTz(props, tDatetime, orig_ldt, MysqlType.CHAR, senderTz, expDatetime);
+                                        setObjectFromTz(props, tDatetime, orig_ldt, MysqlType.VARCHAR, senderTz, expDatetime);
+                                        setObjectFromTz(props, tDatetime, orig_ldt, MysqlType.TINYTEXT, senderTz, expDatetime);
+                                        setObjectFromTz(props, tDatetime, orig_ldt, MysqlType.TEXT, senderTz, expDatetime);
+                                        setObjectFromTz(props, tDatetime, orig_ldt, MysqlType.MEDIUMTEXT, senderTz, expDatetime);
+                                        setObjectFromTz(props, tDatetime, orig_ldt, MysqlType.LONGTEXT, senderTz, expDatetime);
+                                        if (useSSPS) {
+                                            if (withFract) {
+                                                setObjectFromTz(props, tDatetime, orig_ldt, MysqlType.TIME, senderTz, expDatetimeDef);
+                                            } else {
+                                                assertThrows(props, tDatetime, orig_ldt, MysqlType.TIME, senderTz, dataTruncatedErr);
+                                            }
+                                        } else {
+                                            assertThrows(props, tDatetime, orig_ldt, MysqlType.TIME, senderTz, incorrectDatetimeErr.replace("X", expTime));
+                                        }
+
+                                        setObjectFromTz(props, tDatetime, orig_ldt, MysqlType.DATETIME, senderTz, expDatetime);
+                                        setObjectFromTz(props, tDatetime, orig_ldt, MysqlType.TIMESTAMP, senderTz, expDatetime);
+
+                                        assertThrows(props, tDatetime, orig_ldt, MysqlType.YEAR, senderTz, incorrectDatetimeErr.replace("X", expYear));
+
+                                        /* Into TIMESTAMP field */
+
+                                        setObjectFromTz(props, tTimestamp, orig_ldt, null, senderTz, expTimestamp, expFullUnixTs);
+                                        setObjectFromTz(props, tTimestamp, orig_ldt, MysqlType.DATE, senderTz, expTimestampNoTime, expUnixTsFromDate);
+                                        setObjectFromTz(props, tTimestamp, orig_ldt, MysqlType.CHAR, senderTz, expTimestamp, expFullUnixTs);
+                                        setObjectFromTz(props, tTimestamp, orig_ldt, MysqlType.VARCHAR, senderTz, expTimestamp, expFullUnixTs);
+                                        setObjectFromTz(props, tTimestamp, orig_ldt, MysqlType.TINYTEXT, senderTz, expTimestamp, expFullUnixTs);
+                                        setObjectFromTz(props, tTimestamp, orig_ldt, MysqlType.TEXT, senderTz, expTimestamp, expFullUnixTs);
+                                        setObjectFromTz(props, tTimestamp, orig_ldt, MysqlType.MEDIUMTEXT, senderTz, expTimestamp, expFullUnixTs);
+                                        setObjectFromTz(props, tTimestamp, orig_ldt, MysqlType.LONGTEXT, senderTz, expTimestamp, expFullUnixTs);
+                                        if (useSSPS && withFract) {
+                                            setObjectFromTz(props, tTimestamp, orig_ldt, MysqlType.TIME, senderTz, expDefTimestamp, expDefUnixTs);
+                                        } else {
+                                            assertThrows(props, tTimestamp, orig_ldt, MysqlType.TIME, senderTz, incorrectDatetimeErr.replace("X", expTime));
+                                        }
+                                        setObjectFromTz(props, tTimestamp, orig_ldt, MysqlType.DATETIME, senderTz, expTimestamp, expFullUnixTs);
+                                        setObjectFromTz(props, tTimestamp, orig_ldt, MysqlType.TIMESTAMP, senderTz, expTimestamp, expFullUnixTs);
+                                        assertThrows(props, tTimestamp, orig_ldt, MysqlType.YEAR, senderTz, incorrectDatetimeErr.replace("X", expYear));
+
+                                        /* Into VARCHAR field */
+
+                                        String expDatetime2 = useSSPS
+                                                ? zdt_20200101_120000_123456_on_wire.format(TimeUtil.DATETIME_FORMATTER_NO_FRACT_NO_OFFSET)
+                                                : zdt_20200101_120000_123456_on_wire.format(dateTimeFmt); // TODO milliseconds are ignored by server. Bug ?
+                                        String expTime2 = useSSPS ? expTimeNoMs : expTime; // TODO milliseconds are ignored by server. Bug ?
+
+                                        setObjectFromTz(props, tVarchar, orig_ldt, null, senderTz, expDatetime2);
+                                        setObjectFromTz(props, tVarchar, orig_ldt, MysqlType.DATETIME, senderTz, expDatetime2);
+                                        setObjectFromTz(props, tVarchar, orig_ldt, MysqlType.TIMESTAMP, senderTz, expDatetime2);
+                                        setObjectFromTz(props, tVarchar, orig_ldt, MysqlType.TIME, senderTz, expTime2);
+                                        setObjectFromTz(props, tVarchar, orig_ldt, MysqlType.DATE, senderTz, expDate);
+                                        setObjectFromTz(props, tVarchar, orig_ldt, MysqlType.CHAR, senderTz, expDatetimeChars);
+                                        setObjectFromTz(props, tVarchar, orig_ldt, MysqlType.VARCHAR, senderTz, expDatetimeChars);
+                                        setObjectFromTz(props, tVarchar, orig_ldt, MysqlType.TINYTEXT, senderTz, expDatetimeChars);
+                                        setObjectFromTz(props, tVarchar, orig_ldt, MysqlType.TEXT, senderTz, expDatetimeChars);
+                                        setObjectFromTz(props, tVarchar, orig_ldt, MysqlType.MEDIUMTEXT, senderTz, expDatetimeChars);
+                                        setObjectFromTz(props, tVarchar, orig_ldt, MysqlType.LONGTEXT, senderTz, expDatetimeChars);
+                                        setObjectFromTz(props, tVarchar, orig_ldt, MysqlType.YEAR, senderTz, expYear);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    closeConnections();
+                }
+            } finally {
+                closeConnections();
+            }
+        }
+    }
+
+    @Test
+    public void testOffsetTimeSetters() throws Exception {
+        boolean withFract = versionMeetsMinimum(5, 6, 4); // fractional seconds are not supported in previous versions
+
+        createTable(tYear, "(id INT, d YEAR)");
+        createTable(tDate, "(id INT, d DATE)");
+        createTable(tTime, withFract ? "(id INT, d TIME(6))" : "(id INT, d TIME)");
+        createTable(tDatetime, withFract ? "(id INT, d DATETIME(6))" : "(id INT, d DATETIME)");
+        createTable(tTimestamp, withFract ? "(id INT, d TIMESTAMP(6))" : "(id INT, d TIMESTAMP)");
+        createTable(tVarchar, "(id INT, d VARCHAR(30))");
+
+        id = 0;
+
+        Properties props = new Properties();
+        props.setProperty(PropertyKey.sslMode.getKeyName(), "DISABLED");
+        props.setProperty(PropertyKey.allowPublicKeyRetrieval.getKeyName(), "true");
+        props.setProperty(PropertyKey.cacheDefaultTimeZone.getKeyName(), "false");
+        props.setProperty(PropertyKey.connectionTimeZone.getKeyName(), "SERVER");
+
+        TimeZone serverTz;
+        try (Connection testConn = getConnectionWithProps(props)) {
+            serverTz = ((MysqlConnection) testConn).getSession().getServerSession().getSessionTimeZone();
+        }
+
+        OffsetTime ot_120000_123456_05_00 = OffsetTime.of(12, 00, 00, withFract ? 123456000 : 0, ZoneOffset.ofHours(5));
+        OffsetTime ot_120000_05_00 = OffsetTime.of(12, 00, 00, 0, ZoneOffset.ofHours(5));
+
+        for (TimeZone senderTz : this.senderTimeZones) {
+            try {
+                for (String connectionTZ : this.connectionTimeZones) {
+                    initConnections(senderTz, connectionTZ);
+
+                    for (boolean forceConnectionTimeZoneToSession : new boolean[] { false, true }) {
+                        for (boolean preserveInstants : new boolean[] { false, true }) {
+                            for (boolean useSSPS : new boolean[] { false, true }) {
+                                for (boolean sendFractionalSeconds : new boolean[] { false, true }) {
+                                    for (boolean sendTimeFract : new boolean[] { false, true }) {
+
+                                        System.out.println("connTimeZone=" + connectionTZ + "; forceConnTimeZoneToSession=" + forceConnectionTimeZoneToSession
+                                                + "; preserveInstants=" + preserveInstants + "; useServerPrepStmts=" + useSSPS + "; sendFractSeconds="
+                                                + sendFractionalSeconds + "; sendFractSecondsForTime=" + sendTimeFract);
+
+                                        if (connectionTZ == null) {
+                                            props.remove(PropertyKey.connectionTimeZone.getKeyName());
+                                        } else {
+                                            props.setProperty(PropertyKey.connectionTimeZone.getKeyName(), connectionTZ);
+                                        }
+                                        props.setProperty(PropertyKey.forceConnectionTimeZoneToSession.getKeyName(), "" + forceConnectionTimeZoneToSession);
+                                        props.setProperty(PropertyKey.preserveInstants.getKeyName(), "" + preserveInstants);
+                                        props.setProperty(PropertyKey.useServerPrepStmts.getKeyName(), "" + useSSPS);
+                                        props.setProperty(PropertyKey.sendFractionalSecondsForTime.getKeyName(), "" + sendTimeFract);
+                                        props.setProperty(PropertyKey.sendFractionalSeconds.getKeyName(), "" + sendFractionalSeconds);
+
+                                        TimeZone connTz = connectionTZ == null || "LOCAL".equals(connectionTZ) ? senderTz
+                                                : "SERVER".equals(connectionTZ) ? serverTz : TimeZone.getTimeZone(connectionTZ);
+                                        TimeZone sessionTz = forceConnectionTimeZoneToSession ? connTz : serverTz;
+
+                                        DateTimeFormatter dateTimeFmt = withFract && sendFractionalSeconds ? DATETIME_FORMATTER_WITH_MICROS_NO_OFFCET
+                                                : TimeUtil.DATETIME_FORMATTER_NO_FRACT_NO_OFFSET;
+                                        DateTimeFormatter timeFmt = withFract && sendFractionalSeconds ? TIME_FORMATTER_WITH_MICROS_NO_OFFCET
+                                                : TimeUtil.TIME_FORMATTER_NO_FRACT_NO_OFFSET;
+                                        DateTimeFormatter timeFmtTz = withFract && sendFractionalSeconds ? TimeUtil.TIME_FORMATTER_WITH_NANOS_WITH_OFFSET
+                                                : TimeUtil.TIME_FORMATTER_NO_FRACT_WITH_OFFSET;
+
+                                        ZonedDateTime zdt_20200101_120000_123456_at_senderTz = LocalDate.now(sessionTz.toZoneId())
+                                                .atTime(ot_120000_123456_05_00.atDate(LocalDate.now()).atZoneSameInstant(senderTz.toZoneId()).toLocalTime())
+                                                .atZone(senderTz.toZoneId());
+                                        ZonedDateTime zdt_no_date_120000_123456_on_wire = (sendFractionalSeconds ? zdt_20200101_120000_123456_at_senderTz
+                                                : zdt_20200101_120000_123456_at_senderTz.withNano(0)).withZoneSameLocal(sessionTz.toZoneId());
+
+                                        String expYearDef = zdt_no_date_120000_123456_on_wire.format(YEAR_FORMATTER);
+                                        String expDateDef = zdt_no_date_120000_123456_on_wire
+                                                .format(useSSPS ? TimeUtil.DATE_FORMATTER : DateTimeFormatter.ofPattern("20HH-mm-ss"));
+                                        String expTimeNoMs = zdt_no_date_120000_123456_on_wire.format(TimeUtil.TIME_FORMATTER_NO_FRACT_NO_OFFSET);
+                                        String expTime = zdt_no_date_120000_123456_on_wire.format(timeFmt);
+                                        String expTimeTz = ot_120000_123456_05_00.format(timeFmtTz).replace("+", "\\+");
+                                        String expTimeTz8_0_28 = ot_120000_123456_05_00.format(DateTimeFormatter.ofPattern("20HH-mm-ss X:00:00")).replace("+",
+                                                "");
+                                        String expDatetimeTz8_0_28 = ot_120000_123456_05_00.format(DateTimeFormatter.ofPattern("20HH-mm-ss X:00:00.000000"))
+                                                .replace("+", "");
+
+                                        String expDatetimeDef = zdt_no_date_120000_123456_on_wire
+                                                .format(useSSPS ? dateTimeFmt : DateTimeFormatter.ofPattern("20HH-mm-ss 00:00:00"));
+                                        String expDefTimestamp = zdt_no_date_120000_123456_on_wire.withZoneSameInstant(tz_UTC.toZoneId()).format(dateTimeFmt);
+                                        String expDefTimestampNoMs = zdt_no_date_120000_123456_on_wire.withZoneSameInstant(tz_UTC.toZoneId())
+                                                .format(TimeUtil.DATETIME_FORMATTER_NO_FRACT_NO_OFFSET);
+
+                                        String expDefUnixTsNoMs = zdt_no_date_120000_123456_on_wire.toEpochSecond() + "";
+                                        String expDefUnixTs = expDefUnixTsNoMs + (zdt_no_date_120000_123456_on_wire.getNano() > 0
+                                                ? "." + TimeUtil.formatNanos(zdt_no_date_120000_123456_on_wire.getNano(), 6)
+                                                : "");
+
+                                        String expDateErr = incorrectDateErr.replace("X", expTime);
+                                        String expDateErrTz = incorrectDateErr.replace("X",
+                                                useSSPS && !sendFractionalSeconds && versionMeetsMinimum(8, 0, 28) ? expTimeTz8_0_28 : expTimeTz);
+                                        String expTimeErrTz = incorrectTimeErr.replace("X", expTimeTz);
+                                        String expDatetimeErr = incorrectDatetimeErr.replace("X", expTime);
+                                        String expDatetimeErrTz = incorrectDatetimeErr.replace("X",
+                                                useSSPS && !sendFractionalSeconds && versionMeetsMinimum(8, 0, 28) ? expDatetimeTz8_0_28 : expTimeTz);
+
+                                        /* Unsupported conversions */
+
+                                        assertThrows(props, tVarchar, ot_120000_123456_05_00, MysqlType.DATE, senderTz,
+                                                ".*Conversion from java.time.OffsetTime to DATE is not supported.");
+                                        assertThrows(props, tVarchar, ot_120000_123456_05_00, MysqlType.DATETIME, senderTz,
+                                                ".*Conversion from java.time.OffsetTime to DATETIME is not supported.");
+                                        assertThrows(props, tVarchar, ot_120000_123456_05_00, MysqlType.TIMESTAMP, senderTz,
+                                                ".*Conversion from java.time.OffsetTime to TIMESTAMP is not supported.");
+                                        assertThrows(props, tVarchar, ot_120000_123456_05_00, MysqlType.YEAR, senderTz,
+                                                ".*Conversion from java.time.OffsetTime to YEAR is not supported.");
+
+                                        /* Into YEAR field */
+
+                                        if (useSSPS && withFract) {
+                                            setObjectFromTz(props, tYear, ot_120000_123456_05_00, null, senderTz, expYearDef);
+                                            setObjectFromTz(props, tYear, ot_120000_123456_05_00, MysqlType.TIME, senderTz, expYearDef);
+                                        } else {
+                                            assertThrows(props, tYear, ot_120000_123456_05_00, null, senderTz, dataTruncatedErr);
+                                            assertThrows(props, tYear, ot_120000_123456_05_00, MysqlType.TIME, senderTz, dataTruncatedErr);
+                                        }
+                                        assertThrows(props, tYear, ot_120000_123456_05_00, MysqlType.CHAR, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, ot_120000_123456_05_00, MysqlType.VARCHAR, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, ot_120000_123456_05_00, MysqlType.TINYTEXT, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, ot_120000_123456_05_00, MysqlType.TEXT, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, ot_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, ot_120000_123456_05_00, MysqlType.LONGTEXT, senderTz, dataTruncatedErr);
+
+                                        /* Into DATE field */
+
+                                        if (useSSPS) {
+                                            if (withFract) {
+                                                setObjectFromTz(props, tDate, ot_120000_123456_05_00, null, senderTz, expDateDef);
+                                                setObjectFromTz(props, tDate, ot_120000_123456_05_00, MysqlType.TIME, senderTz, expDateDef);
+                                            } else {
+                                                assertThrows(props, tDate, ot_120000_123456_05_00, null, senderTz, dataTruncatedErr);
+                                                assertThrows(props, tDate, ot_120000_123456_05_00, MysqlType.TIME, senderTz,
+                                                        versionMeetsMinimum(5, 6) ? expDateErr : dataTruncatedErr);
+                                            }
+                                        } else {
+                                            assertThrows(props, tDate, ot_120000_123456_05_00, null, senderTz, expDateErr);
+                                            assertThrows(props, tDate, ot_120000_123456_05_00, MysqlType.TIME, senderTz, expDateErr);
+                                        }
+                                        assertThrows(props, tDate, ot_120000_123456_05_00, MysqlType.CHAR, senderTz, expDateErrTz);
+                                        assertThrows(props, tDate, ot_120000_123456_05_00, MysqlType.VARCHAR, senderTz, expDateErrTz);
+                                        assertThrows(props, tDate, ot_120000_123456_05_00, MysqlType.TINYTEXT, senderTz, expDateErrTz);
+                                        assertThrows(props, tDate, ot_120000_123456_05_00, MysqlType.TEXT, senderTz, expDateErrTz);
+                                        assertThrows(props, tDate, ot_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz, expDateErrTz);
+                                        assertThrows(props, tDate, ot_120000_123456_05_00, MysqlType.LONGTEXT, senderTz, expDateErrTz);
+
+                                        /* Into TIME field */
+
+                                        setObjectFromTz(props, tTime, ot_120000_123456_05_00, null, senderTz, expTime);
+                                        assertThrows(props, tTime, ot_120000_123456_05_00, MysqlType.CHAR, senderTz, expTimeErrTz);
+                                        assertThrows(props, tTime, ot_120000_123456_05_00, MysqlType.VARCHAR, senderTz, expTimeErrTz);
+                                        assertThrows(props, tTime, ot_120000_123456_05_00, MysqlType.TINYTEXT, senderTz, expTimeErrTz);
+                                        assertThrows(props, tTime, ot_120000_123456_05_00, MysqlType.TEXT, senderTz, expTimeErrTz);
+                                        assertThrows(props, tTime, ot_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz, expTimeErrTz);
+                                        assertThrows(props, tTime, ot_120000_123456_05_00, MysqlType.LONGTEXT, senderTz, expTimeErrTz);
+                                        setObjectFromTz(props, tTime, ot_120000_05_00, MysqlType.TIME, senderTz, expTimeNoMs);
+                                        setObjectFromTz(props, tTime, ot_120000_123456_05_00, MysqlType.TIME, senderTz, expTime);
+
+                                        /* Into DATETIME field */
+
+                                        if (useSSPS) {
+                                            if (withFract) {
+                                                setObjectFromTz(props, tDatetime, ot_120000_123456_05_00, null, senderTz, expDatetimeDef);
+                                                setObjectFromTz(props, tDatetime, ot_120000_123456_05_00, MysqlType.TIME, senderTz, expDatetimeDef);
+                                            } else {
+                                                assertThrows(props, tDatetime, ot_120000_123456_05_00, null, senderTz, dataTruncatedErr);
+                                                assertThrows(props, tDatetime, ot_120000_123456_05_00, MysqlType.TIME, senderTz, dataTruncatedErr);
+                                            }
+                                        } else {
+                                            assertThrows(props, tDatetime, ot_120000_123456_05_00, null, senderTz, expDatetimeErr);
+                                            assertThrows(props, tDatetime, ot_120000_123456_05_00, MysqlType.TIME, senderTz, expDatetimeErr);
+                                        }
+                                        assertThrows(props, tDatetime, ot_120000_123456_05_00, MysqlType.CHAR, senderTz, expDatetimeErrTz);
+                                        assertThrows(props, tDatetime, ot_120000_123456_05_00, MysqlType.VARCHAR, senderTz, expDatetimeErrTz);
+                                        assertThrows(props, tDatetime, ot_120000_123456_05_00, MysqlType.TINYTEXT, senderTz, expDatetimeErrTz);
+                                        assertThrows(props, tDatetime, ot_120000_123456_05_00, MysqlType.TEXT, senderTz, expDatetimeErrTz);
+                                        assertThrows(props, tDatetime, ot_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz, expDatetimeErrTz);
+                                        assertThrows(props, tDatetime, ot_120000_123456_05_00, MysqlType.LONGTEXT, senderTz, expDatetimeErrTz);
+
+                                        /* Into TIMESTAMP field */
+
+                                        if (useSSPS && withFract) {
+                                            setObjectFromTz(props, tTimestamp, ot_120000_123456_05_00, null, senderTz, expDefTimestamp, expDefUnixTs);
+                                            setObjectFromTz(props, tTimestamp, ot_120000_05_00, null, senderTz, expDefTimestampNoMs, expDefUnixTsNoMs);
+                                            setObjectFromTz(props, tTimestamp, ot_120000_123456_05_00, MysqlType.TIME, senderTz, expDefTimestamp, expDefUnixTs);
+                                        } else {
+                                            assertThrows(props, tTimestamp, ot_120000_123456_05_00, null, senderTz, expDatetimeErr);
+                                            assertThrows(props, tTimestamp, ot_120000_05_00, null, senderTz, incorrectDatetimeErr.replace("X", expTimeNoMs));
+                                            assertThrows(props, tTimestamp, ot_120000_123456_05_00, MysqlType.TIME, senderTz, expDatetimeErr);
+                                        }
+                                        assertThrows(props, tTimestamp, ot_120000_123456_05_00, MysqlType.CHAR, senderTz, expDatetimeErrTz);
+                                        assertThrows(props, tTimestamp, ot_120000_123456_05_00, MysqlType.VARCHAR, senderTz, expDatetimeErrTz);
+                                        assertThrows(props, tTimestamp, ot_120000_123456_05_00, MysqlType.TINYTEXT, senderTz, expDatetimeErrTz);
+                                        assertThrows(props, tTimestamp, ot_120000_123456_05_00, MysqlType.TEXT, senderTz, expDatetimeErrTz);
+                                        assertThrows(props, tTimestamp, ot_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz, expDatetimeErrTz);
+                                        assertThrows(props, tTimestamp, ot_120000_123456_05_00, MysqlType.LONGTEXT, senderTz, expDatetimeErrTz);
+
+                                        /* Into VARCHAR field */
+
+                                        String expTime2 = useSSPS ? expTimeNoMs : expTime; // TODO milliseconds are ignored by server. Bug ?
+
+                                        setObjectFromTz(props, tVarchar, ot_120000_123456_05_00, null, senderTz, expTime2);
+                                        setObjectFromTz(props, tVarchar, ot_120000_123456_05_00, MysqlType.TIME, senderTz, expTime2);
+                                        setObjectFromTz(props, tVarchar, ot_120000_123456_05_00, MysqlType.CHAR, senderTz, expTimeTz);
+                                        setObjectFromTz(props, tVarchar, ot_120000_123456_05_00, MysqlType.VARCHAR, senderTz, expTimeTz);
+                                        setObjectFromTz(props, tVarchar, ot_120000_123456_05_00, MysqlType.TINYTEXT, senderTz, expTimeTz);
+                                        setObjectFromTz(props, tVarchar, ot_120000_123456_05_00, MysqlType.TEXT, senderTz, expTimeTz);
+                                        setObjectFromTz(props, tVarchar, ot_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz, expTimeTz);
+                                        setObjectFromTz(props, tVarchar, ot_120000_123456_05_00, MysqlType.LONGTEXT, senderTz, expTimeTz);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    closeConnections();
+                }
+            } finally {
+                closeConnections();
+            }
+        }
+    }
+
+    @Test
+    public void testOffsetDatetimeSetters() throws Exception {
+        boolean withFract = versionMeetsMinimum(5, 6, 4); // fractional seconds are not supported in previous versions
+        boolean allowsOffset = versionMeetsMinimum(8, 0, 19);
+        // Starting from MySQL 8.0.22 server also converts string values in TIMESTAMP_WITH_TIMEZONE format to the session time zone
+        // for column types other than TIMESTAMP and DATETIME. In MySQL 8.0.26 it was reverted, restored in MySQL 8.0.28.
+        boolean serverConvertsTzForAllTypes = versionMeetsMinimum(8, 0, 22) && !versionMeetsMinimum(8, 0, 26) || versionMeetsMinimum(8, 0, 28);
+
+        createTable(tYear, "(id INT, d YEAR)");
+        createTable(tDate, "(id INT, d DATE)");
+        createTable(tTime, withFract ? "(id INT, d TIME(6))" : "(id INT, d TIME)");
+        createTable(tDatetime, withFract ? "(id INT, d DATETIME(6))" : "(id INT, d DATETIME)");
+        createTable(tTimestamp, withFract ? "(id INT, d TIMESTAMP(6))" : "(id INT, d TIMESTAMP)");
+        createTable(tVarchar, "(id INT, d VARCHAR(35))");
+
+        id = 0;
+
+        Properties props = new Properties();
+        props.setProperty(PropertyKey.cacheDefaultTimeZone.getKeyName(), "false");
+        props.setProperty(PropertyKey.connectionTimeZone.getKeyName(), "SERVER");
+        props.setProperty(PropertyKey.sslMode.getKeyName(), "DISABLED");
+        props.setProperty(PropertyKey.allowPublicKeyRetrieval.getKeyName(), "true");
+
+        TimeZone serverTz;
+        try (Connection testConn = getConnectionWithProps(props)) {
+            serverTz = ((MysqlConnection) testConn).getSession().getServerSession().getSessionTimeZone();
+            System.out.println("Local tz: " + TimeZone.getDefault());
+            System.out.println("Server tz: " + serverTz);
+        }
+
+        OffsetDateTime odt_20200101_120000_123456_05_00 = OffsetDateTime.of(2020, 1, 1, 12, 00, 00, withFract ? 123456000 : 0, ZoneOffset.ofHours(5));
+
+        for (TimeZone senderTz : this.senderTimeZones) {
+            try {
+                for (String connectionTZ : this.connectionTimeZones) {
+                    initConnections(senderTz, connectionTZ);
+
+                    for (boolean forceConnectionTimeZoneToSession : new boolean[] { false, true }) {
+                        for (boolean preserveInstants : new boolean[] { false, true }) {
+                            for (boolean useSSPS : new boolean[] { false, true }) {
+                                for (boolean sendFractionalSeconds : new boolean[] { false, true }) {
+                                    for (boolean sendTimeFract : new boolean[] { false, true }) {
+
+                                        System.out.println("connTimeZone=" + connectionTZ + "; forceConnTimeZoneToSession=" + forceConnectionTimeZoneToSession
+                                                + "; preserveInstants=" + preserveInstants + "; useServerPrepStmts=" + useSSPS + "; sendFractSeconds="
+                                                + sendFractionalSeconds + "; sendFractSecondsForTime=" + sendTimeFract);
+
+                                        if (connectionTZ == null) {
+                                            props.remove(PropertyKey.connectionTimeZone.getKeyName());
+                                        } else {
+                                            props.setProperty(PropertyKey.connectionTimeZone.getKeyName(), connectionTZ);
+                                        }
+                                        props.setProperty(PropertyKey.forceConnectionTimeZoneToSession.getKeyName(), "" + forceConnectionTimeZoneToSession);
+                                        props.setProperty(PropertyKey.preserveInstants.getKeyName(), "" + preserveInstants);
+                                        props.setProperty(PropertyKey.useServerPrepStmts.getKeyName(), "" + useSSPS);
+                                        props.setProperty(PropertyKey.sendFractionalSecondsForTime.getKeyName(), "" + sendTimeFract);
+                                        props.setProperty(PropertyKey.sendFractionalSeconds.getKeyName(), "" + sendFractionalSeconds);
+
+                                        TimeZone connTz = connectionTZ == null || "LOCAL".equals(connectionTZ) ? senderTz
+                                                : "SERVER".equals(connectionTZ) ? serverTz : TimeZone.getTimeZone(connectionTZ);
+                                        TimeZone sessionTz = forceConnectionTimeZoneToSession ? connTz : serverTz;
+
+                                        DateTimeFormatter dateTimeFmt = withFract && sendFractionalSeconds ? DATETIME_FORMATTER_WITH_MICROS_NO_OFFCET
+                                                : TimeUtil.DATETIME_FORMATTER_NO_FRACT_NO_OFFSET;
+                                        DateTimeFormatter timeFmt = withFract && sendFractionalSeconds ? TIME_FORMATTER_WITH_MICROS_NO_OFFCET
+                                                : TimeUtil.TIME_FORMATTER_NO_FRACT_NO_OFFSET;
+
+                                        ZonedDateTime zdt_20200101_120000_123456_at_senderTz = odt_20200101_120000_123456_05_00
+                                                .atZoneSameInstant(senderTz.toZoneId());
+
+                                        ZonedDateTime zdt_20200101_120000_123456_senderTz_to_connTz = preserveInstants
+                                                && !(connectionTZ == null || "LOCAL".equals(connectionTZ))
+                                                        ? zdt_20200101_120000_123456_at_senderTz.withZoneSameInstant(connTz.toZoneId())
+                                                        : zdt_20200101_120000_123456_at_senderTz;
+
+                                        ZonedDateTime zdt_20200101_120000_123456_on_wire = (sendFractionalSeconds ? zdt_20200101_120000_123456_at_senderTz
+                                                : zdt_20200101_120000_123456_at_senderTz.withNano(0)).withZoneSameLocal(sessionTz.toZoneId());
+                                        ZonedDateTime zdt_no_date_120000_123456_on_wire = LocalDate.now(sessionTz.toZoneId())
+                                                .atTime((sendFractionalSeconds ? zdt_20200101_120000_123456_at_senderTz
+                                                        : zdt_20200101_120000_123456_at_senderTz.withNano(0)).toLocalTime())
+                                                .atZone(sessionTz.toZoneId());
+                                        ZonedDateTime zdt_20200101_no_time_on_wire = zdt_20200101_120000_123456_on_wire.withHour(0).withMinute(0).withSecond(0)
+                                                .withNano(0);
+
+                                        ZonedDateTime zdt_TS_on_wire = (sendFractionalSeconds ? zdt_20200101_120000_123456_senderTz_to_connTz
+                                                : zdt_20200101_120000_123456_senderTz_to_connTz.withNano(0)).withZoneSameLocal(sessionTz.toZoneId());
+
+                                        String expYear = zdt_20200101_120000_123456_on_wire.format(YEAR_FORMATTER);
+                                        String expYearDef = zdt_no_date_120000_123456_on_wire.format(YEAR_FORMATTER);
+                                        String expYearTS = zdt_TS_on_wire.format(YEAR_FORMATTER);
+
+                                        String expDate = zdt_20200101_120000_123456_on_wire.format(TimeUtil.DATE_FORMATTER);
+                                        String expDateDef = zdt_no_date_120000_123456_on_wire
+                                                .format(useSSPS ? TimeUtil.DATE_FORMATTER : DateTimeFormatter.ofPattern("20HH-mm-ss"));
+
+                                        String expDateChar = serverConvertsTzForAllTypes
+                                                ? odt_20200101_120000_123456_05_00.atZoneSameInstant(sessionTz.toZoneId()).format(TimeUtil.DATE_FORMATTER)
+                                                : odt_20200101_120000_123456_05_00.format(TimeUtil.DATE_FORMATTER);
+                                        String expDateTS = zdt_TS_on_wire.format(TimeUtil.DATE_FORMATTER);
+
+                                        String expTimeNoMs = zdt_20200101_120000_123456_on_wire.format(TimeUtil.TIME_FORMATTER_NO_FRACT_NO_OFFSET);
+                                        String expTime = zdt_20200101_120000_123456_on_wire.format(timeFmt);
+
+                                        String expTime2 = serverConvertsTzForAllTypes
+                                                ? odt_20200101_120000_123456_05_00.atZoneSameInstant(sessionTz.toZoneId()).format(timeFmt)
+                                                : odt_20200101_120000_123456_05_00.format(timeFmt);
+                                        String expTimeTS = zdt_TS_on_wire.format(timeFmt);
+
+                                        String expDatetime = zdt_20200101_120000_123456_on_wire.format(dateTimeFmt);
+                                        String expDatetimeTS = zdt_TS_on_wire.format(dateTimeFmt);
+                                        String expDatetimeDef = LocalDate.now(sessionTz.toZoneId()).atTime(zdt_20200101_120000_123456_on_wire.toLocalTime())
+                                                .atZone(sessionTz.toZoneId())
+                                                .format(useSSPS ? dateTimeFmt : DateTimeFormatter.ofPattern("20HH-mm-ss 00:00:00"));
+                                        String expDatetimeNoTime = zdt_20200101_120000_123456_on_wire
+                                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd 00:00:00"));
+                                        String expDatetimeExt = (sendFractionalSeconds ? odt_20200101_120000_123456_05_00
+                                                : odt_20200101_120000_123456_05_00.withNano(0)).atZoneSameInstant(sessionTz.toZoneId()).format(dateTimeFmt);
+                                        String expDatetimeExtOff = (sendFractionalSeconds ? odt_20200101_120000_123456_05_00
+                                                : odt_20200101_120000_123456_05_00.withNano(0))
+                                                        .format(withFract && sendFractionalSeconds ? TimeUtil.DATETIME_FORMATTER_WITH_NANOS_WITH_OFFSET
+                                                                : TimeUtil.DATETIME_FORMATTER_NO_FRACT_WITH_OFFSET);
+
+                                        String expTimestamp = zdt_20200101_120000_123456_on_wire.withZoneSameInstant(tz_UTC.toZoneId()).format(dateTimeFmt);
+                                        String expTimestampTS = zdt_TS_on_wire.withZoneSameInstant(tz_UTC.toZoneId()).format(dateTimeFmt);
+                                        String expDefTimestamp = zdt_no_date_120000_123456_on_wire.withZoneSameInstant(tz_UTC.toZoneId()).format(dateTimeFmt);
+                                        String expTimestampNoTime = zdt_20200101_no_time_on_wire.withZoneSameInstant(tz_UTC.toZoneId()).format(dateTimeFmt);
+
+                                        String expDefUnixTs = zdt_no_date_120000_123456_on_wire.toEpochSecond()
+                                                + (zdt_no_date_120000_123456_on_wire.getNano() > 0
+                                                        ? "." + TimeUtil.formatNanos(zdt_no_date_120000_123456_on_wire.getNano(), 6)
+                                                        : "");
+                                        String expFullUnixTs = zdt_20200101_120000_123456_on_wire.toEpochSecond()
+                                                + (zdt_20200101_120000_123456_on_wire.getNano() > 0
+                                                        ? "." + TimeUtil.formatNanos(zdt_20200101_120000_123456_on_wire.getNano(), 6)
+                                                        : "");
+                                        String expFullUnixTsTS = zdt_TS_on_wire.toEpochSecond()
+                                                + (zdt_TS_on_wire.getNano() > 0 ? "." + TimeUtil.formatNanos(zdt_TS_on_wire.getNano(), 6) : "");
+                                        String expUnixTsFromDate = zdt_20200101_no_time_on_wire.toEpochSecond() + "";
+
+                                        /* Into YEAR field */
+
+                                        if (useSSPS && withFract) {
+
+                                            setObjectFromTz(props, tYear, odt_20200101_120000_123456_05_00, null, senderTz, expYearTS);
+                                            setObjectFromTz(props, tYear, odt_20200101_120000_123456_05_00, MysqlType.DATE, senderTz, expYear);
+                                            setObjectFromTz(props, tYear, odt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz, expYearDef);
+                                            setObjectFromTz(props, tYear, odt_20200101_120000_123456_05_00, MysqlType.DATETIME, senderTz, expYear);
+                                            setObjectFromTz(props, tYear, odt_20200101_120000_123456_05_00, MysqlType.TIMESTAMP, senderTz, expYearTS);
+                                        } else {
+                                            assertThrows(props, tYear, odt_20200101_120000_123456_05_00, null, senderTz, dataTruncatedErr);
+                                            assertThrows(props, tYear, odt_20200101_120000_123456_05_00, MysqlType.DATE, senderTz, dataTruncatedErr);
+                                            assertThrows(props, tYear, odt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz, dataTruncatedErr);
+                                            assertThrows(props, tYear, odt_20200101_120000_123456_05_00, MysqlType.DATETIME, senderTz, dataTruncatedErr);
+                                            assertThrows(props, tYear, odt_20200101_120000_123456_05_00, MysqlType.TIMESTAMP, senderTz, dataTruncatedErr);
+                                        }
+                                        assertThrows(props, tYear, odt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, odt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, odt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, odt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, odt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, odt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz, dataTruncatedErr);
+
+                                        setObjectFromTz(props, tYear, odt_20200101_120000_123456_05_00, MysqlType.YEAR, senderTz, expYear);
+
+                                        /* Into DATE field */
+
+                                        setObjectFromTz(props, tDate, odt_20200101_120000_123456_05_00, null, senderTz, expDateTS);
+                                        setObjectFromTz(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.DATE, senderTz, expDate);
+                                        if (allowsOffset) {
+                                            setObjectFromTz(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz, expDateChar);
+                                            setObjectFromTz(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz, expDateChar);
+                                            setObjectFromTz(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz, expDateChar);
+                                            setObjectFromTz(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz, expDateChar);
+                                            setObjectFromTz(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz, expDateChar);
+                                            setObjectFromTz(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz, expDateChar);
+                                        } else {
+                                            assertThrows(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz,
+                                                    incorrectDateErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz,
+                                                    incorrectDateErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz,
+                                                    incorrectDateErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz,
+                                                    incorrectDateErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz,
+                                                    incorrectDateErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz,
+                                                    incorrectDateErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+
+                                        }
+                                        if (useSSPS) {
+                                            if (withFract) {
+                                                setObjectFromTz(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz, expDateDef);
+                                            } else {
+                                                assertThrows(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz, dataTruncatedErr);
+                                            }
+                                        } else {
+                                            assertThrows(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz,
+                                                    incorrectDateErr.replace("X", expTime));
+                                        }
+                                        setObjectFromTz(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.DATETIME, senderTz, expDate);
+                                        setObjectFromTz(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.TIMESTAMP, senderTz, expDateTS);
+
+                                        assertThrows(props, tDate, odt_20200101_120000_123456_05_00, MysqlType.YEAR, senderTz,
+                                                incorrectDateErr.replace("X", expYear));
+
+                                        /* Into TIME field */
+
+                                        setObjectFromTz(props, tTime, odt_20200101_120000_123456_05_00, null, senderTz, expTimeTS);
+                                        if (useSSPS) {
+                                            setObjectFromTz(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.DATE, senderTz, s_000000_000000);
+                                        } else {
+                                            assertThrows(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.DATE, senderTz,
+                                                    incorrectTimeErr.replace("X", expDate));
+                                        }
+                                        if (allowsOffset) {
+                                            setObjectFromTz(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz, expTime2);
+                                            setObjectFromTz(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz, expTime2);
+                                            setObjectFromTz(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz, expTime2);
+                                            setObjectFromTz(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz, expTime2);
+                                            setObjectFromTz(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz, expTime2);
+                                            setObjectFromTz(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz, expTime2);
+                                        } else {
+                                            assertThrows(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz,
+                                                    incorrectTimeErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz,
+                                                    incorrectTimeErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz,
+                                                    incorrectTimeErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz,
+                                                    incorrectTimeErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz,
+                                                    incorrectTimeErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz,
+                                                    incorrectTimeErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                        }
+
+                                        setObjectFromTz(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz, expTime);
+                                        setObjectFromTz(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.DATETIME, senderTz, expTime);
+                                        setObjectFromTz(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.TIMESTAMP, senderTz, expTimeTS);
+                                        setObjectFromTz(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.YEAR, senderTz, expYear); // TIME takes numbers as a short notation, thus it works here
+                                        setObjectFromTz(props, tTime, odt_20200101_120000_123456_05_00, MysqlType.YEAR, senderTz,
+                                                "00:" + expYear.substring(0, 2) + ":" + expYear.substring(2)); // TIME takes numbers as a short notation, thus it works here
+
+                                        /* Into DATETIME field */
+
+                                        setObjectFromTz(props, tDatetime, odt_20200101_120000_123456_05_00, null, senderTz, expDatetimeTS);
+                                        setObjectFromTz(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.DATE, senderTz, expDatetimeNoTime);
+                                        if (allowsOffset) {
+                                            setObjectFromTz(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz, expDatetimeExt);
+                                            setObjectFromTz(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz, expDatetimeExt);
+                                            setObjectFromTz(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz, expDatetimeExt);
+                                            setObjectFromTz(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz, expDatetimeExt);
+                                            setObjectFromTz(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz, expDatetimeExt);
+                                            setObjectFromTz(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz, expDatetimeExt);
+                                        } else {
+                                            assertThrows(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                        }
+                                        if (useSSPS) {
+                                            if (withFract) {
+                                                setObjectFromTz(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz, expDatetimeDef);
+                                            } else {
+                                                assertThrows(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz, dataTruncatedErr);
+                                            }
+                                        } else {
+                                            assertThrows(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expTime));
+                                        }
+
+                                        setObjectFromTz(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.DATETIME, senderTz, expDatetime);
+                                        setObjectFromTz(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.TIMESTAMP, senderTz, expDatetimeTS);
+
+                                        assertThrows(props, tDatetime, odt_20200101_120000_123456_05_00, MysqlType.YEAR, senderTz,
+                                                incorrectDatetimeErr.replace("X", expYear));
+
+                                        /* Into TIMESTAMP field */
+
+                                        String expTimestampExt = (sendFractionalSeconds ? odt_20200101_120000_123456_05_00
+                                                : odt_20200101_120000_123456_05_00.withNano(0)).atZoneSameInstant(tz_UTC.toZoneId()).format(dateTimeFmt);
+                                        String expFullUnixTsExt = odt_20200101_120000_123456_05_00.toEpochSecond()
+                                                + (sendFractionalSeconds && odt_20200101_120000_123456_05_00.getNano() > 0
+                                                        ? "." + TimeUtil.formatNanos(odt_20200101_120000_123456_05_00.getNano(), 6)
+                                                        : "");
+
+                                        setObjectFromTz(props, tTimestamp, odt_20200101_120000_123456_05_00, null, senderTz, expTimestampTS, expFullUnixTsTS);
+                                        setObjectFromTz(props, tTimestamp, odt_20200101_120000_123456_05_00, MysqlType.DATE, senderTz, expTimestampNoTime,
+                                                expUnixTsFromDate);
+
+                                        if (allowsOffset) {
+                                            setObjectFromTz(props, tTimestamp, odt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz, expTimestampExt,
+                                                    expFullUnixTsExt);
+                                            setObjectFromTz(props, tTimestamp, odt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz, expTimestampExt,
+                                                    expFullUnixTsExt);
+                                            setObjectFromTz(props, tTimestamp, odt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz, expTimestampExt,
+                                                    expFullUnixTsExt);
+                                            setObjectFromTz(props, tTimestamp, odt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz, expTimestampExt,
+                                                    expFullUnixTsExt);
+                                            setObjectFromTz(props, tTimestamp, odt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz,
+                                                    expTimestampExt, expFullUnixTsExt);
+                                            setObjectFromTz(props, tTimestamp, odt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz, expTimestampExt,
+                                                    expFullUnixTsExt);
+                                        } else {
+                                            assertThrows(props, tTimestamp, odt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tTimestamp, odt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tTimestamp, odt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tTimestamp, odt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tTimestamp, odt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                            assertThrows(props, tTimestamp, odt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeExtOff.replace("+", "\\+")));
+                                        }
+
+                                        if (useSSPS && withFract) {
+                                            setObjectFromTz(props, tTimestamp, odt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz, expDefTimestamp,
+                                                    expDefUnixTs);
+                                        } else {
+                                            assertThrows(props, tTimestamp, odt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expTime));
+                                        }
+                                        setObjectFromTz(props, tTimestamp, odt_20200101_120000_123456_05_00, MysqlType.DATETIME, senderTz, expTimestamp,
+                                                expFullUnixTs);
+                                        setObjectFromTz(props, tTimestamp, odt_20200101_120000_123456_05_00, MysqlType.TIMESTAMP, senderTz, expTimestampTS,
+                                                expFullUnixTsTS);
+                                        assertThrows(props, tTimestamp, odt_20200101_120000_123456_05_00, MysqlType.YEAR, senderTz,
+                                                incorrectDatetimeErr.replace("X", expYear));
+
+                                        /* Into VARCHAR field */
+
+                                        String expDatetime2 = useSSPS
+                                                ? zdt_20200101_120000_123456_on_wire.format(TimeUtil.DATETIME_FORMATTER_NO_FRACT_NO_OFFSET)
+                                                : expDatetime; // TODO milliseconds are ignored by server. Bug ?
+                                        String expDatetimeTS2 = useSSPS ? zdt_TS_on_wire.format(TimeUtil.DATETIME_FORMATTER_NO_FRACT_NO_OFFSET) : expDatetimeTS; // TODO milliseconds are ignored by server. Bug ?
+
+                                        expTime2 = useSSPS ? expTimeNoMs : expTime; // TODO milliseconds are ignored by server. Bug ?
+
+                                        setObjectFromTz(props, tVarchar, odt_20200101_120000_123456_05_00, null, senderTz, expDatetimeTS2);
+                                        setObjectFromTz(props, tVarchar, odt_20200101_120000_123456_05_00, MysqlType.DATETIME, senderTz, expDatetime2);
+                                        setObjectFromTz(props, tVarchar, odt_20200101_120000_123456_05_00, MysqlType.TIMESTAMP, senderTz, expDatetimeTS2);
+                                        setObjectFromTz(props, tVarchar, odt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz, expTime2);
+                                        setObjectFromTz(props, tVarchar, odt_20200101_120000_123456_05_00, MysqlType.DATE, senderTz, expDate);
+                                        setObjectFromTz(props, tVarchar, odt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz, expDatetimeExtOff);
+                                        setObjectFromTz(props, tVarchar, odt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz, expDatetimeExtOff);
+                                        setObjectFromTz(props, tVarchar, odt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz, expDatetimeExtOff);
+                                        setObjectFromTz(props, tVarchar, odt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz, expDatetimeExtOff);
+                                        setObjectFromTz(props, tVarchar, odt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz, expDatetimeExtOff);
+                                        setObjectFromTz(props, tVarchar, odt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz, expDatetimeExtOff);
+                                        setObjectFromTz(props, tVarchar, odt_20200101_120000_123456_05_00, MysqlType.YEAR, senderTz, expYear);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    closeConnections();
+                }
+            } finally {
+                closeConnections();
+            }
+        }
+    }
+
+    @Test
+    public void testZonedDatetimeSetters() throws Exception {
+        boolean withFract = versionMeetsMinimum(5, 6, 4); // fractional seconds are not supported in previous versions
+        boolean allowsOffset = versionMeetsMinimum(8, 0, 19);
+        // Starting from MySQL 8.0.22 server also converts string values in TIMESTAMP_WITH_TIMEZONE format to the session time zone
+        // for column types other than TIMESTAMP and DATETIME. In MySQL 8.0.26 it was reverted, restored in MySQL 8.0.28.
+        boolean serverConvertsTzForAllTypes = versionMeetsMinimum(8, 0, 22) && !versionMeetsMinimum(8, 0, 26) || versionMeetsMinimum(8, 0, 28);
+
+        createTable(tYear, "(id INT, d YEAR)");
+        createTable(tDate, "(id INT, d DATE)");
+        createTable(tTime, withFract ? "(id INT, d TIME(6))" : "(id INT, d TIME)");
+        createTable(tDatetime, withFract ? "(id INT, d DATETIME(6))" : "(id INT, d DATETIME)");
+        createTable(tTimestamp, withFract ? "(id INT, d TIMESTAMP(6))" : "(id INT, d TIMESTAMP)");
+        createTable(tVarchar, "(id INT, d VARCHAR(35))");
+
+        id = 0;
+
+        Properties props = new Properties();
+        props.setProperty(PropertyKey.sslMode.getKeyName(), "DISABLED");
+        props.setProperty(PropertyKey.allowPublicKeyRetrieval.getKeyName(), "true");
+        props.setProperty(PropertyKey.cacheDefaultTimeZone.getKeyName(), "false");
+        props.setProperty(PropertyKey.connectionTimeZone.getKeyName(), "SERVER");
+
+        TimeZone serverTz;
+        try (Connection testConn = getConnectionWithProps(props)) {
+            serverTz = ((MysqlConnection) testConn).getSession().getServerSession().getSessionTimeZone();
+            System.out.println("Local tz: " + TimeZone.getDefault());
+            System.out.println("Server tz: " + serverTz);
+        }
+
+        ZonedDateTime zdt_20200101_120000_123456_05_00 = ZonedDateTime.of(withFract ? ldt_20200101_120000_123456 : ldt_20200101_120000_123456.withNano(0),
+                ZoneId.of("Asia/Yekaterinburg"));
+
+        for (TimeZone senderTz : this.senderTimeZones) {
+            try {
+                for (String connectionTZ : this.connectionTimeZones) {
+                    initConnections(senderTz, connectionTZ);
+
+                    for (boolean forceConnectionTimeZoneToSession : new boolean[] { false, true }) {
+                        for (boolean preserveInstants : new boolean[] { false, true }) {
+                            for (boolean useSSPS : new boolean[] { false, true }) {
+                                for (boolean sendFractionalSeconds : new boolean[] { false, true }) {
+                                    for (boolean sendTimeFract : new boolean[] { false, true }) {
+
+                                        System.out.println("connTimeZone=" + connectionTZ + "; forceConnTimeZoneToSession=" + forceConnectionTimeZoneToSession
+                                                + "; preserveInstants=" + preserveInstants + "; useServerPrepStmts=" + useSSPS + "; sendFractSeconds="
+                                                + sendFractionalSeconds + "; sendFractSecondsForTime=" + sendTimeFract);
+
+                                        if (connectionTZ == null) {
+                                            props.remove(PropertyKey.connectionTimeZone.getKeyName());
+                                        } else {
+                                            props.setProperty(PropertyKey.connectionTimeZone.getKeyName(), connectionTZ);
+                                        }
+                                        props.setProperty(PropertyKey.forceConnectionTimeZoneToSession.getKeyName(), "" + forceConnectionTimeZoneToSession);
+                                        props.setProperty(PropertyKey.preserveInstants.getKeyName(), "" + preserveInstants);
+                                        props.setProperty(PropertyKey.useServerPrepStmts.getKeyName(), "" + useSSPS);
+                                        props.setProperty(PropertyKey.sendFractionalSecondsForTime.getKeyName(), "" + sendTimeFract);
+                                        props.setProperty(PropertyKey.sendFractionalSeconds.getKeyName(), "" + sendFractionalSeconds);
+
+                                        TimeZone connTz = connectionTZ == null || "LOCAL".equals(connectionTZ) ? senderTz
+                                                : "SERVER".equals(connectionTZ) ? serverTz : TimeZone.getTimeZone(connectionTZ);
+                                        TimeZone sessionTz = forceConnectionTimeZoneToSession ? connTz : serverTz;
+
+                                        DateTimeFormatter dateTimeFmt = withFract && sendFractionalSeconds ? DATETIME_FORMATTER_WITH_MICROS_NO_OFFCET
+                                                : TimeUtil.DATETIME_FORMATTER_NO_FRACT_NO_OFFSET;
+                                        DateTimeFormatter timeFmt = withFract && sendFractionalSeconds ? TIME_FORMATTER_WITH_MICROS_NO_OFFCET
+                                                : TimeUtil.TIME_FORMATTER_NO_FRACT_NO_OFFSET;
+
+                                        ZonedDateTime zdt_20200101_120000_123456_at_senderTz = zdt_20200101_120000_123456_05_00
+                                                .withZoneSameInstant(senderTz.toZoneId());
+
+                                        ZonedDateTime zdt_20200101_120000_123456_senderTz_to_connTz = preserveInstants
+                                                && !(connectionTZ == null || "LOCAL".equals(connectionTZ))
+                                                        ? zdt_20200101_120000_123456_at_senderTz.withZoneSameInstant(connTz.toZoneId())
+                                                        : zdt_20200101_120000_123456_at_senderTz;
+
+                                        ZonedDateTime zdt_20200101_120000_123456_on_wire = (sendFractionalSeconds ? zdt_20200101_120000_123456_at_senderTz
+                                                : zdt_20200101_120000_123456_at_senderTz.withNano(0)).withZoneSameLocal(sessionTz.toZoneId());
+                                        ZonedDateTime zdt_no_date_120000_123456_on_wire = LocalDate.now(sessionTz.toZoneId())
+                                                .atTime((sendFractionalSeconds ? zdt_20200101_120000_123456_at_senderTz
+                                                        : zdt_20200101_120000_123456_at_senderTz.withNano(0)).toLocalTime())
+                                                .atZone(sessionTz.toZoneId());
+                                        ZonedDateTime zdt_20200101_no_time_on_wire = zdt_20200101_120000_123456_on_wire.withHour(0).withMinute(0).withSecond(0)
+                                                .withNano(0);
+                                        ZonedDateTime zdt_TS_on_wire = (sendFractionalSeconds ? zdt_20200101_120000_123456_senderTz_to_connTz
+                                                : zdt_20200101_120000_123456_senderTz_to_connTz.withNano(0)).withZoneSameLocal(sessionTz.toZoneId());
+
+                                        String expYear = zdt_20200101_120000_123456_on_wire.format(YEAR_FORMATTER);
+                                        String expYearDef = zdt_no_date_120000_123456_on_wire.format(YEAR_FORMATTER);
+                                        String expYearTS = zdt_TS_on_wire.format(YEAR_FORMATTER);
+
+                                        String expDate = zdt_20200101_120000_123456_on_wire.format(TimeUtil.DATE_FORMATTER);
+                                        String expDateDef = zdt_no_date_120000_123456_on_wire
+                                                .format(useSSPS ? TimeUtil.DATE_FORMATTER : DateTimeFormatter.ofPattern("20HH-mm-ss"));
+                                        String expDateChar = serverConvertsTzForAllTypes
+                                                ? zdt_20200101_120000_123456_05_00.withZoneSameInstant(sessionTz.toZoneId()).format(TimeUtil.DATE_FORMATTER)
+                                                : zdt_20200101_120000_123456_05_00.format(TimeUtil.DATE_FORMATTER);
+                                        String expDateTS = zdt_TS_on_wire.format(TimeUtil.DATE_FORMATTER);
+
+                                        String expTimeNoMs = zdt_20200101_120000_123456_on_wire.format(TimeUtil.TIME_FORMATTER_NO_FRACT_NO_OFFSET);
+                                        String expTime = zdt_20200101_120000_123456_on_wire.format(timeFmt);
+                                        String expTime2 = serverConvertsTzForAllTypes
+                                                ? zdt_20200101_120000_123456_05_00.withZoneSameInstant(sessionTz.toZoneId()).format(timeFmt)
+                                                : zdt_20200101_120000_123456_05_00.format(timeFmt);
+                                        String expTimeTS = zdt_TS_on_wire.format(timeFmt);
+
+                                        String expDatetime = zdt_20200101_120000_123456_on_wire.format(dateTimeFmt);
+                                        String expDatetimeTS = zdt_TS_on_wire.format(dateTimeFmt);
+                                        String expDatetimeDef = LocalDate.now(sessionTz.toZoneId()).atTime(zdt_20200101_120000_123456_on_wire.toLocalTime())
+                                                .atZone(sessionTz.toZoneId())
+                                                .format(useSSPS ? dateTimeFmt : DateTimeFormatter.ofPattern("20HH-mm-ss 00:00:00"));
+                                        String expDatetimeNoTime = zdt_20200101_120000_123456_on_wire
+                                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd 00:00:00"));
+                                        String expDatetimeOff = zdt_20200101_120000_123456_05_00
+                                                .format(withFract && sendFractionalSeconds ? TimeUtil.DATETIME_FORMATTER_WITH_NANOS_WITH_OFFSET
+                                                        : TimeUtil.DATETIME_FORMATTER_NO_FRACT_WITH_OFFSET);
+
+                                        String expTimestamp = zdt_20200101_120000_123456_on_wire.withZoneSameInstant(tz_UTC.toZoneId()).format(dateTimeFmt);
+                                        String expTimestampTS = zdt_TS_on_wire.withZoneSameInstant(tz_UTC.toZoneId()).format(dateTimeFmt);
+                                        String expDefTimestamp = zdt_no_date_120000_123456_on_wire.withZoneSameInstant(tz_UTC.toZoneId()).format(dateTimeFmt);
+                                        String expTimestampNoTime = zdt_20200101_no_time_on_wire.withZoneSameInstant(tz_UTC.toZoneId()).format(dateTimeFmt);
+
+                                        String expDefUnixTs = zdt_no_date_120000_123456_on_wire.toEpochSecond()
+                                                + (zdt_no_date_120000_123456_on_wire.getNano() > 0
+                                                        ? "." + TimeUtil.formatNanos(zdt_no_date_120000_123456_on_wire.getNano(), 6)
+                                                        : "");
+                                        String expFullUnixTs = zdt_20200101_120000_123456_on_wire.toEpochSecond()
+                                                + (zdt_20200101_120000_123456_on_wire.getNano() > 0
+                                                        ? "." + TimeUtil.formatNanos(zdt_20200101_120000_123456_on_wire.getNano(), 6)
+                                                        : "");
+                                        String expFullUnixTsTS = zdt_TS_on_wire.toEpochSecond()
+                                                + (zdt_TS_on_wire.getNano() > 0 ? "." + TimeUtil.formatNanos(zdt_TS_on_wire.getNano(), 6) : "");
+                                        String expUnixTsFromDate = zdt_20200101_no_time_on_wire.toEpochSecond() + "";
+
+                                        /* Into YEAR field */
+
+                                        if (useSSPS && withFract) {
+
+                                            setObjectFromTz(props, tYear, zdt_20200101_120000_123456_05_00, null, senderTz, expYearTS);
+                                            setObjectFromTz(props, tYear, zdt_20200101_120000_123456_05_00, MysqlType.DATE, senderTz, expYear);
+                                            setObjectFromTz(props, tYear, zdt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz, expYearDef);
+                                            setObjectFromTz(props, tYear, zdt_20200101_120000_123456_05_00, MysqlType.DATETIME, senderTz, expYear);
+                                            setObjectFromTz(props, tYear, zdt_20200101_120000_123456_05_00, MysqlType.TIMESTAMP, senderTz, expYearTS);
+                                        } else {
+                                            assertThrows(props, tYear, zdt_20200101_120000_123456_05_00, null, senderTz, dataTruncatedErr);
+                                            assertThrows(props, tYear, zdt_20200101_120000_123456_05_00, MysqlType.DATE, senderTz, dataTruncatedErr);
+                                            assertThrows(props, tYear, zdt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz, dataTruncatedErr);
+                                            assertThrows(props, tYear, zdt_20200101_120000_123456_05_00, MysqlType.DATETIME, senderTz, dataTruncatedErr);
+                                            assertThrows(props, tYear, zdt_20200101_120000_123456_05_00, MysqlType.TIMESTAMP, senderTz, dataTruncatedErr);
+                                        }
+                                        assertThrows(props, tYear, zdt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, zdt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, zdt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, zdt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, zdt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz, dataTruncatedErr);
+                                        assertThrows(props, tYear, zdt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz, dataTruncatedErr);
+
+                                        setObjectFromTz(props, tYear, zdt_20200101_120000_123456_05_00, MysqlType.YEAR, senderTz, expYear);
+
+                                        /* Into DATE field */
+
+                                        setObjectFromTz(props, tDate, zdt_20200101_120000_123456_05_00, null, senderTz, expDateTS);
+                                        setObjectFromTz(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.DATE, senderTz, expDate);
+                                        if (allowsOffset) {
+                                            setObjectFromTz(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz, expDateChar);
+                                            setObjectFromTz(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz, expDateChar);
+                                            setObjectFromTz(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz, expDateChar);
+                                            setObjectFromTz(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz, expDateChar);
+                                            setObjectFromTz(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz, expDateChar);
+                                            setObjectFromTz(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz, expDateChar);
+                                        } else {
+                                            assertThrows(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz,
+                                                    incorrectDateErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz,
+                                                    incorrectDateErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz,
+                                                    incorrectDateErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz,
+                                                    incorrectDateErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz,
+                                                    incorrectDateErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz,
+                                                    incorrectDateErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                        }
+                                        if (useSSPS) {
+                                            if (withFract) {
+                                                setObjectFromTz(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz, expDateDef);
+                                            } else {
+                                                assertThrows(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz, dataTruncatedErr);
+                                            }
+                                        } else {
+                                            assertThrows(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz,
+                                                    incorrectDateErr.replace("X", expTime));
+                                        }
+                                        setObjectFromTz(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.DATETIME, senderTz, expDate);
+                                        setObjectFromTz(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.TIMESTAMP, senderTz, expDateTS);
+
+                                        assertThrows(props, tDate, zdt_20200101_120000_123456_05_00, MysqlType.YEAR, senderTz,
+                                                incorrectDateErr.replace("X", expYear));
+
+                                        /* Into TIME field */
+
+                                        setObjectFromTz(props, tTime, zdt_20200101_120000_123456_05_00, null, senderTz, expTimeTS);
+                                        if (useSSPS) {
+                                            setObjectFromTz(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.DATE, senderTz, s_000000_000000);
+                                        } else {
+                                            assertThrows(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.DATE, senderTz,
+                                                    incorrectTimeErr.replace("X", expDate));
+                                        }
+                                        if (allowsOffset) {
+                                            setObjectFromTz(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz, expTime2);
+                                            setObjectFromTz(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz, expTime2);
+                                            setObjectFromTz(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz, expTime2);
+                                            setObjectFromTz(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz, expTime2);
+                                            setObjectFromTz(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz, expTime2);
+                                            setObjectFromTz(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz, expTime2);
+                                        } else {
+                                            assertThrows(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz,
+                                                    incorrectTimeErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz,
+                                                    incorrectTimeErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz,
+                                                    incorrectTimeErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz,
+                                                    incorrectTimeErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz,
+                                                    incorrectTimeErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz,
+                                                    incorrectTimeErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                        }
+                                        setObjectFromTz(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz, expTime);
+                                        setObjectFromTz(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.DATETIME, senderTz, expTime);
+                                        setObjectFromTz(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.TIMESTAMP, senderTz, expTimeTS);
+                                        setObjectFromTz(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.YEAR, senderTz, expYear); // TIME takes numbers as a short notation, thus it works here
+                                        setObjectFromTz(props, tTime, zdt_20200101_120000_123456_05_00, MysqlType.YEAR, senderTz,
+                                                "00:" + expYear.substring(0, 2) + ":" + expYear.substring(2)); // TIME takes numbers as a short notation, thus it works here
+
+                                        /* Into DATETIME field */
+
+                                        String expDatetimeExt = zdt_20200101_120000_123456_05_00.withZoneSameInstant(sessionTz.toZoneId()).format(dateTimeFmt);
+
+                                        setObjectFromTz(props, tDatetime, zdt_20200101_120000_123456_05_00, null, senderTz, expDatetimeTS);
+                                        setObjectFromTz(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.DATE, senderTz, expDatetimeNoTime);
+                                        if (allowsOffset) {
+                                            setObjectFromTz(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz, expDatetimeExt);
+                                            setObjectFromTz(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz, expDatetimeExt);
+                                            setObjectFromTz(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz, expDatetimeExt);
+                                            setObjectFromTz(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz, expDatetimeExt);
+                                            setObjectFromTz(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz, expDatetimeExt);
+                                            setObjectFromTz(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz, expDatetimeExt);
+                                        } else {
+                                            assertThrows(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                        }
+                                        if (useSSPS) {
+                                            if (withFract) {
+                                                setObjectFromTz(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz, expDatetimeDef);
+                                            } else {
+                                                assertThrows(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz, dataTruncatedErr);
+                                            }
+                                        } else {
+                                            assertThrows(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expTime));
+                                        }
+                                        setObjectFromTz(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.DATETIME, senderTz, expDatetime);
+                                        setObjectFromTz(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.TIMESTAMP, senderTz, expDatetimeTS);
+                                        assertThrows(props, tDatetime, zdt_20200101_120000_123456_05_00, MysqlType.YEAR, senderTz,
+                                                incorrectDatetimeErr.replace("X", expYear));
+
+                                        /* Into TIMESTAMP field */
+
+                                        String expTimestampExt = zdt_20200101_120000_123456_05_00.withZoneSameInstant(tz_UTC.toZoneId()).format(dateTimeFmt);
+                                        String expFullUnixTsExt = zdt_20200101_120000_123456_05_00.toEpochSecond()
+                                                + (sendFractionalSeconds && zdt_20200101_120000_123456_05_00.getNano() > 0
+                                                        ? "." + TimeUtil.formatNanos(zdt_20200101_120000_123456_05_00.getNano(), 6)
+                                                        : "");
+
+                                        setObjectFromTz(props, tTimestamp, zdt_20200101_120000_123456_05_00, null, senderTz, expTimestampTS, expFullUnixTsTS);
+                                        setObjectFromTz(props, tTimestamp, zdt_20200101_120000_123456_05_00, MysqlType.DATE, senderTz, expTimestampNoTime,
+                                                expUnixTsFromDate);
+                                        if (allowsOffset) {
+                                            setObjectFromTz(props, tTimestamp, zdt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz, expTimestampExt,
+                                                    expFullUnixTsExt);
+                                            setObjectFromTz(props, tTimestamp, zdt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz, expTimestampExt,
+                                                    expFullUnixTsExt);
+                                            setObjectFromTz(props, tTimestamp, zdt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz, expTimestampExt,
+                                                    expFullUnixTsExt);
+                                            setObjectFromTz(props, tTimestamp, zdt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz, expTimestampExt,
+                                                    expFullUnixTsExt);
+                                            setObjectFromTz(props, tTimestamp, zdt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz,
+                                                    expTimestampExt, expFullUnixTsExt);
+                                            setObjectFromTz(props, tTimestamp, zdt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz, expTimestampExt,
+                                                    expFullUnixTsExt);
+                                        } else {
+                                            assertThrows(props, tTimestamp, zdt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tTimestamp, zdt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tTimestamp, zdt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tTimestamp, zdt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tTimestamp, zdt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                            assertThrows(props, tTimestamp, zdt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expDatetimeOff.replace("+", "\\+")));
+                                        }
+                                        if (useSSPS && withFract) {
+                                            setObjectFromTz(props, tTimestamp, zdt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz, expDefTimestamp,
+                                                    expDefUnixTs);
+                                        } else {
+                                            assertThrows(props, tTimestamp, zdt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz,
+                                                    incorrectDatetimeErr.replace("X", expTime));
+                                        }
+                                        setObjectFromTz(props, tTimestamp, zdt_20200101_120000_123456_05_00, MysqlType.DATETIME, senderTz, expTimestamp,
+                                                expFullUnixTs);
+                                        setObjectFromTz(props, tTimestamp, zdt_20200101_120000_123456_05_00, MysqlType.TIMESTAMP, senderTz, expTimestampTS,
+                                                expFullUnixTsTS);
+                                        assertThrows(props, tTimestamp, zdt_20200101_120000_123456_05_00, MysqlType.YEAR, senderTz,
+                                                incorrectDatetimeErr.replace("X", expYear));
+
+                                        /* Into VARCHAR field */
+
+                                        String expDatetime2 = useSSPS
+                                                ? zdt_20200101_120000_123456_on_wire.format(TimeUtil.DATETIME_FORMATTER_NO_FRACT_NO_OFFSET)
+                                                : expDatetime; // TODO milliseconds are ignored by server. Bug ?
+                                        String expDatetimeTS2 = useSSPS ? zdt_TS_on_wire.format(TimeUtil.DATETIME_FORMATTER_NO_FRACT_NO_OFFSET) : expDatetimeTS; // TODO milliseconds are ignored by server. Bug ?
+
+                                        expTime2 = useSSPS ? expTimeNoMs : expTime; // TODO milliseconds are ignored by server. Bug ?
+
+                                        setObjectFromTz(props, tVarchar, zdt_20200101_120000_123456_05_00, null, senderTz, expDatetimeTS2);
+                                        setObjectFromTz(props, tVarchar, zdt_20200101_120000_123456_05_00, MysqlType.DATETIME, senderTz, expDatetime2);
+                                        setObjectFromTz(props, tVarchar, zdt_20200101_120000_123456_05_00, MysqlType.TIMESTAMP, senderTz, expDatetimeTS2);
+                                        setObjectFromTz(props, tVarchar, zdt_20200101_120000_123456_05_00, MysqlType.TIME, senderTz, expTime2);
+                                        setObjectFromTz(props, tVarchar, zdt_20200101_120000_123456_05_00, MysqlType.DATE, senderTz, expDate);
+                                        setObjectFromTz(props, tVarchar, zdt_20200101_120000_123456_05_00, MysqlType.CHAR, senderTz, expDatetimeOff);
+                                        setObjectFromTz(props, tVarchar, zdt_20200101_120000_123456_05_00, MysqlType.VARCHAR, senderTz, expDatetimeOff);
+                                        setObjectFromTz(props, tVarchar, zdt_20200101_120000_123456_05_00, MysqlType.TINYTEXT, senderTz, expDatetimeOff);
+                                        setObjectFromTz(props, tVarchar, zdt_20200101_120000_123456_05_00, MysqlType.TEXT, senderTz, expDatetimeOff);
+                                        setObjectFromTz(props, tVarchar, zdt_20200101_120000_123456_05_00, MysqlType.MEDIUMTEXT, senderTz, expDatetimeOff);
+                                        setObjectFromTz(props, tVarchar, zdt_20200101_120000_123456_05_00, MysqlType.LONGTEXT, senderTz, expDatetimeOff);
+                                        setObjectFromTz(props, tVarchar, zdt_20200101_120000_123456_05_00, MysqlType.YEAR, senderTz, expYear);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    closeConnections();
+                }
+            } finally {
+                closeConnections();
+            }
+        }
+    }
+
+    @Test
+    public void testDurationSetters() throws Exception {
+        boolean withFract = versionMeetsMinimum(5, 6, 4); // fractional seconds are not supported in previous versions
+
+        createTable(tYear, "(id INT, d YEAR)");
+        createTable(tDate, "(id INT, d DATE)");
+        createTable(tTime, withFract ? "(id INT, d TIME(6))" : "(id INT, d TIME)");
+        createTable(tDatetime, withFract ? "(id INT, d DATETIME(6))" : "(id INT, d DATETIME)");
+        createTable(tTimestamp, withFract ? "(id INT, d TIMESTAMP(6))" : "(id INT, d TIMESTAMP)");
+        createTable(tVarchar, "(id INT, d VARCHAR(30))");
+
+        id = 0;
+
+        Properties props = new Properties();
+        props.setProperty(PropertyKey.sslMode.getKeyName(), "DISABLED");
+        props.setProperty(PropertyKey.allowPublicKeyRetrieval.getKeyName(), "true");
+        props.setProperty(PropertyKey.cacheDefaultTimeZone.getKeyName(), "false");
+
+        for (TimeZone senderTz : this.senderTimeZones) {
+            try {
+                for (String connectionTZ : this.connectionTimeZones) {
+                    initConnections(senderTz, connectionTZ);
+
+                    for (boolean forceConnectionTimeZoneToSession : new boolean[] { false, true }) {
+                        for (boolean preserveInstants : new boolean[] { false, true }) {
+                            for (boolean useSSPS : new boolean[] { false, true }) {
+                                for (boolean sendFractionalSeconds : new boolean[] { false, true }) {
+                                    for (boolean sendTimeFract : new boolean[] { false, true }) {
+
+                                        System.out.println("connTimeZone=" + connectionTZ + "; forceConnTimeZoneToSession=" + forceConnectionTimeZoneToSession
+                                                + "; preserveInstants=" + preserveInstants + "; useServerPrepStmts=" + useSSPS + "; sendFractSeconds="
+                                                + sendFractionalSeconds + "; sendFractSecondsForTime=" + sendTimeFract);
+
+                                        if (connectionTZ == null) {
+                                            props.remove(PropertyKey.connectionTimeZone.getKeyName());
+                                        } else {
+                                            props.setProperty(PropertyKey.connectionTimeZone.getKeyName(), connectionTZ);
+                                        }
+                                        props.setProperty(PropertyKey.forceConnectionTimeZoneToSession.getKeyName(), "" + forceConnectionTimeZoneToSession);
+                                        props.setProperty(PropertyKey.preserveInstants.getKeyName(), "" + preserveInstants);
+                                        props.setProperty(PropertyKey.useServerPrepStmts.getKeyName(), "" + useSSPS);
+                                        props.setProperty(PropertyKey.sendFractionalSecondsForTime.getKeyName(), "" + sendTimeFract);
+                                        props.setProperty(PropertyKey.sendFractionalSeconds.getKeyName(), "" + sendFractionalSeconds);
+
+                                        Duration dur_no_fract = Duration.parse("PT300H10M20S");
+                                        Duration dur_with_fract = Duration.parse("PT300H10M20.123S");
+                                        Duration dur = withFract ? dur_with_fract : dur_no_fract;
+                                        String expDur = TimeUtil.getDurationString(sendFractionalSeconds ? dur : dur_no_fract);
+                                        String expTime = TimeUtil.getDurationString(dur);
+
+                                        Duration neg_dur_no_fract = Duration.parse("-PT300H10M20S");
+                                        Duration neg_dur = withFract ? Duration.parse("-PT300H10M20.123S") : neg_dur_no_fract;
+                                        String expNegDur = TimeUtil.getDurationString(sendFractionalSeconds ? neg_dur : neg_dur_no_fract);
+                                        String expNegTime = TimeUtil.getDurationString(neg_dur);
+
+                                        /* Unsupported conversions */
+
+                                        assertThrows(props, tVarchar, dur, MysqlType.DATE, senderTz,
+                                                ".*Conversion from java.time.Duration to DATE is not supported.");
+                                        assertThrows(props, tVarchar, dur, MysqlType.DATETIME, senderTz,
+                                                ".*Conversion from java.time.Duration to DATETIME is not supported.");
+                                        assertThrows(props, tVarchar, dur, MysqlType.TIMESTAMP, senderTz,
+                                                ".*Conversion from java.time.Duration to TIMESTAMP is not supported.");
+                                        assertThrows(props, tVarchar, dur, MysqlType.YEAR, senderTz,
+                                                ".*Conversion from java.time.Duration to YEAR is not supported.");
+
+                                        /* Into TIME field */
+
+                                        setObjectFromTz(props, tTime, dur, null, senderTz, expDur);
+                                        setObjectFromTz(props, tTime, neg_dur, null, senderTz, expNegDur);
+                                        setObjectFromTz(props, tTime, dur, MysqlType.TIME, senderTz, expDur);
+                                        setObjectFromTz(props, tTime, neg_dur, MysqlType.TIME, senderTz, expNegDur);
+                                        setObjectFromTz(props, tTime, dur, MysqlType.CHAR, senderTz, expTime);
+                                        setObjectFromTz(props, tTime, neg_dur, MysqlType.CHAR, senderTz, expNegTime);
+                                        setObjectFromTz(props, tTime, dur, MysqlType.VARCHAR, senderTz, expTime);
+                                        setObjectFromTz(props, tTime, dur, MysqlType.TINYTEXT, senderTz, expTime);
+                                        setObjectFromTz(props, tTime, dur, MysqlType.TEXT, senderTz, expTime);
+                                        setObjectFromTz(props, tTime, dur, MysqlType.MEDIUMTEXT, senderTz, expTime);
+                                        setObjectFromTz(props, tTime, dur, MysqlType.LONGTEXT, senderTz, expTime);
+
+                                        /* Into VARCHAR field */
+
+                                        String expChar = expDur + (withFract && sendFractionalSeconds && useSSPS ? "000" : "");
+                                        String expChar2 = useSSPS ? TimeUtil.getDurationString(dur_no_fract) : expChar; // TODO milliseconds are ignored by server. Bug ?
+                                        String expNegChar = expNegDur + (withFract && sendFractionalSeconds && useSSPS ? "000" : "");
+                                        String expNegChar2 = useSSPS ? TimeUtil.getDurationString(neg_dur_no_fract) : expNegChar; // TODO milliseconds are ignored by server. Bug ?
+
+                                        setObjectFromTz(props, tVarchar, dur, null, senderTz, expChar2);
+                                        setObjectFromTz(props, tVarchar, neg_dur, null, senderTz, expNegChar2);
+                                        setObjectFromTz(props, tVarchar, dur, MysqlType.TIME, senderTz, expChar2);
+                                        setObjectFromTz(props, tVarchar, neg_dur, MysqlType.TIME, senderTz, expNegChar2);
+                                        setObjectFromTz(props, tVarchar, dur, MysqlType.CHAR, senderTz, expTime);
+                                        setObjectFromTz(props, tVarchar, neg_dur, MysqlType.CHAR, senderTz, expNegTime);
+                                        setObjectFromTz(props, tVarchar, dur, MysqlType.VARCHAR, senderTz, expTime);
+                                        setObjectFromTz(props, tVarchar, neg_dur, MysqlType.VARCHAR, senderTz, expNegTime);
+                                        setObjectFromTz(props, tVarchar, dur, MysqlType.TINYTEXT, senderTz, expTime);
+                                        setObjectFromTz(props, tVarchar, neg_dur, MysqlType.TINYTEXT, senderTz, expNegTime);
+                                        setObjectFromTz(props, tVarchar, dur, MysqlType.TEXT, senderTz, expTime);
+                                        setObjectFromTz(props, tVarchar, neg_dur, MysqlType.TEXT, senderTz, expNegTime);
+                                        setObjectFromTz(props, tVarchar, dur, MysqlType.MEDIUMTEXT, senderTz, expTime);
+                                        setObjectFromTz(props, tVarchar, neg_dur, MysqlType.MEDIUMTEXT, senderTz, expNegTime);
+                                        setObjectFromTz(props, tVarchar, dur, MysqlType.LONGTEXT, senderTz, expTime);
+                                        setObjectFromTz(props, tVarchar, neg_dur, MysqlType.LONGTEXT, senderTz, expNegTime);
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    closeConnections();
+                }
+            } finally {
+                closeConnections();
+            }
+        }
+    }
+
+    void assertThrows(Properties props, String tableName, Object parameter, SQLType targetSqlType, TimeZone senderTz, String err) throws Exception {
+        assertThrows(SQLException.class, err, () -> {
+            setObjectFromTz(props, tableName, parameter, targetSqlType, senderTz);
+            return null;
+        });
+    }
+
+    void assertThrows(Properties props, String tableName, Object parameter, SQLType targetSqlType, TimeZone senderTz, String expectedValue,
+            String expectedUnixTimestamp, UseMethod useMethod, String err) throws Exception {
+        assertThrows(SQLException.class, err, () -> {
+            setObjectFromTz(props, tableName, parameter, targetSqlType, senderTz, expectedValue, expectedUnixTimestamp, useMethod, null);
+            return null;
+        });
+    }
+
+    void assertThrows(Properties props, String tableName, Object parameter, SQLType targetSqlType, TimeZone senderTz, String expectedValue,
+            String expectedUnixTimestamp, UseMethod useMethod, Calendar calendar, String err) throws Exception {
+        assertThrows(SQLException.class, err, () -> {
+            setObjectFromTz(props, tableName, parameter, targetSqlType, senderTz, expectedValue, expectedUnixTimestamp, useMethod, calendar);
+            return null;
+        });
+    }
+
+    void setObjectFromTz(Properties props, String tableName, Object parameter, SQLType targetSqlType, TimeZone senderTz) throws Exception {
+        setObjectFromTz(props, tableName, parameter, targetSqlType, senderTz, null, null, UseMethod.setObject, null);
+    }
+
+    void setObjectFromTz(Properties props, String tableName, Object parameter, SQLType targetSqlType, TimeZone senderTz, String expectedUTCValue)
+            throws Exception {
+        setObjectFromTz(props, tableName, parameter, targetSqlType, senderTz, expectedUTCValue, null, UseMethod.setObject, null);
+    }
+
+    void setObjectFromTz(Properties props, String tableName, Object parameter, SQLType targetSqlType, TimeZone senderTz, String expectedUTCValue,
+            String expectedUnixTimestamp) throws Exception {
+        setObjectFromTz(props, tableName, parameter, targetSqlType, senderTz, expectedUTCValue, expectedUnixTimestamp, UseMethod.setObject, null);
+    }
+
+    void setObjectFromTz(Properties props, String tableName, Object parameter, SQLType targetSqlType, TimeZone senderTz, String expectedUTCValue,
+            String expectedUnixTimestamp, UseMethod useMethod) throws Exception {
+        setObjectFromTz(props, tableName, parameter, targetSqlType, senderTz, expectedUTCValue, expectedUnixTimestamp, useMethod, null);
+    }
+
+    void setObjectFromTz(Properties props, String tableName, Object parameter, SQLType targetSqlType, TimeZone senderTz, String expectedUTCValue,
+            String expectedUnixTimestamp, UseMethod useMethod, Calendar calendar) throws Exception {
+        if (props == null) {
+            props = new Properties();
+        }
+        final TimeZone origTz = TimeZone.getDefault();
+        try {
+            TimeZone.setDefault(senderTz);
+            Connection testConn = this.tzConnections.get(getKey(props));
+
+            id++;
+
+            PreparedStatement localPstmt = testConn.prepareStatement("INSERT INTO " + tableName + " VALUES (?, ?)");
+            localPstmt.setInt(1, id);
+            switch (useMethod) {
+                case setDate:
+                    if (calendar == null) {
+                        localPstmt.setDate(2, (Date) parameter);
+                    } else {
+                        localPstmt.setDate(2, (Date) parameter, calendar);
+                    }
+                    break;
+
+                case setTime:
+                    if (calendar == null) {
+                        localPstmt.setTime(2, (Time) parameter);
+                    } else {
+                        localPstmt.setTime(2, (Time) parameter, calendar);
+                    }
+                    break;
+
+                case setTimestamp:
+                    if (calendar == null) {
+                        localPstmt.setTimestamp(2, (Timestamp) parameter);
+                    } else {
+                        localPstmt.setTimestamp(2, (Timestamp) parameter, calendar);
+                    }
+                    break;
+
+                default:
+                    if (targetSqlType == null) {
+                        localPstmt.setObject(2, parameter);
+                    } else {
+                        localPstmt.setObject(2, parameter, targetSqlType);
+                    }
+                    break;
+            }
+            assertEquals(1, localPstmt.executeUpdate());
+            localPstmt.close();
+
+            if (expectedUTCValue != null) {
+                TimeZone.setDefault(tz_UTC);
+                testConn = this.utcConnections.get(getKey(props));
+                Statement localStmt = testConn.createStatement();
+                localStmt.execute("set @@time_zone='+00:00'");
+                String sql = "SELECT * FROM " + tableName + " WHERE id = " + id + " AND d = '" + expectedUTCValue + "'"
+                        + (expectedUnixTimestamp != null ? " AND unix_timestamp(d) = " + expectedUnixTimestamp : "");
+                ResultSet localRs = localStmt.executeQuery(sql);
+                assertTrue(localRs.next(), parameter + "\n" + targetSqlType + "\n" + senderTz + "\n" + useMethod + "\n" + sql);
+                localStmt.close();
+            }
+        } finally {
+            TimeZone.setDefault(origTz);
+        }
+    }
+
+    @Test
+    public void testDateGetters() throws Exception {
+        createTable(tDate, "(d DATE)");
+        this.stmt.executeUpdate("INSERT INTO " + tDate + " VALUES ('2020-01-01'), ('2019-12-31')");
+
+        Calendar cal_05 = Calendar.getInstance(tz_plus_05_00);
+
+        Properties props = new Properties();
+        props.setProperty(PropertyKey.sslMode.getKeyName(), "DISABLED");
+        props.setProperty(PropertyKey.allowPublicKeyRetrieval.getKeyName(), "true");
+        props.setProperty(PropertyKey.cacheDefaultTimeZone.getKeyName(), "false");
+
+        final TimeZone origTz = TimeZone.getDefault();
+        try {
+            for (TimeZone tz : this.senderTimeZones) {
+                for (String connectionTZ : this.connectionTimeZones) {
+                    for (boolean forceConnectionTimeZoneToSession : new boolean[] { false, true }) {
+                        for (boolean preserveInstants : new boolean[] { false, true }) {
+                            for (boolean useSSPS : new boolean[] { false, true }) {
+                                for (boolean sendFractionalSeconds : new boolean[] { false, true }) {
+                                    for (boolean sendTimeFract : new boolean[] { false, true }) {
+
+                                        System.out.println("connTimeZone=" + connectionTZ + "; forceConnTimeZoneToSession=" + forceConnectionTimeZoneToSession
+                                                + "; preserveInstants=" + preserveInstants + "; useServerPrepStmts=" + useSSPS + "; sendFractSeconds="
+                                                + sendFractionalSeconds + "; sendFractSecondsForTime=" + sendTimeFract);
+
+                                        if (connectionTZ == null) {
+                                            props.remove(PropertyKey.connectionTimeZone.getKeyName());
+                                        } else {
+                                            props.setProperty(PropertyKey.connectionTimeZone.getKeyName(), connectionTZ);
+                                        }
+                                        props.setProperty(PropertyKey.forceConnectionTimeZoneToSession.getKeyName(), "" + forceConnectionTimeZoneToSession);
+                                        props.setProperty(PropertyKey.preserveInstants.getKeyName(), "" + preserveInstants);
+                                        props.setProperty(PropertyKey.useServerPrepStmts.getKeyName(), "" + useSSPS);
+                                        props.setProperty(PropertyKey.sendFractionalSecondsForTime.getKeyName(), "" + sendTimeFract);
+                                        props.setProperty(PropertyKey.sendFractionalSeconds.getKeyName(), "" + sendFractionalSeconds);
+
+                                        TimeZone.setDefault(tz);
+                                        ZoneId currZoneId = ZoneId.of(tz.getID());
+
+                                        Connection testConn = getConnectionWithProps(timeZoneFreeDbUrl, props);
+                                        this.rs = testConn.createStatement().executeQuery("select * from " + tDate);
+
+                                        assertTrue(this.rs.next());
+                                        Instant exp_instant_tz = ldt_20200101_0000.atZone(currZoneId).toInstant();
+                                        Instant exp_instant_05 = ldt_20200101_0000.atOffset(ZoneOffset.ofHours(5)).toInstant();
+
+                                        Calendar exp_cal = Calendar.getInstance(tz);
+                                        exp_cal.set(2020, 0, 1, 0, 0, 0);
+                                        exp_cal.set(Calendar.MILLISECOND, 0);
+                                        exp_cal.setLenient(false);
+
+                                        assertEquals(java.util.Date.from(exp_instant_tz), this.rs.getDate(1));
+                                        assertEquals(java.util.Date.from(exp_instant_05), this.rs.getDate(1, cal_05));
+                                        assertEquals(java.sql.Time.valueOf(lt_000000), this.rs.getTime(1));
+                                        assertEquals(java.util.Date.from(lt_000000.atOffset(ZoneOffset.ofHours(5)).atDate(ld_19700101).toInstant()),
+                                                this.rs.getTime(1, cal_05));
+                                        assertEquals(java.sql.Timestamp.from(exp_instant_tz), this.rs.getTimestamp(1));
+                                        assertEquals(java.sql.Timestamp.from(exp_instant_05), this.rs.getTimestamp(1, cal_05));
+                                        assertEquals(java.util.Date.from(exp_instant_tz), this.rs.getObject(1));
+                                        assertEquals(java.util.Date.from(exp_instant_tz), this.rs.getObject(1, java.sql.Date.class));
+                                        assertEquals(java.sql.Time.valueOf(lt_000000), this.rs.getObject(1, java.sql.Time.class));
+                                        assertEquals(java.sql.Timestamp.from(exp_instant_tz), this.rs.getObject(1, java.sql.Timestamp.class));
+                                        assertEquals(java.util.Date.from(exp_instant_tz), this.rs.getObject(1, java.util.Date.class));
+                                        assertEquals(exp_cal, this.rs.getObject(1, java.util.Calendar.class));
+                                        assertEquals(ld_20200101, this.rs.getObject(1, LocalDate.class));
+                                        assertEquals(lt_000000, this.rs.getObject(1, LocalTime.class));
+                                        assertEquals(ldt_20200101_0000, this.rs.getObject(1, LocalDateTime.class));
+                                        assertEquals(ldt_20200101_0000.atZone(currZoneId).toOffsetDateTime().toOffsetTime(),
+                                                this.rs.getObject(1, OffsetTime.class));
+                                        assertEquals(ldt_20200101_0000.atZone(currZoneId).toOffsetDateTime(), this.rs.getObject(1, OffsetDateTime.class));
+                                        assertEquals(ldt_20200101_0000.atZone(currZoneId), this.rs.getObject(1, ZonedDateTime.class));
+                                        assertEquals(s_20200101, this.rs.getString(1));
+                                        assertThrows(SQLException.class,
+                                                Messages.getString("ResultSet.UnsupportedConversion", new Object[] { "DATE", Duration.class.getName() }),
+                                                () -> {
+                                                    this.rs.getObject(1, Duration.class);
+                                                    return null;
+                                                });
+
+                                        assertTrue(this.rs.next());
+                                        exp_instant_tz = ldt_20191231_0000.atZone(currZoneId).toInstant();
+                                        exp_instant_05 = ldt_20191231_0000.atOffset(ZoneOffset.ofHours(5)).toInstant();
+
+                                        exp_cal = Calendar.getInstance(tz);
+                                        exp_cal.set(2019, 11, 31, 0, 0, 0);
+                                        exp_cal.set(Calendar.MILLISECOND, 0);
+                                        exp_cal.setLenient(false);
+
+                                        assertEquals(java.util.Date.from(exp_instant_tz), this.rs.getDate(1));
+                                        assertEquals(java.util.Date.from(exp_instant_05), this.rs.getDate(1, cal_05));
+                                        assertEquals(java.sql.Time.valueOf(lt_000000), this.rs.getTime(1));
+                                        assertEquals(java.util.Date.from(lt_000000.atOffset(ZoneOffset.ofHours(5)).atDate(ld_19700101).toInstant()),
+                                                this.rs.getTime(1, cal_05));
+                                        assertEquals(java.sql.Timestamp.from(exp_instant_tz), this.rs.getTimestamp(1));
+                                        assertEquals(java.sql.Timestamp.from(exp_instant_05), this.rs.getTimestamp(1, cal_05));
+                                        assertEquals(java.util.Date.from(exp_instant_tz), this.rs.getObject(1));
+                                        assertEquals(java.util.Date.from(exp_instant_tz), this.rs.getObject(1, java.sql.Date.class));
+                                        assertEquals(java.sql.Time.valueOf(lt_000000), this.rs.getObject(1, java.sql.Time.class));
+                                        assertEquals(java.sql.Timestamp.from(exp_instant_tz), this.rs.getObject(1, java.sql.Timestamp.class));
+                                        assertEquals(java.util.Date.from(exp_instant_tz), this.rs.getObject(1, java.util.Date.class));
+                                        assertEquals(exp_cal, this.rs.getObject(1, java.util.Calendar.class));
+                                        assertEquals(ld_20191231, this.rs.getObject(1, LocalDate.class));
+                                        assertEquals(lt_000000, this.rs.getObject(1, LocalTime.class));
+                                        assertEquals(ldt_20191231_0000, this.rs.getObject(1, LocalDateTime.class));
+                                        assertEquals(ldt_20191231_0000.atZone(currZoneId).toOffsetDateTime().toOffsetTime(),
+                                                this.rs.getObject(1, OffsetTime.class));
+                                        assertEquals(ldt_20191231_0000.atZone(currZoneId).toOffsetDateTime(), this.rs.getObject(1, OffsetDateTime.class));
+                                        assertEquals(ldt_20191231_0000.atZone(currZoneId), this.rs.getObject(1, ZonedDateTime.class));
+                                        assertEquals(s_20191231, this.rs.getString(1));
+
+                                        testConn.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } finally {
+            TimeZone.setDefault(origTz);
+        }
+    }
+
+    @Test
+    public void testTimeGetters() throws Exception {
+        boolean withFract = versionMeetsMinimum(5, 6, 4); // fractional seconds are not supported in previous versions
+
+        String dur1 = withFract ? "300:10:20.012300" : "300:10:20";
+        String dur2 = withFract ? "-300:10:20.012300" : "-300:10:20";
+
+        createTable(tTime, withFract ? "(d TIME(6))" : "(d TIME)");
+        this.stmt.executeUpdate("INSERT INTO " + tTime + " VALUES ('" + lt_120000_123456.toString() + "')");
+        this.stmt.executeUpdate("INSERT INTO " + tTime + " VALUES ('" + dur1 + "')");
+        this.stmt.executeUpdate("INSERT INTO " + tTime + " VALUES ('" + dur2 + "')");
+
+        Calendar cal_05 = Calendar.getInstance(tz_plus_05_00);
+
+        Properties props = new Properties();
+        props.setProperty(PropertyKey.sslMode.getKeyName(), "DISABLED");
+        props.setProperty(PropertyKey.allowPublicKeyRetrieval.getKeyName(), "true");
+        props.setProperty(PropertyKey.cacheDefaultTimeZone.getKeyName(), "false");
+
+        final TimeZone origTz = TimeZone.getDefault();
+        try {
+            for (TimeZone tz : this.senderTimeZones) {
+                for (String connectionTZ : this.connectionTimeZones) {
+                    for (boolean forceConnectionTimeZoneToSession : new boolean[] { false, true }) {
+                        for (boolean preserveInstants : new boolean[] { false, true }) {
+                            for (boolean useSSPS : new boolean[] { false, true }) {
+                                for (boolean sendFractionalSeconds : new boolean[] { false, true }) {
+                                    for (boolean sendTimeFract : new boolean[] { false, true }) {
+
+                                        System.out.println("connTimeZone=" + connectionTZ + "; forceConnTimeZoneToSession=" + forceConnectionTimeZoneToSession
+                                                + "; preserveInstants=" + preserveInstants + "; useServerPrepStmts=" + useSSPS + "; sendFractSeconds="
+                                                + sendFractionalSeconds + "; sendFractSecondsForTime=" + sendTimeFract);
+
+                                        if (connectionTZ == null) {
+                                            props.remove(PropertyKey.connectionTimeZone.getKeyName());
+                                        } else {
+                                            props.setProperty(PropertyKey.connectionTimeZone.getKeyName(), connectionTZ);
+                                        }
+                                        props.setProperty(PropertyKey.forceConnectionTimeZoneToSession.getKeyName(), "" + forceConnectionTimeZoneToSession);
+                                        props.setProperty(PropertyKey.preserveInstants.getKeyName(), "" + preserveInstants);
+                                        props.setProperty(PropertyKey.useServerPrepStmts.getKeyName(), "" + useSSPS);
+                                        props.setProperty(PropertyKey.sendFractionalSecondsForTime.getKeyName(), "" + sendTimeFract);
+                                        props.setProperty(PropertyKey.sendFractionalSeconds.getKeyName(), "" + sendFractionalSeconds);
+
+                                        TimeZone.setDefault(tz);
+                                        ZoneId currZoneId = ZoneId.of(tz.getID());
+
+                                        Connection testConn = getConnectionWithProps(timeZoneFreeDbUrl, props);
+                                        this.rs = testConn.createStatement().executeQuery("select * from " + tTime);
+                                        assertTrue(this.rs.next());
+
+                                        LocalDateTime exp_ldt = withFract ? ldt_19700101_120000_123456 : ldt_19700101_120000_123456.withNano(0);
+                                        LocalTime exp_lt = withFract ? lt_120000_123456 : lt_120000;
+
+                                        Instant exp_instant_tz = exp_ldt.atZone(currZoneId).toInstant();
+                                        Instant exp_instant_05 = exp_ldt.atOffset(ZoneOffset.ofHours(5)).toInstant();
+
+                                        Calendar exp_cal = Calendar.getInstance(tz);
+                                        exp_cal.clear();
+                                        exp_cal.set(Calendar.HOUR_OF_DAY, 12);
+                                        exp_cal.set(Calendar.MILLISECOND, withFract ? 123 : 0);
+                                        exp_cal.setLenient(false);
+
+                                        assertEquals(java.sql.Date.valueOf(ld_19700101), this.rs.getDate(1));
+                                        assertEquals(java.sql.Date.valueOf(ld_19700101), this.rs.getDate(1, cal_05));
+                                        assertEquals(java.util.Date.from(exp_instant_tz), this.rs.getTime(1));
+                                        assertEquals(java.util.Date.from(exp_instant_05), this.rs.getTime(1, cal_05));
+                                        assertEquals(java.sql.Timestamp.from(exp_instant_tz), this.rs.getTimestamp(1));
+                                        assertEquals(java.sql.Timestamp.from(exp_instant_05), this.rs.getTimestamp(1, cal_05));
+                                        assertEquals(java.util.Date.from(exp_instant_tz), this.rs.getObject(1));
+                                        assertEquals(java.sql.Date.valueOf(ld_19700101), this.rs.getObject(1, java.sql.Date.class));
+                                        assertEquals(java.util.Date.from(exp_instant_tz), this.rs.getObject(1, java.sql.Time.class));
+                                        assertEquals(java.sql.Timestamp.from(exp_instant_tz), this.rs.getObject(1, java.sql.Timestamp.class));
+                                        assertEquals(java.util.Date.from(exp_instant_tz), this.rs.getObject(1, java.util.Date.class));
+                                        assertEquals(exp_cal, this.rs.getObject(1, java.util.Calendar.class));
+                                        assertEquals(ld_19700101, this.rs.getObject(1, LocalDate.class));
+                                        assertEquals(exp_lt, this.rs.getObject(1, LocalTime.class));
+                                        assertEquals(exp_ldt, this.rs.getObject(1, LocalDateTime.class));
+                                        assertEquals(exp_ldt.atZone(currZoneId).toOffsetDateTime().toOffsetTime(), this.rs.getObject(1, OffsetTime.class));
+                                        assertEquals(exp_ldt.atZone(currZoneId).toOffsetDateTime(), this.rs.getObject(1, OffsetDateTime.class));
+                                        assertEquals(exp_ldt.atZone(currZoneId), this.rs.getObject(1, ZonedDateTime.class));
+                                        assertEquals(withFract ? s_120000_123456 : s_120000, this.rs.getString(1));
+
+                                        assertTrue(this.rs.next());
+                                        assertEquals(java.sql.Date.valueOf(ld_19700101), this.rs.getDate(1));
+                                        assertEquals(java.sql.Date.valueOf(ld_19700101), this.rs.getDate(1, cal_05));
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur1 }), () -> {
+                                            this.rs.getTime(1);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur1 }), () -> {
+                                            this.rs.getTime(1, cal_05);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur1 }), () -> {
+                                            this.rs.getTimestamp(1);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur1 }), () -> {
+                                            this.rs.getTimestamp(1, cal_05);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur1 }), () -> {
+                                            this.rs.getObject(1);
+                                            return null;
+                                        });
+                                        assertEquals(java.sql.Date.valueOf(ld_19700101), this.rs.getObject(1, java.sql.Date.class));
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur1 }), () -> {
+                                            this.rs.getObject(1, java.sql.Time.class);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur1 }), () -> {
+                                            this.rs.getObject(1, java.sql.Timestamp.class);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur1 }), () -> {
+                                            this.rs.getObject(1, java.util.Date.class);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur1 }), () -> {
+                                            this.rs.getObject(1, java.util.Calendar.class);
+                                            return null;
+                                        });
+                                        assertEquals(ld_19700101, this.rs.getObject(1, LocalDate.class));
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur1 }), () -> {
+                                            this.rs.getObject(1, LocalTime.class);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur1 }), () -> {
+                                            this.rs.getObject(1, LocalDateTime.class);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur1 }), () -> {
+                                            this.rs.getObject(1, OffsetTime.class);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur1 }), () -> {
+                                            this.rs.getObject(1, OffsetDateTime.class);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur1 }), () -> {
+                                            this.rs.getObject(1, ZonedDateTime.class);
+                                            return null;
+                                        });
+                                        assertEquals(Duration.parse(withFract ? "PT300H10M20.123S" : "PT300H10M20S"), this.rs.getObject(1, Duration.class));
+                                        assertEquals(dur1, this.rs.getString(1));
+
+                                        assertTrue(this.rs.next());
+                                        assertEquals(java.sql.Date.valueOf(ld_19700101), this.rs.getDate(1));
+                                        assertEquals(java.sql.Date.valueOf(ld_19700101), this.rs.getDate(1, cal_05));
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur2 }), () -> {
+                                            DateTimeTest.this.rs.getTime(1);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur2 }), () -> {
+                                            this.rs.getTime(1, cal_05);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur2 }), () -> {
+                                            this.rs.getTimestamp(1);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur2 }), () -> {
+                                            this.rs.getTimestamp(1, cal_05);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur2 }), () -> {
+                                            this.rs.getObject(1);
+                                            return null;
+                                        });
+                                        assertEquals(java.sql.Date.valueOf(ld_19700101), this.rs.getObject(1, java.sql.Date.class));
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur2 }), () -> {
+                                            this.rs.getObject(1, java.sql.Time.class);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur2 }), () -> {
+                                            this.rs.getObject(1, java.sql.Timestamp.class);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur2 }), () -> {
+                                            this.rs.getObject(1, java.util.Date.class);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur2 }), () -> {
+                                            this.rs.getObject(1, java.util.Calendar.class);
+                                            return null;
+                                        });
+                                        assertEquals(ld_19700101, this.rs.getObject(1, LocalDate.class));
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur2 }), () -> {
+                                            this.rs.getObject(1, LocalTime.class);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur2 }), () -> {
+                                            this.rs.getObject(1, LocalDateTime.class);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur2 }), () -> {
+                                            this.rs.getObject(1, OffsetTime.class);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur2 }), () -> {
+                                            this.rs.getObject(1, OffsetDateTime.class);
+                                            return null;
+                                        });
+                                        assertThrows(SQLException.class, Messages.getString("ResultSet.InvalidTimeValue", new Object[] { dur2 }), () -> {
+                                            this.rs.getObject(1, ZonedDateTime.class);
+                                            return null;
+                                        });
+                                        assertEquals(Duration.parse(withFract ? "-PT300H10M20.123S" : "-PT300H10M20S"), this.rs.getObject(1, Duration.class));
+                                        assertEquals(dur2, this.rs.getString(1));
+
+                                        testConn.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } finally {
+            TimeZone.setDefault(origTz);
+        }
+    }
+
+    @Test
+    public void testTimestampGetters() throws Exception {
+        boolean withFract = versionMeetsMinimum(5, 6, 4); // fractional seconds are not supported in previous versions
+
+        OffsetDateTime orig_UTC = OffsetDateTime.of(2019, 12, 31, 22, 0, 0, withFract ? 123456000 : 0, ZoneOffset.UTC);
+
+        createTable(tTimestamp, withFract ? "(d TIMESTAMP(6))" : "(d TIMESTAMP)");
+
+        DateTimeFormatter dateTimeFmt = withFract ? DATETIME_FORMATTER_WITH_MICROS_NO_OFFCET : TimeUtil.DATETIME_FORMATTER_NO_FRACT_NO_OFFSET;
+
+        Calendar cal_05 = Calendar.getInstance(tz_plus_05_00);
+
+        Properties props = new Properties();
+        props.setProperty(PropertyKey.sslMode.getKeyName(), "DISABLED");
+        props.setProperty(PropertyKey.allowPublicKeyRetrieval.getKeyName(), "true");
+        props.setProperty(PropertyKey.cacheDefaultTimeZone.getKeyName(), "false");
+        props.setProperty(PropertyKey.cacheDefaultTimeZone.getKeyName(), "false");
+        props.setProperty(PropertyKey.connectionTimeZone.getKeyName(), "SERVER");
+
+        TimeZone serverTz;
+        try (Connection testConn = getConnectionWithProps(timeZoneFreeDbUrl, props)) {
+            this.pstmt = testConn.prepareStatement("INSERT INTO " + tTimestamp + " VALUES (?)");
+            this.pstmt.setObject(1, orig_UTC);
+            this.pstmt.execute();
+            serverTz = ((MysqlConnection) testConn).getSession().getServerSession().getSessionTimeZone();
+        }
+
+        final TimeZone origTz = TimeZone.getDefault();
+        try {
+            for (TimeZone clientTz : this.senderTimeZones) {
+                for (String connectionTZ : this.connectionTimeZones) {
+                    for (boolean forceConnectionTimeZoneToSession : new boolean[] { false, true }) {
+                        for (boolean preserveInstants : new boolean[] { false, true }) {
+                            for (boolean useSSPS : new boolean[] { false, true }) {
+                                for (boolean sendFractionalSeconds : new boolean[] { false, true }) {
+                                    for (boolean sendTimeFract : new boolean[] { false, true }) {
+
+                                        System.out.println("connTimeZone=" + connectionTZ + "; forceConnTimeZoneToSession=" + forceConnectionTimeZoneToSession
+                                                + "; preserveInstants=" + preserveInstants + "; useServerPrepStmts=" + useSSPS + "; sendFractSeconds="
+                                                + sendFractionalSeconds + "; sendFractSecondsForTime=" + sendTimeFract);
+
+                                        if (connectionTZ == null) {
+                                            props.remove(PropertyKey.connectionTimeZone.getKeyName());
+                                        } else {
+                                            props.setProperty(PropertyKey.connectionTimeZone.getKeyName(), connectionTZ);
+                                        }
+                                        props.setProperty(PropertyKey.forceConnectionTimeZoneToSession.getKeyName(), "" + forceConnectionTimeZoneToSession);
+                                        props.setProperty(PropertyKey.preserveInstants.getKeyName(), "" + preserveInstants);
+                                        props.setProperty(PropertyKey.useServerPrepStmts.getKeyName(), "" + useSSPS);
+                                        props.setProperty(PropertyKey.sendFractionalSecondsForTime.getKeyName(), "" + sendTimeFract);
+                                        props.setProperty(PropertyKey.sendFractionalSeconds.getKeyName(), "" + sendFractionalSeconds);
+
+                                        TimeZone.setDefault(clientTz);
+                                        ZoneId currZoneId = ZoneId.of(clientTz.getID());
+
+                                        Connection testConn = getConnectionWithProps(timeZoneFreeDbUrl, props);
+                                        this.rs = testConn.createStatement().executeQuery("select * from " + tTimestamp);
+                                        assertTrue(this.rs.next());
+
+                                        TimeZone connTz = connectionTZ == null || "LOCAL".equals(connectionTZ) ? clientTz
+                                                : "SERVER".equals(connectionTZ) ? serverTz : TimeZone.getTimeZone(connectionTZ);
+
+                                        TimeZone sessionTz = forceConnectionTimeZoneToSession ? connTz : serverTz;
+
+                                        ZonedDateTime exp_on_wire = orig_UTC.atZoneSameInstant(ZoneId.of(sessionTz.getID()));
+
+                                        ZonedDateTime exp_date = exp_on_wire.withHour(0).withNano(0).withZoneSameLocal(currZoneId);
+                                        Instant exp_date_with_cal = exp_on_wire.withHour(0).withNano(0).toOffsetDateTime()
+                                                .withOffsetSameLocal(ZoneOffset.ofHours(5)).toInstant();
+
+                                        ZonedDateTime exp_time = exp_on_wire.withYear(1970).withMonth(1).withDayOfMonth(1).withZoneSameLocal(currZoneId);
+                                        Instant exp_time_with_cal = exp_on_wire.withYear(1970).withMonth(1).withDayOfMonth(1).toOffsetDateTime()
+                                                .withOffsetSameLocal(ZoneOffset.ofHours(5)).toInstant();
+
+                                        ZonedDateTime exp_datetime = exp_on_wire.withZoneSameLocal(currZoneId);
+                                        ZonedDateTime exp_timestamp = preserveInstants
+                                                ? exp_on_wire.withZoneSameLocal(connTz.toZoneId()).withZoneSameInstant(currZoneId)
+                                                : exp_on_wire.withZoneSameLocal(currZoneId);
+
+                                        Instant exp_timestamp_with_cal = exp_on_wire.toOffsetDateTime().withOffsetSameLocal(ZoneOffset.ofHours(5)).toInstant();
+
+                                        ZonedDateTime exp_odt = exp_on_wire.withZoneSameLocal(preserveInstants ? connTz.toZoneId() : currZoneId);
+
+                                        Calendar exp_cal = Calendar.getInstance(preserveInstants ? connTz : clientTz);
+                                        exp_cal.set(exp_on_wire.getYear(), exp_on_wire.getMonthValue() - 1, exp_on_wire.getDayOfMonth(), exp_on_wire.getHour(),
+                                                exp_on_wire.getMinute(), exp_on_wire.getSecond());
+                                        exp_cal.set(Calendar.MILLISECOND, exp_on_wire.getNano() / 1000000);
+                                        exp_cal.setLenient(false);
+
+                                        assertEquals(java.util.Date.from(exp_date.toInstant()), this.rs.getDate(1));
+                                        assertEquals(java.util.Date.from(exp_date_with_cal), this.rs.getDate(1, cal_05));
+                                        assertEquals(java.util.Date.from(exp_time.toInstant()), this.rs.getTime(1));
+                                        assertEquals(java.util.Date.from(exp_time_with_cal), this.rs.getTime(1, cal_05));
+                                        assertEquals(java.sql.Timestamp.from(exp_timestamp.toInstant()), this.rs.getTimestamp(1));
+                                        assertEquals(java.sql.Timestamp.from(exp_timestamp_with_cal), this.rs.getTimestamp(1, cal_05));
+                                        assertEquals(java.sql.Timestamp.from(exp_timestamp.toInstant()), this.rs.getObject(1));
+                                        assertEquals(java.util.Date.from(exp_date.toInstant()), this.rs.getObject(1, java.sql.Date.class));
+                                        assertEquals(java.util.Date.from(exp_time.toInstant()), this.rs.getObject(1, java.sql.Time.class));
+                                        assertEquals(java.sql.Timestamp.from(exp_timestamp.toInstant()), this.rs.getObject(1, java.sql.Timestamp.class));
+                                        assertEquals(java.util.Date.from(exp_timestamp.toInstant()), this.rs.getObject(1, java.util.Date.class));
+                                        assertEquals(exp_cal, this.rs.getObject(1, java.util.Calendar.class));
+                                        assertEquals(exp_datetime.toLocalDate(), this.rs.getObject(1, LocalDate.class));
+                                        assertEquals(exp_time.toLocalTime(), this.rs.getObject(1, LocalTime.class));
+                                        assertEquals(exp_datetime.toLocalDateTime(), this.rs.getObject(1, LocalDateTime.class));
+                                        assertEquals(exp_datetime.toOffsetDateTime().toOffsetTime(), this.rs.getObject(1, OffsetTime.class));
+                                        assertEquals(exp_odt.toOffsetDateTime(), this.rs.getObject(1, OffsetDateTime.class));
+                                        assertEquals(exp_odt, this.rs.getObject(1, ZonedDateTime.class));
+                                        assertEquals(exp_on_wire.toLocalDateTime().format(dateTimeFmt), this.rs.getString(1));
+                                        assertThrows(SQLException.class,
+                                                Messages.getString("ResultSet.UnsupportedConversion", new Object[] { "TIMESTAMP", Duration.class.getName() }),
+                                                () -> {
+                                                    this.rs.getObject(1, Duration.class);
+                                                    return null;
+                                                });
+
+                                        testConn.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } finally {
+            TimeZone.setDefault(origTz);
+        }
+    }
+
+    @Test
+    public void testDatetimeGetters() throws Exception {
+        boolean withFract = versionMeetsMinimum(5, 6, 4); // fractional seconds are not supported in previous versions
+        LocalDateTime ldt_20200101_020000_123456 = LocalDateTime.of(2020, 1, 1, 2, 0, 0, withFract ? 123456000 : 0);
+        DateTimeFormatter dateTimeFmt = withFract ? DATETIME_FORMATTER_WITH_MICROS_NO_OFFCET : TimeUtil.DATETIME_FORMATTER_NO_FRACT_NO_OFFSET;
+        OffsetDateTime orig_UTC = OffsetDateTime.of(2020, 1, 1, 2, 0, 0, withFract ? 123456000 : 0, ZoneOffset.UTC);
+
+        Calendar cal_05 = Calendar.getInstance(tz_plus_05_00);
+
+        createTable(tDatetime, withFract ? "(d DATETIME(6))" : "(d DATETIME)");
+        this.stmt.executeUpdate("INSERT INTO " + tDatetime + " VALUES ('" + ldt_20200101_020000_123456.toString() + "')");
+
+        Properties props = new Properties();
+        props.setProperty(PropertyKey.sslMode.getKeyName(), "DISABLED");
+        props.setProperty(PropertyKey.allowPublicKeyRetrieval.getKeyName(), "true");
+        props.setProperty(PropertyKey.cacheDefaultTimeZone.getKeyName(), "false");
+        props.setProperty(PropertyKey.cacheDefaultTimeZone.getKeyName(), "false");
+        props.setProperty(PropertyKey.connectionTimeZone.getKeyName(), "SERVER");
+
+        TimeZone serverTz;
+        try (Connection testConn = getConnectionWithProps(timeZoneFreeDbUrl, props)) {
+            serverTz = ((MysqlConnection) testConn).getSession().getServerSession().getSessionTimeZone();
+        }
+
+        final TimeZone origTz = TimeZone.getDefault();
+        try {
+            for (TimeZone clientTz : this.senderTimeZones) {
+                for (String connectionTZ : this.connectionTimeZones) {
+                    for (boolean forceConnectionTimeZoneToSession : new boolean[] { false, true }) {
+                        for (boolean preserveInstants : new boolean[] { false, true }) {
+                            for (boolean useSSPS : new boolean[] { false, true }) {
+                                for (boolean sendFractionalSeconds : new boolean[] { false, true }) {
+                                    for (boolean sendTimeFract : new boolean[] { false, true }) {
+
+                                        System.out.println("connTimeZone=" + connectionTZ + "; forceConnTimeZoneToSession=" + forceConnectionTimeZoneToSession
+                                                + "; preserveInstants=" + preserveInstants + "; useServerPrepStmts=" + useSSPS + "; sendFractSeconds="
+                                                + sendFractionalSeconds + "; sendFractSecondsForTime=" + sendTimeFract);
+
+                                        if (connectionTZ == null) {
+                                            props.remove(PropertyKey.connectionTimeZone.getKeyName());
+                                        } else {
+                                            props.setProperty(PropertyKey.connectionTimeZone.getKeyName(), connectionTZ);
+                                        }
+                                        props.setProperty(PropertyKey.forceConnectionTimeZoneToSession.getKeyName(), "" + forceConnectionTimeZoneToSession);
+                                        props.setProperty(PropertyKey.preserveInstants.getKeyName(), "" + preserveInstants);
+                                        props.setProperty(PropertyKey.useServerPrepStmts.getKeyName(), "" + useSSPS);
+                                        props.setProperty(PropertyKey.sendFractionalSecondsForTime.getKeyName(), "" + sendTimeFract);
+                                        props.setProperty(PropertyKey.sendFractionalSeconds.getKeyName(), "" + sendFractionalSeconds);
+
+                                        TimeZone.setDefault(clientTz);
+                                        ZoneId currZoneId = ZoneId.of(clientTz.getID());
+
+                                        Connection testConn = getConnectionWithProps(timeZoneFreeDbUrl, props);
+                                        this.rs = testConn.createStatement().executeQuery("select * from " + tDatetime);
+                                        assertTrue(this.rs.next());
+
+                                        Instant exp_date_instant_tz = ldt_20200101_0000.atZone(currZoneId).toInstant();
+                                        Instant exp_date_instant_05 = ldt_20200101_0000.atOffset(ZoneOffset.ofHours(5)).toInstant();
+
+                                        Instant exp_time_instant_tz = (withFract ? ldt_19700101_020000_123000 : ldt_19700101_020000_123000.withNano(0))
+                                                .atZone(currZoneId).toInstant();
+                                        Instant exp_time_instant_05 = (withFract ? ldt_19700101_020000_123000 : ldt_19700101_020000_123000.withNano(0))
+                                                .atOffset(ZoneOffset.ofHours(5)).toInstant();
+
+                                        Instant exp_timestamp_instant_05 = ldt_20200101_020000_123456.atOffset(ZoneOffset.ofHours(5)).toInstant();
+
+                                        TimeZone connTz = connectionTZ == null || "LOCAL".equals(connectionTZ) ? clientTz
+                                                : "SERVER".equals(connectionTZ) ? serverTz : TimeZone.getTimeZone(connectionTZ);
+                                        TimeZone sessionTz = forceConnectionTimeZoneToSession ? connTz : serverTz;
+                                        ZonedDateTime exp_on_wire = orig_UTC.atZoneSimilarLocal(ZoneId.of(sessionTz.getID()));
+                                        Instant exp_timestamp_instant = (preserveInstants
+                                                ? exp_on_wire.withZoneSameLocal(connTz.toZoneId()).withZoneSameInstant(currZoneId)
+                                                : exp_on_wire.withZoneSameLocal(currZoneId)).toInstant();
+
+                                        Calendar exp_cal = Calendar.getInstance(preserveInstants ? connTz : clientTz);
+                                        exp_cal.set(exp_on_wire.getYear(), exp_on_wire.getMonthValue() - 1, exp_on_wire.getDayOfMonth(), exp_on_wire.getHour(),
+                                                exp_on_wire.getMinute(), exp_on_wire.getSecond());
+                                        exp_cal.set(Calendar.MILLISECOND, exp_on_wire.getNano() / 1000000);
+                                        exp_cal.setLenient(false);
+
+                                        assertEquals(java.util.Date.from(exp_date_instant_tz), this.rs.getDate(1));
+                                        assertEquals(java.util.Date.from(exp_date_instant_05), this.rs.getDate(1, cal_05));
+                                        assertEquals(java.util.Date.from(exp_time_instant_tz), this.rs.getTime(1));
+                                        assertEquals(java.util.Date.from(exp_time_instant_05), this.rs.getTime(1, cal_05));
+                                        assertEquals(java.sql.Timestamp.from(exp_timestamp_instant), this.rs.getTimestamp(1));
+                                        assertEquals(java.sql.Timestamp.from(exp_timestamp_instant_05), this.rs.getTimestamp(1, cal_05));
+                                        assertEquals(ldt_20200101_020000_123456, this.rs.getObject(1));
+                                        assertEquals(java.util.Date.from(exp_date_instant_tz), this.rs.getObject(1, java.sql.Date.class));
+                                        assertEquals(java.util.Date.from(exp_time_instant_tz), this.rs.getObject(1, java.sql.Time.class));
+                                        assertEquals(java.sql.Timestamp.from(exp_timestamp_instant), this.rs.getObject(1, java.sql.Timestamp.class));
+                                        assertEquals(java.util.Date.from(exp_timestamp_instant), this.rs.getObject(1, java.util.Date.class));
+                                        assertEquals(exp_cal, this.rs.getObject(1, java.util.Calendar.class));
+                                        assertEquals(ldt_20200101_020000_123456.toLocalDate(), this.rs.getObject(1, LocalDate.class));
+                                        assertEquals(ldt_20200101_020000_123456.toLocalTime(), this.rs.getObject(1, LocalTime.class));
+                                        assertEquals(ldt_20200101_020000_123456, this.rs.getObject(1, LocalDateTime.class));
+                                        assertEquals((withFract ? ldt_19700101_020000_123456 : ldt_19700101_020000_123456.withNano(0)).atZone(currZoneId)
+                                                .toOffsetDateTime().toOffsetTime(), this.rs.getObject(1, OffsetTime.class));
+                                        assertEquals(ldt_20200101_020000_123456.atZone(preserveInstants ? connTz.toZoneId() : currZoneId).toOffsetDateTime(),
+                                                this.rs.getObject(1, OffsetDateTime.class));
+                                        assertEquals(ldt_20200101_020000_123456.atZone(preserveInstants ? connTz.toZoneId() : currZoneId),
+                                                this.rs.getObject(1, ZonedDateTime.class));
+                                        assertEquals(ldt_20200101_020000_123456.format(dateTimeFmt), this.rs.getString(1));
+                                        assertThrows(SQLException.class,
+                                                Messages.getString("ResultSet.UnsupportedConversion", new Object[] { "DATETIME", Duration.class.getName() }),
+                                                () -> {
+                                                    this.rs.getObject(1, Duration.class);
+                                                    return null;
+                                                });
+
+                                        testConn.close();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } finally {
+            TimeZone.setDefault(origTz);
+        }
+    }
+
+    @Test
+    public void testYearGetters() throws Exception {
+        createTable(tYear, "(d YEAR, s VARCHAR(30))");
+        this.stmt.executeUpdate("INSERT INTO " + tYear + " VALUES ('" + s_2020 + "', '" + s_2020 + "')");
+
+        Calendar cal_05 = Calendar.getInstance(tz_plus_05_00);
+
+        Properties props = new Properties();
+        props.setProperty(PropertyKey.sslMode.getKeyName(), "DISABLED");
+        props.setProperty(PropertyKey.allowPublicKeyRetrieval.getKeyName(), "true");
+        props.setProperty(PropertyKey.cacheDefaultTimeZone.getKeyName(), "false");
+
+        final TimeZone origTz = TimeZone.getDefault();
+        try {
+            for (boolean yearIsDateType : new boolean[] { true, false }) {
+                for (TimeZone tz : this.senderTimeZones) {
+                    for (String connectionTZ : this.connectionTimeZones) {
+                        for (boolean forceConnectionTimeZoneToSession : new boolean[] { false, true }) {
+                            for (boolean preserveInstants : new boolean[] { false, true }) {
+                                for (boolean useSSPS : new boolean[] { false, true }) {
+                                    for (boolean sendFractionalSeconds : new boolean[] { false, true }) {
+                                        for (boolean sendTimeFract : new boolean[] { false, true }) {
+
+                                            System.out.println("connTimeZone=" + connectionTZ + "; forceConnTimeZoneToSession="
+                                                    + forceConnectionTimeZoneToSession + "; preserveInstants=" + preserveInstants + "; useServerPrepStmts="
+                                                    + useSSPS + "; sendFractSeconds=" + sendFractionalSeconds + "; sendFractSecondsForTime=" + sendTimeFract);
+
+                                            props.setProperty(PropertyKey.yearIsDateType.getKeyName(), "" + yearIsDateType);
+                                            if (connectionTZ == null) {
+                                                props.remove(PropertyKey.connectionTimeZone.getKeyName());
+                                            } else {
+                                                props.setProperty(PropertyKey.connectionTimeZone.getKeyName(), connectionTZ);
+                                            }
+                                            props.setProperty(PropertyKey.forceConnectionTimeZoneToSession.getKeyName(), "" + forceConnectionTimeZoneToSession);
+                                            props.setProperty(PropertyKey.preserveInstants.getKeyName(), "" + preserveInstants);
+                                            props.setProperty(PropertyKey.useServerPrepStmts.getKeyName(), "" + useSSPS);
+                                            props.setProperty(PropertyKey.sendFractionalSecondsForTime.getKeyName(), "" + sendTimeFract);
+                                            props.setProperty(PropertyKey.sendFractionalSeconds.getKeyName(), "" + sendFractionalSeconds);
+
+                                            TimeZone.setDefault(tz);
+                                            ZoneId currZoneId = ZoneId.of(tz.getID());
+
+                                            Connection testConn = getConnectionWithProps(timeZoneFreeDbUrl, props);
+                                            ResultSet rs1 = testConn.createStatement().executeQuery("select * from " + tYear);
+
+                                            assertTrue(rs1.next());
+                                            Instant exp_instant_tz = ldt_20200101_0000.atZone(currZoneId).toInstant();
+                                            Instant exp_instant_05 = ldt_20200101_0000.atOffset(ZoneOffset.ofHours(5)).toInstant();
+
+                                            Calendar exp_cal = Calendar.getInstance(tz);
+                                            exp_cal.set(2020, 0, 1, 0, 0, 0);
+                                            exp_cal.set(Calendar.MILLISECOND, 0);
+                                            exp_cal.setLenient(false);
+
+                                            if (yearIsDateType) {
+                                                assertEquals(java.util.Date.from(exp_instant_tz), rs1.getDate(1));
+                                                assertEquals(java.util.Date.from(exp_instant_05), rs1.getDate(1, cal_05));
+                                                assertEquals(java.sql.Time.valueOf(lt_000000), rs1.getTime(1));
+                                                assertEquals(java.util.Date.from(lt_000000.atOffset(ZoneOffset.ofHours(5)).atDate(ld_19700101).toInstant()),
+                                                        rs1.getTime(1, cal_05));
+                                                assertEquals(java.sql.Timestamp.from(exp_instant_tz), rs1.getTimestamp(1));
+                                                assertEquals(java.sql.Timestamp.from(exp_instant_05), rs1.getTimestamp(1, cal_05));
+                                                assertEquals(java.util.Date.from(exp_instant_tz), rs1.getObject(1));
+                                                assertEquals(java.util.Date.from(exp_instant_tz), rs1.getObject(1, java.sql.Date.class));
+                                                assertEquals(java.sql.Time.valueOf(lt_000000), rs1.getObject(1, java.sql.Time.class));
+                                                assertEquals(java.sql.Timestamp.from(exp_instant_tz), rs1.getObject(1, java.sql.Timestamp.class));
+                                                assertEquals(java.util.Date.from(exp_instant_tz), rs1.getObject(1, java.util.Date.class));
+                                                assertEquals(exp_cal, rs1.getObject(1, java.util.Calendar.class));
+                                                assertEquals(ld_20200101, rs1.getObject(1, LocalDate.class));
+                                                assertEquals(lt_000000, rs1.getObject(1, LocalTime.class));
+                                                assertEquals(ldt_20200101_0000, rs1.getObject(1, LocalDateTime.class));
+                                                assertEquals(ldt_20200101_0000.atZone(currZoneId).toOffsetDateTime().toOffsetTime(),
+                                                        rs1.getObject(1, OffsetTime.class));
+                                                assertEquals(ldt_20200101_0000.atZone(currZoneId).toOffsetDateTime(), rs1.getObject(1, OffsetDateTime.class));
+                                                assertEquals(ldt_20200101_0000.atZone(currZoneId), rs1.getObject(1, ZonedDateTime.class));
+                                                assertEquals(s_20200101, rs1.getString(1));
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "DATE", Duration.class.getName() }), () -> {
+                                                            rs1.getObject(1, Duration.class);
+                                                            return null;
+                                                        });
+                                            } else {
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "LONG", java.sql.Date.class.getName() }), () -> {
+                                                            rs1.getDate(1);
+                                                            return null;
+                                                        });
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "LONG", java.sql.Date.class.getName() }), () -> {
+                                                            rs1.getDate(1, cal_05);
+                                                            return null;
+                                                        });
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "LONG", java.sql.Time.class.getName() }), () -> {
+                                                            rs1.getTime(1);
+                                                            return null;
+                                                        });
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "LONG", java.sql.Time.class.getName() }), () -> {
+                                                            rs1.getTime(1, cal_05);
+                                                            return null;
+                                                        });
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "LONG", java.sql.Timestamp.class.getName() }), () -> {
+                                                            rs1.getTimestamp(1);
+                                                            return null;
+                                                        });
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "LONG", java.sql.Timestamp.class.getName() }), () -> {
+                                                            rs1.getTimestamp(1, cal_05);
+                                                            return null;
+                                                        });
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "LONG", java.sql.Date.class.getName() }), () -> {
+                                                            rs1.getObject(1, java.sql.Date.class);
+                                                            return null;
+                                                        });
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "LONG", java.sql.Time.class.getName() }), () -> {
+                                                            rs1.getObject(1, java.sql.Time.class);
+                                                            return null;
+                                                        });
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "LONG", java.sql.Timestamp.class.getName() }), () -> {
+                                                            rs1.getObject(1, java.sql.Timestamp.class);
+                                                            return null;
+                                                        });
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "LONG", java.sql.Timestamp.class.getName() }), () -> {
+                                                            rs1.getObject(1, java.util.Date.class);
+                                                            return null;
+                                                        });
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "LONG", Calendar.class.getName() }), () -> {
+                                                            rs1.getObject(1, java.util.Calendar.class);
+                                                            return null;
+                                                        });
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "LONG", LocalDate.class.getName() }), () -> {
+                                                            rs1.getObject(1, LocalDate.class);
+                                                            return null;
+                                                        });
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "LONG", LocalTime.class.getName() }), () -> {
+                                                            rs1.getObject(1, LocalTime.class);
+                                                            return null;
+                                                        });
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "LONG", LocalDateTime.class.getName() }), () -> {
+                                                            rs1.getObject(1, LocalDateTime.class);
+                                                            return null;
+                                                        });
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "LONG", OffsetTime.class.getName() }), () -> {
+                                                            rs1.getObject(1, OffsetTime.class);
+                                                            return null;
+                                                        });
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "LONG", OffsetDateTime.class.getName() }), () -> {
+                                                            rs1.getObject(1, OffsetDateTime.class);
+                                                            return null;
+                                                        });
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "LONG", ZonedDateTime.class.getName() }), () -> {
+                                                            rs1.getObject(1, ZonedDateTime.class);
+                                                            return null;
+                                                        });
+                                                assertThrows(SQLException.class, Messages.getString("ResultSet.UnsupportedConversion",
+                                                        new Object[] { "LONG", Duration.class.getName() }), () -> {
+                                                            rs1.getObject(1, Duration.class);
+                                                            return null;
+                                                        });
+                                                assertEquals(s_2020, rs1.getString(1));
+                                                assertEquals(Short.valueOf((short) 2020), rs1.getObject(1));
+                                            }
+
+                                            assertEquals(s_2020, rs1.getObject(2));
+                                            assertEquals(s_2020, rs1.getString(2));
+
+                                            assertThrows(SQLException.class, Messages.getString("ResultSet.UnableToConvertString",
+                                                    new Object[] { s_2020, java.sql.Date.class.getName() }), () -> {
+                                                        rs1.getDate(2);
+                                                        return null;
+                                                    });
+                                            assertThrows(SQLException.class, Messages.getString("ResultSet.UnableToConvertString",
+                                                    new Object[] { s_2020, java.sql.Date.class.getName() }), () -> {
+                                                        rs1.getDate(2, cal_05);
+                                                        return null;
+                                                    });
+                                            assertThrows(SQLException.class, Messages.getString("ResultSet.UnableToConvertString",
+                                                    new Object[] { s_2020, java.sql.Time.class.getName() }), () -> {
+                                                        rs1.getTime(2);
+                                                        return null;
+                                                    });
+                                            assertThrows(SQLException.class, Messages.getString("ResultSet.UnableToConvertString",
+                                                    new Object[] { s_2020, java.sql.Time.class.getName() }), () -> {
+                                                        rs1.getTime(2, cal_05);
+                                                        return null;
+                                                    });
+                                            assertThrows(SQLException.class, Messages.getString("ResultSet.UnableToConvertString",
+                                                    new Object[] { s_2020, java.sql.Timestamp.class.getName() }), () -> {
+                                                        rs1.getTimestamp(2, cal_05);
+                                                        return null;
+                                                    });
+                                            assertThrows(SQLException.class, Messages.getString("ResultSet.UnableToConvertString",
+                                                    new Object[] { s_2020, java.sql.Timestamp.class.getName() }), () -> {
+                                                        rs1.getTimestamp(2, cal_05);
+                                                        return null;
+                                                    });
+                                            assertThrows(SQLException.class, Messages.getString("ResultSet.UnableToConvertString",
+                                                    new Object[] { s_2020, java.sql.Date.class.getName() }), () -> {
+                                                        rs1.getObject(2, java.sql.Date.class);
+                                                        return null;
+                                                    });
+                                            assertThrows(SQLException.class, Messages.getString("ResultSet.UnableToConvertString",
+                                                    new Object[] { s_2020, java.sql.Time.class.getName() }), () -> {
+                                                        rs1.getObject(2, java.sql.Time.class);
+                                                        return null;
+                                                    });
+                                            assertThrows(SQLException.class, Messages.getString("ResultSet.UnableToConvertString",
+                                                    new Object[] { s_2020, java.sql.Timestamp.class.getName() }), () -> {
+                                                        rs1.getObject(2, java.sql.Timestamp.class);
+                                                        return null;
+                                                    });
+                                            assertThrows(SQLException.class, Messages.getString("ResultSet.UnableToConvertString",
+                                                    new Object[] { s_2020, java.sql.Timestamp.class.getName() }), () -> {
+                                                        rs1.getObject(2, java.util.Date.class);
+                                                        return null;
+                                                    });
+                                            assertThrows(SQLException.class, Messages.getString("ResultSet.UnableToConvertString",
+                                                    new Object[] { s_2020, java.util.Calendar.class.getName() }), () -> {
+                                                        rs1.getObject(2, java.util.Calendar.class);
+                                                        return null;
+                                                    });
+                                            assertThrows(SQLException.class,
+                                                    Messages.getString("ResultSet.UnableToConvertString", new Object[] { s_2020, LocalDate.class.getName() }),
+                                                    () -> {
+                                                        rs1.getObject(2, LocalDate.class);
+                                                        return null;
+                                                    });
+                                            assertThrows(SQLException.class,
+                                                    Messages.getString("ResultSet.UnableToConvertString", new Object[] { s_2020, LocalTime.class.getName() }),
+                                                    () -> {
+                                                        rs1.getObject(2, LocalTime.class);
+                                                        return null;
+                                                    });
+                                            assertThrows(SQLException.class, Messages.getString("ResultSet.UnableToConvertString",
+                                                    new Object[] { s_2020, LocalDateTime.class.getName() }), () -> {
+                                                        rs1.getObject(2, LocalDateTime.class);
+                                                        return null;
+                                                    });
+                                            assertThrows(SQLException.class,
+                                                    Messages.getString("ResultSet.UnableToConvertString", new Object[] { s_2020, OffsetTime.class.getName() }),
+                                                    () -> {
+                                                        rs1.getObject(2, OffsetTime.class);
+                                                        return null;
+                                                    });
+                                            assertThrows(SQLException.class, Messages.getString("ResultSet.UnableToConvertString",
+                                                    new Object[] { s_2020, OffsetDateTime.class.getName() }), () -> {
+                                                        rs1.getObject(2, OffsetDateTime.class);
+                                                        return null;
+                                                    });
+                                            assertThrows(SQLException.class, Messages.getString("ResultSet.UnableToConvertString",
+                                                    new Object[] { s_2020, ZonedDateTime.class.getName() }), () -> {
+                                                        rs1.getObject(2, ZonedDateTime.class);
+                                                        return null;
+                                                    });
+
+                                            testConn.close();
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } finally {
+            TimeZone.setDefault(origTz);
+        }
+    }
+
+    @Test
+    public void testSymmetricInstantRetrieval() throws Exception {
+        boolean withFract = versionMeetsMinimum(5, 6, 4); // fractional seconds are not supported in previous versions
+
+        createTable(tDatetime, withFract ? "(id INT, d DATETIME(6))" : "(id INT, d DATETIME)");
+        createTable(tTimestamp, withFract ? "(id INT, d TIMESTAMP(6))" : "(id INT, d TIMESTAMP)");
+        createTable(tVarchar, "(id INT, d VARCHAR(30))");
+
+        id = 0;
+
+        Properties props = new Properties();
+        props.setProperty(PropertyKey.sslMode.getKeyName(), "DISABLED");
+        props.setProperty(PropertyKey.allowPublicKeyRetrieval.getKeyName(), "true");
+        props.setProperty(PropertyKey.cacheDefaultTimeZone.getKeyName(), "false");
+        props.setProperty(PropertyKey.connectionTimeZone.getKeyName(), "SERVER");
+
+        TimeZone serverTz;
+        try (Connection testConn = getConnectionWithProps(props)) {
+            serverTz = ((MysqlConnection) testConn).getSession().getServerSession().getSessionTimeZone();
+        }
+
+        Calendar cal_02 = Calendar.getInstance(tz_plus_02_00);
+
+        for (TimeZone senderTz : this.senderTimeZones) {
+            try {
+                for (String connectionTZ : this.connectionTimeZones) {
+                    initConnections(senderTz, connectionTZ);
+
+                    for (boolean forceConnectionTimeZoneToSession : new boolean[] { false, true }) {
+                        for (boolean preserveInstants : new boolean[] { false, true }) {
+                            for (boolean useSSPS : new boolean[] { false, true }) {
+                                for (boolean sendFractionalSeconds : new boolean[] { false, true }) {
+                                    for (boolean sendTimeFract : new boolean[] { false, true }) {
+
+                                        System.out.println("connTimeZone=" + connectionTZ + "; forceConnTimeZoneToSession=" + forceConnectionTimeZoneToSession
+                                                + "; preserveInstants=" + preserveInstants + "; useServerPrepStmts=" + useSSPS + "; sendFractSeconds="
+                                                + sendFractionalSeconds + "; sendFractSecondsForTime=" + sendTimeFract);
+
+                                        if (connectionTZ == null) {
+                                            props.remove(PropertyKey.connectionTimeZone.getKeyName());
+                                        } else {
+                                            props.setProperty(PropertyKey.connectionTimeZone.getKeyName(), connectionTZ);
+                                        }
+                                        props.setProperty(PropertyKey.forceConnectionTimeZoneToSession.getKeyName(), "" + forceConnectionTimeZoneToSession);
+                                        props.setProperty(PropertyKey.preserveInstants.getKeyName(), "" + preserveInstants);
+                                        props.setProperty(PropertyKey.useServerPrepStmts.getKeyName(), "" + useSSPS);
+                                        props.setProperty(PropertyKey.sendFractionalSecondsForTime.getKeyName(), "" + sendTimeFract);
+                                        props.setProperty(PropertyKey.sendFractionalSeconds.getKeyName(), "" + sendFractionalSeconds);
+
+                                        ZonedDateTime zdt_20200101_120000_123456_at_senderTz = (withFract ? ldt_20200101_120000_123456
+                                                : ldt_20200101_120000_123456.withNano(0)).atZone(senderTz.toZoneId());
+
+                                        java.sql.Timestamp ts = java.sql.Timestamp.from(zdt_20200101_120000_123456_at_senderTz.toInstant());
+                                        java.util.Date ud = java.util.Date.from(zdt_20200101_120000_123456_at_senderTz.toInstant());
+
+                                        java.sql.Timestamp expTsNoFract = java.sql.Timestamp
+                                                .from(zdt_20200101_120000_123456_at_senderTz.withNano(0).toInstant());
+                                        java.sql.Timestamp expTsNanos = sendFractionalSeconds
+                                                ? java.sql.Timestamp.from(zdt_20200101_120000_123456_at_senderTz.toInstant())
+                                                : expTsNoFract;
+                                        java.sql.Timestamp expTsMillis = sendFractionalSeconds
+                                                ? java.sql.Timestamp.from(zdt_20200101_120000_123456_at_senderTz.truncatedTo(ChronoUnit.MILLIS).toInstant())
+                                                : expTsNoFract;
+
+                                        java.util.Date expUdNoFract = java.util.Date.from(zdt_20200101_120000_123456_at_senderTz.withNano(0).toInstant());
+                                        java.util.Date expUd = sendFractionalSeconds ? java.util.Date.from(zdt_20200101_120000_123456_at_senderTz.toInstant())
+                                                : expUdNoFract;
+
+                                        TimeZone connTz = connectionTZ == null || "LOCAL".equals(connectionTZ) ? senderTz
+                                                : "SERVER".equals(connectionTZ) ? serverTz : TimeZone.getTimeZone(connectionTZ);
+                                        ZonedDateTime expZdtNoFract = zdt_20200101_120000_123456_at_senderTz.withNano(0)
+                                                .withZoneSameInstant(preserveInstants ? connTz.toZoneId() : senderTz.toZoneId());
+                                        ZonedDateTime expZdt = sendFractionalSeconds
+                                                ? zdt_20200101_120000_123456_at_senderTz
+                                                        .withZoneSameInstant(preserveInstants ? connTz.toZoneId() : senderTz.toZoneId())
+                                                : expZdtNoFract;
+
+                                        /* java.sql.Timestamp into DATETIME field */
+
+                                        checkSymmetricSetAndGet(props, tDatetime, ts, null, senderTz, UseMethod.setTimestamp, cal_02, UseMethod.getTimestamp,
+                                                null, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tDatetime, ts, null, senderTz, UseMethod.setTimestamp, null, UseMethod.getTimestamp,
+                                                null, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tDatetime, ts, null, senderTz, UseMethod.setTimestamp, null, UseMethod.getObject,
+                                                Timestamp.class, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tDatetime, ts, null, senderTz, UseMethod.setObject, null, UseMethod.getTimestamp, null,
+                                                expTsNanos);
+                                        checkSymmetricSetAndGet(props, tDatetime, ts, null, senderTz, UseMethod.setObject, null, UseMethod.getObject,
+                                                Timestamp.class, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tDatetime, ts, MysqlType.TIMESTAMP, senderTz, UseMethod.setObject, null,
+                                                UseMethod.getTimestamp, null, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tDatetime, ts, MysqlType.TIMESTAMP, senderTz, UseMethod.setObject, null,
+                                                UseMethod.getObject, Timestamp.class, expTsNanos);
+
+                                        /* java.util.Date into DATETIME field */
+
+                                        checkSymmetricSetAndGet(props, tDatetime, ud, null, senderTz, UseMethod.setObject, null, UseMethod.getTimestamp, null,
+                                                expTsMillis);
+                                        checkSymmetricSetAndGet(props, tDatetime, ud, null, senderTz, UseMethod.setObject, null, UseMethod.getObject,
+                                                Timestamp.class, expTsMillis);
+                                        checkSymmetricSetAndGet(props, tDatetime, ud, MysqlType.TIMESTAMP, senderTz, UseMethod.setObject, null,
+                                                UseMethod.getTimestamp, null, expTsMillis);
+                                        checkSymmetricSetAndGet(props, tDatetime, ud, MysqlType.TIMESTAMP, senderTz, UseMethod.setObject, null,
+                                                UseMethod.getObject, Timestamp.class, expTsMillis);
+                                        checkSymmetricSetAndGet(props, tDatetime, ud, MysqlType.TIMESTAMP, senderTz, UseMethod.setObject, null,
+                                                UseMethod.getObject, java.util.Date.class, expUd);
+
+                                        /* java.time.ZonedDateTime into DATETIME field */
+
+                                        checkSymmetricSetAndGet(props, tDatetime, zdt_20200101_120000_123456_at_senderTz, null, senderTz, UseMethod.setObject,
+                                                null, UseMethod.getTimestamp, null, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tDatetime, zdt_20200101_120000_123456_at_senderTz, null, senderTz, UseMethod.setObject,
+                                                null, UseMethod.getObject, Timestamp.class, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tDatetime, zdt_20200101_120000_123456_at_senderTz, MysqlType.TIMESTAMP, senderTz,
+                                                UseMethod.setObject, null, UseMethod.getTimestamp, null, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tDatetime, zdt_20200101_120000_123456_at_senderTz, MysqlType.TIMESTAMP, senderTz,
+                                                UseMethod.setObject, null, UseMethod.getObject, Timestamp.class, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tDatetime, zdt_20200101_120000_123456_at_senderTz, MysqlType.TIMESTAMP, senderTz,
+                                                UseMethod.setObject, null, UseMethod.getObject, java.util.Date.class, expUd);
+                                        checkSymmetricSetAndGet(props, tDatetime, zdt_20200101_120000_123456_at_senderTz, MysqlType.TIMESTAMP, senderTz,
+                                                UseMethod.setObject, null, UseMethod.getObject, ZonedDateTime.class, expZdt);
+
+                                        /* java.sql.Timestamp into TIMESTAMP field */
+
+                                        checkSymmetricSetAndGet(props, tTimestamp, ts, null, senderTz, UseMethod.setTimestamp, cal_02, UseMethod.getTimestamp,
+                                                null, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tTimestamp, ts, null, senderTz, UseMethod.setTimestamp, null, UseMethod.getTimestamp,
+                                                null, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tTimestamp, ts, null, senderTz, UseMethod.setTimestamp, null, UseMethod.getObject, null,
+                                                expTsNanos);
+                                        checkSymmetricSetAndGet(props, tTimestamp, ts, null, senderTz, UseMethod.setTimestamp, null, UseMethod.getObject,
+                                                Timestamp.class, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tTimestamp, ts, null, senderTz, UseMethod.setObject, null, UseMethod.getTimestamp, null,
+                                                expTsNanos);
+                                        checkSymmetricSetAndGet(props, tTimestamp, ts, null, senderTz, UseMethod.setObject, null, UseMethod.getObject, null,
+                                                expTsNanos);
+                                        checkSymmetricSetAndGet(props, tTimestamp, ts, null, senderTz, UseMethod.setObject, null, UseMethod.getObject,
+                                                Timestamp.class, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tTimestamp, ts, MysqlType.TIMESTAMP, senderTz, UseMethod.setObject, null,
+                                                UseMethod.getTimestamp, null, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tTimestamp, ts, MysqlType.TIMESTAMP, senderTz, UseMethod.setObject, null,
+                                                UseMethod.getObject, null, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tTimestamp, ts, MysqlType.TIMESTAMP, senderTz, UseMethod.setObject, null,
+                                                UseMethod.getObject, Timestamp.class, expTsNanos);
+
+                                        /* java.util.Date into TIMESTAMP field */
+
+                                        checkSymmetricSetAndGet(props, tTimestamp, ud, null, senderTz, UseMethod.setObject, null, UseMethod.getTimestamp, null,
+                                                expTsMillis);
+                                        checkSymmetricSetAndGet(props, tTimestamp, ud, null, senderTz, UseMethod.setObject, null, UseMethod.getObject, null,
+                                                expTsMillis);
+                                        checkSymmetricSetAndGet(props, tTimestamp, ud, null, senderTz, UseMethod.setObject, null, UseMethod.getObject,
+                                                Timestamp.class, expTsMillis);
+                                        checkSymmetricSetAndGet(props, tTimestamp, ud, MysqlType.TIMESTAMP, senderTz, UseMethod.setObject, null,
+                                                UseMethod.getTimestamp, null, expTsMillis);
+                                        checkSymmetricSetAndGet(props, tTimestamp, ud, MysqlType.TIMESTAMP, senderTz, UseMethod.setObject, null,
+                                                UseMethod.getObject, null, expTsMillis);
+                                        checkSymmetricSetAndGet(props, tTimestamp, ud, MysqlType.TIMESTAMP, senderTz, UseMethod.setObject, null,
+                                                UseMethod.getObject, Timestamp.class, expTsMillis);
+                                        checkSymmetricSetAndGet(props, tTimestamp, ud, MysqlType.TIMESTAMP, senderTz, UseMethod.setObject, null,
+                                                UseMethod.getObject, java.util.Date.class, expUd);
+
+                                        /* java.time.ZonedDateTime into TIMESTAMP field */
+
+                                        checkSymmetricSetAndGet(props, tTimestamp, zdt_20200101_120000_123456_at_senderTz, null, senderTz, UseMethod.setObject,
+                                                null, UseMethod.getTimestamp, null, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tTimestamp, zdt_20200101_120000_123456_at_senderTz, null, senderTz, UseMethod.setObject,
+                                                null, UseMethod.getObject, Timestamp.class, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tTimestamp, zdt_20200101_120000_123456_at_senderTz, MysqlType.TIMESTAMP, senderTz,
+                                                UseMethod.setObject, null, UseMethod.getTimestamp, null, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tTimestamp, zdt_20200101_120000_123456_at_senderTz, MysqlType.TIMESTAMP, senderTz,
+                                                UseMethod.setObject, null, UseMethod.getObject, Timestamp.class, expTsNanos);
+                                        checkSymmetricSetAndGet(props, tTimestamp, zdt_20200101_120000_123456_at_senderTz, MysqlType.TIMESTAMP, senderTz,
+                                                UseMethod.setObject, null, UseMethod.getObject, java.util.Date.class, expUd);
+                                        checkSymmetricSetAndGet(props, tTimestamp, zdt_20200101_120000_123456_at_senderTz, MysqlType.TIMESTAMP, senderTz,
+                                                UseMethod.setObject, null, UseMethod.getObject, ZonedDateTime.class, expZdt);
+
+                                        /* java.sql.Timestamp into VARCHAR field */
+
+                                        Timestamp expTsNanosFromChars = useSSPS ? expTsNoFract : expTsNanos; // TODO milliseconds are ignored by server. Bug ?
+                                        Timestamp expTsMillisFromChars = useSSPS ? expTsNoFract : expTsMillis; // TODO milliseconds are ignored by server. Bug ?
+                                        java.util.Date expUdFromChars = useSSPS ? expUdNoFract : expUd; // TODO milliseconds are ignored by server. Bug ?
+                                        ZonedDateTime expZdtFromChars = useSSPS ? expZdtNoFract : expZdt; // TODO milliseconds are ignored by server. Bug ?
+
+                                        checkSymmetricSetAndGet(props, tVarchar, ts, null, senderTz, UseMethod.setTimestamp, cal_02, UseMethod.getTimestamp,
+                                                null, expTsNanosFromChars);
+                                        checkSymmetricSetAndGet(props, tVarchar, ts, null, senderTz, UseMethod.setTimestamp, null, UseMethod.getTimestamp, null,
+                                                expTsNanosFromChars);
+                                        checkSymmetricSetAndGet(props, tVarchar, ts, null, senderTz, UseMethod.setTimestamp, null, UseMethod.getObject,
+                                                Timestamp.class, expTsNanosFromChars);
+                                        checkSymmetricSetAndGet(props, tVarchar, ts, null, senderTz, UseMethod.setObject, null, UseMethod.getTimestamp, null,
+                                                expTsNanosFromChars);
+                                        checkSymmetricSetAndGet(props, tVarchar, ts, null, senderTz, UseMethod.setObject, null, UseMethod.getObject,
+                                                Timestamp.class, expTsNanosFromChars);
+                                        checkSymmetricSetAndGet(props, tVarchar, ts, MysqlType.TIMESTAMP, senderTz, UseMethod.setObject, null,
+                                                UseMethod.getTimestamp, null, expTsNanosFromChars);
+                                        checkSymmetricSetAndGet(props, tVarchar, ts, MysqlType.TIMESTAMP, senderTz, UseMethod.setObject, null,
+                                                UseMethod.getObject, Timestamp.class, expTsNanosFromChars);
+
+                                        /* java.util.Date into VARCHAR field */
+
+                                        checkSymmetricSetAndGet(props, tVarchar, ud, null, senderTz, UseMethod.setObject, null, UseMethod.getTimestamp, null,
+                                                expTsMillisFromChars);
+                                        checkSymmetricSetAndGet(props, tVarchar, ud, null, senderTz, UseMethod.setObject, null, UseMethod.getObject,
+                                                Timestamp.class, expTsMillisFromChars);
+                                        checkSymmetricSetAndGet(props, tVarchar, ud, MysqlType.TIMESTAMP, senderTz, UseMethod.setObject, null,
+                                                UseMethod.getTimestamp, null, expTsMillisFromChars);
+                                        checkSymmetricSetAndGet(props, tVarchar, ud, MysqlType.TIMESTAMP, senderTz, UseMethod.setObject, null,
+                                                UseMethod.getObject, Timestamp.class, expTsMillisFromChars);
+                                        checkSymmetricSetAndGet(props, tVarchar, ud, MysqlType.TIMESTAMP, senderTz, UseMethod.setObject, null,
+                                                UseMethod.getObject, java.util.Date.class, expUdFromChars);
+
+                                        /* java.time.ZonedDateTime into VARCHAR field */
+
+                                        checkSymmetricSetAndGet(props, tVarchar, zdt_20200101_120000_123456_at_senderTz, null, senderTz, UseMethod.setObject,
+                                                null, UseMethod.getTimestamp, null, expTsNanosFromChars);
+                                        checkSymmetricSetAndGet(props, tVarchar, zdt_20200101_120000_123456_at_senderTz, null, senderTz, UseMethod.setObject,
+                                                null, UseMethod.getObject, Timestamp.class, expTsNanosFromChars);
+                                        checkSymmetricSetAndGet(props, tVarchar, zdt_20200101_120000_123456_at_senderTz, MysqlType.TIMESTAMP, senderTz,
+                                                UseMethod.setObject, null, UseMethod.getTimestamp, null, expTsNanosFromChars);
+                                        checkSymmetricSetAndGet(props, tVarchar, zdt_20200101_120000_123456_at_senderTz, MysqlType.TIMESTAMP, senderTz,
+                                                UseMethod.setObject, null, UseMethod.getObject, Timestamp.class, expTsNanosFromChars);
+                                        checkSymmetricSetAndGet(props, tVarchar, zdt_20200101_120000_123456_at_senderTz, MysqlType.TIMESTAMP, senderTz,
+                                                UseMethod.setObject, null, UseMethod.getObject, java.util.Date.class, expUdFromChars);
+                                        checkSymmetricSetAndGet(props, tVarchar, zdt_20200101_120000_123456_at_senderTz, MysqlType.TIMESTAMP, senderTz,
+                                                UseMethod.setObject, null, UseMethod.getObject, ZonedDateTime.class, expZdtFromChars);
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    closeConnections();
+                }
+            } finally {
+                closeConnections();
+            }
+        }
+    }
+
+    private void checkSymmetricSetAndGet(Properties props, String tableName, Object parameter, SQLType targetSqlType, TimeZone senderTz, UseMethod useSetter,
+            Calendar calendar, UseMethod useGetter, Class<?> targetClass, Object expResult) throws Exception {
+        if (props == null) {
+            props = new Properties();
+        }
+        final TimeZone origTz = TimeZone.getDefault();
+        try {
+            TimeZone.setDefault(senderTz);
+            Connection testConn = this.tzConnections.get(getKey(props));
+
+            id++;
+
+            PreparedStatement insertPstmt = testConn.prepareStatement("INSERT INTO " + tableName + " VALUES (?, ?)");
+            insertPstmt.setInt(1, id);
+            switch (useSetter) {
+                case setTimestamp:
+                    if (calendar == null) {
+                        insertPstmt.setTimestamp(2, (Timestamp) parameter);
+                    } else {
+                        insertPstmt.setTimestamp(2, (Timestamp) parameter, calendar);
+                    }
+                    break;
+
+                default:
+                    if (targetSqlType == null) {
+                        insertPstmt.setObject(2, parameter);
+                    } else {
+                        insertPstmt.setObject(2, parameter, targetSqlType);
+                    }
+                    break;
+            }
+            assertEquals(1, insertPstmt.executeUpdate());
+
+            ResultSet res = testConn.createStatement().executeQuery("SELECT * FROM " + tableName + " WHERE id = " + id);
+            assertTrue(res.next());
+            switch (useGetter) {
+                case getTimestamp:
+                    if (calendar == null) {
+                        assertEquals(expResult, res.getTimestamp(2));
+                    } else {
+                        assertEquals(expResult, res.getTimestamp(2, calendar));
+                    }
+                    break;
+
+                default:
+                    if (targetClass == null) {
+                        assertEquals(expResult, res.getObject(2));
+                    } else {
+                        assertEquals(expResult, res.getObject(2, targetClass));
+                    }
+                    break;
+            }
+
+        } finally {
+            TimeZone.setDefault(origTz);
+        }
+    }
+
+}
