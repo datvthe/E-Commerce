@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 
 public class DBConnection {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/gicungco?zeroDateTimeBehavior=CONVERT_TO_NULL";
+    private static final String URL = "jdbc:mysql://localhost:3306/gicungco?zeroDateTimeBehavior=CONVERT_TO_NULL&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8";
     private static final String USER = "root";
     private static final String PASSWORD = "Tunxinhso1";
 
@@ -22,6 +22,8 @@ public class DBConnection {
             System.out.println("Không tìm thấy Driver MySQL: " + e.getMessage());
         } catch (SQLException e) {
             System.out.println("Lỗi kết nối MySQL: " + e.getMessage());
+            // Gợi ý thường gặp
+            System.out.println("Gợi ý: kiểm tra allowPublicKeyRetrieval, useSSL, serverTimezone, user/password, và DB name (gicungco)");
         }
         return conn;
     }

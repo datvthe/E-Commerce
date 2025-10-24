@@ -135,6 +135,7 @@ public class UsersDAO extends DBConnection {
 
         return userRole;
     }
+<<<<<<< Updated upstream
     
     /**
      * Verify password with old format (Base64 combined salt + hash)
@@ -159,6 +160,26 @@ public class UsersDAO extends DBConnection {
             
             // Compare hashes
             return java.security.MessageDigest.isEqual(storedHash, computedHash);
+=======
+
+    public void assignDefaultUserRole(int userId) {
+        // Resolve role ID by name to avoid mismatches between seeds and code
+        int roleId = 3; // default fallback to CUSTOMER in code constants
+        try {
+            Roles customer = new RoleDAO().getRoleByName("customer");
+            if (customer != null) {
+                roleId = customer.getRole_id();
+            }
+        } catch (Exception ignore) {
+        }
+
+        String sql = "INSERT INTO User_Roles (user_id, role_id, assigned_at) VALUES (?, ?, NOW())";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, roleId);
+            ps.executeUpdate();
+>>>>>>> Stashed changes
         } catch (Exception e) {
             return false;
         }
@@ -335,5 +356,25 @@ public class UsersDAO extends DBConnection {
         }
         return false;
     }
+<<<<<<< Updated upstream
     
+=======
+
+    // ===== Admin dashboard helpers =====
+    public List<Users> getRecentUsers(int limit) {
+        List<Users> list = new ArrayList<>();
+        String sql = "SELECT * FROM users ORDER BY created_at DESC LIMIT ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapUser(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+>>>>>>> Stashed changes
 }

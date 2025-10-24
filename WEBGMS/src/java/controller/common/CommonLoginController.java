@@ -135,6 +135,7 @@ public class CommonLoginController extends HttpServlet {
                 return;
             }
 
+<<<<<<< Updated upstream
             dao.UsersDAO userDAO = new dao.UsersDAO();
             Users user = userDAO.checkLogin(account, password);
 
@@ -165,14 +166,66 @@ public class CommonLoginController extends HttpServlet {
                         roleCookie.setMaxAge(60 * 60 * 24 * 3); // 3 ngày
                         roleCookie.setPath(request.getContextPath());
                         response.addCookie(roleCookie);
+=======
+            UsersDAO userDAO = new UsersDAO();
 
+            // ✅ Dùng hàm kiểm tra đăng nhập đã hỗ trợ cả định dạng hash cũ & tự động migrate
+            Users user = userDAO.checkLogin(account, password);
+
+            if (user != null) {
+                // Đăng nhập thành công
+                HttpSession session = request.getSession();
+                session.setAttribute("user", user);
+                session.setAttribute("message", "Đăng nhập thành công!");
+
+                // ✅ Kiểm tra nếu user đã là người bán
+                dao.SellerDAO sellerDAO = new dao.SellerDAO();
+                boolean isSeller = sellerDAO.existsByUserId(user.getUser_id());
+                session.setAttribute("isSeller", isSeller);
+
+                UserRoles userRole = userDAO.getRoleByUserId(user.getUser_id());
+                RoleBasedAccessControl rbac = new RoleBasedAccessControl();
+                session.setAttribute("rbac", rbac);
+                session.setAttribute("userRole", userRole);
+
+                int roleId = (userRole != null && userRole.getRole_id() != null)
+                        ? userRole.getRole_id().getRole_id()
+                        : RoleBasedAccessControl.ROLE_CUSTOMER;
+
+                // ✅ Remember me token
+                if ("on".equalsIgnoreCase(remember) || "true".equalsIgnoreCase(remember) || "1".equals(remember)) {
+                    String token = UUID.randomUUID().toString();
+                    Cookie cookie = new Cookie("remember_token", token);
+                    cookie.setMaxAge(60 * 60 * 24 * 3); // 3 ngày
+                    cookie.setPath(request.getContextPath());
+                    response.addCookie(cookie);
+
+                    Cookie roleCookie = new Cookie("role_id", String.valueOf(roleId));
+                    roleCookie.setMaxAge(60 * 60 * 24 * 3);
+                    roleCookie.setPath(request.getContextPath());
+                    response.addCookie(roleCookie);
+>>>>>>> Stashed changes
+
+                    // Tolerate token persistence failures (e.g., missing table) without failing login
+                    try {
                         userDAO.saveUserToken(user.getUser_id(), token, 3);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
                     }
+<<<<<<< Updated upstream
 
                     String path = getRedirectPathByRole(roleId);
                     response.sendRedirect(request.getContextPath() + path);
                     return;
                 }
+=======
+                }
+
+                // ✅ Chuyển hướng theo quyền
+                response.sendRedirect(request.getContextPath() + getRedirectPathByRole(roleId));
+                return;
+            }
+>>>>>>> Stashed changes
 
                 response.sendRedirect(request.getContextPath() + "/home");
                 return;
