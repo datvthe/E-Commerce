@@ -206,33 +206,50 @@ public class AIBotController extends HttpServlet {
     private void escalateToAdmin(HttpServletRequest request, HttpServletResponse response, Users user) 
             throws IOException {
         
-        // Read JSON body
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader reader = request.getReader()) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
+        try {
+            System.out.println("[AIBot Controller] Escalate request from user: " + user.getUser_id());
+            
+            // Read JSON body
+            StringBuilder sb = new StringBuilder();
+            try (BufferedReader reader = request.getReader()) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
             }
+            
+            System.out.println("[AIBot Controller] Request body: " + sb.toString());
+            
+            JsonObject jsonRequest = gson.fromJson(sb.toString(), JsonObject.class);
+            Long aiBotRoomId = jsonRequest.get("aiBotRoomId").getAsLong();
+            
+            System.out.println("[AIBot Controller] AI Bot Room ID: " + aiBotRoomId);
+            
+            String userName = user.getFullName() != null ? user.getFullName() : "User";
+            ChatRoom adminRoom = aiBotService.escalateToAdmin((long) user.getUser_id(), userName, aiBotRoomId);
+            
+            if (adminRoom == null) {
+                System.err.println("[AIBot Controller] Failed to create/find admin room");
+                sendJsonError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to create admin room");
+                return;
+            }
+            
+            System.out.println("[AIBot Controller] Admin room created/found: " + adminRoom.getRoomId());
+            
+            JsonObject result = new JsonObject();
+            result.addProperty("success", true);
+            result.addProperty("adminRoomId", adminRoom.getRoomId());
+            result.addProperty("roomName", adminRoom.getRoomName());
+            result.addProperty("message", "Successfully connected to admin");
+            
+            sendJsonResponse(response, result);
+            
+        } catch (Exception e) {
+            System.err.println("[AIBot Controller] Exception in escalateToAdmin:");
+            e.printStackTrace();
+            sendJsonError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
+                "Error: " + e.getClass().getSimpleName() + ": " + e.getMessage());
         }
-        
-        JsonObject jsonRequest = gson.fromJson(sb.toString(), JsonObject.class);
-        Long aiBotRoomId = jsonRequest.get("aiBotRoomId").getAsLong();
-        
-        String userName = user.getFullName() != null ? user.getFullName() : "User";
-        ChatRoom adminRoom = aiBotService.escalateToAdmin((long) user.getUser_id(), userName, aiBotRoomId);
-        
-        if (adminRoom == null) {
-            sendJsonError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to create admin room");
-            return;
-        }
-        
-        JsonObject result = new JsonObject();
-        result.addProperty("success", true);
-        result.addProperty("adminRoomId", adminRoom.getRoomId());
-        result.addProperty("roomName", adminRoom.getRoomName());
-        result.addProperty("message", "Successfully connected to admin");
-        
-        sendJsonResponse(response, result);
     }
     
     /**

@@ -87,6 +87,9 @@ public class ChatController extends HttpServlet {
         } else if (pathInfo.equals("/markRead")) {
             // Mark messages as read
             markMessagesAsRead(request, response, user);
+        } else if (pathInfo.equals("/hide")) {
+            // Hide chat room from user's view
+            hideRoom(request, response, user);
         } else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
@@ -301,6 +304,40 @@ public class ChatController extends HttpServlet {
         JsonObject result = new JsonObject();
         result.addProperty("success", true);
         result.addProperty("message", "Messages marked as read");
+        
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        out.print(gson.toJson(result));
+        out.flush();
+    }
+    
+    /**
+     * Hide chat room from user's view
+     */
+    private void hideRoom(HttpServletRequest request, HttpServletResponse response, Users user) 
+            throws IOException {
+        
+        String roomIdStr = request.getParameter("roomId");
+        
+        if (roomIdStr == null) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Room ID required");
+            return;
+        }
+        
+        Long roomId = Long.parseLong(roomIdStr);
+        
+        // Verify user is participant
+        if (!participantDAO.isParticipant(roomId, (long) user.getUser_id())) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Not authorized");
+            return;
+        }
+        
+        boolean success = participantDAO.hideRoom(roomId, (long) user.getUser_id());
+        
+        JsonObject result = new JsonObject();
+        result.addProperty("success", success);
+        result.addProperty("message", success ? "Chat room hidden" : "Failed to hide chat room");
         
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

@@ -230,9 +230,21 @@ public class AIBotService {
     }
     
     /**
-     * Create admin escalation room
+     * Create admin escalation room or return existing one
      */
     public ChatRoom escalateToAdmin(Long userId, String userName, Long aiBotRoomId) {
+        System.out.println("[AIBotService] Escalating to admin for user: " + userId);
+        
+        // Check if user already has an admin chat room
+        ChatRoom existingRoom = chatRoomDAO.findChatRoomBetweenUsers(userId, 1L, null);
+        
+        if (existingRoom != null) {
+            System.out.println("[AIBotService] Found existing admin room: " + existingRoom.getRoomId());
+            return existingRoom;
+        }
+        
+        System.out.println("[AIBotService] Creating new admin room...");
+        
         // Create new admin chat room
         ChatRoom adminRoom = chatRoomDAO.createChatRoom("customer_admin", "Chat với Admin - " + userName, null, null);
         
@@ -258,6 +270,10 @@ public class AIBotService {
                 null,
                 true
             );
+            
+            System.out.println("[AIBotService] Admin room created successfully: " + adminRoom.getRoomId());
+        } else {
+            System.err.println("[AIBotService] Failed to create admin room");
         }
         
         return adminRoom;

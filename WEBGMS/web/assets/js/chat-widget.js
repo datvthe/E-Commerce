@@ -144,11 +144,30 @@ function loadWidgetMessages(roomId) {
             const container = document.getElementById('widgetMessages');
             container.innerHTML = '';
             
-            messages.reverse().forEach(message => {
+            // Sort messages by creation time to ensure proper order
+            // Since timestamps are corrupted, we'll use message_id sorting
+            messages.sort((a, b) => {
+                // Always use message_id as primary sort since timestamps are corrupted
+                const idA = parseInt(a.messageId) || 0;
+                const idB = parseInt(b.messageId) || 0;
+                
+                console.log('[Widget] Sorting by message_id - A:', idA, 'B:', idB);
+                return idA - idB; // Ascending order (oldest first)
+            });
+            
+            messages.forEach(message => {
                 appendWidgetMessage(message);
             });
             
-            scrollWidgetToBottom();
+            // Ensure scroll to bottom after loading messages
+            setTimeout(() => {
+                scrollWidgetToBottom();
+                // Force scroll again to ensure it works
+                setTimeout(() => {
+                    scrollWidgetToBottom();
+                }, 50);
+            }, 10);
+            
             markWidgetAsRead(roomId);
         })
         .catch(error => console.error('Error loading widget messages:', error));
@@ -189,16 +208,22 @@ function connectWidgetWebSocket(roomId) {
  * Handle WebSocket messages for widget
  */
 function handleWidgetWebSocketMessage(message) {
+    console.log('[Widget] WebSocket message received:', message.type, message);
+    
     switch (message.type) {
         case 'connected':
             console.log('Widget connected to room:', message.roomId);
             break;
             
         case 'new_message':
-            appendWidgetMessage(message);
-            scrollWidgetToBottom();
+            // Only append if it's from another user (avoid duplicates)
             if (message.senderId !== widgetUserId) {
+                console.log('[Widget] Appending message from other user');
+                appendWidgetMessage(message);
+                scrollWidgetToBottom();
                 playWidgetNotification();
+            } else {
+                console.log('[Widget] Skipping own message (already displayed)');
             }
             break;
             
@@ -207,6 +232,9 @@ function handleWidgetWebSocketMessage(message) {
                 showWidgetTyping(message.isTyping);
             }
             break;
+            
+        default:
+            console.log('[Widget] Unknown message type:', message.type);
     }
 }
 
@@ -214,7 +242,29 @@ function handleWidgetWebSocketMessage(message) {
  * Append message to widget
  */
 function appendWidgetMessage(message) {
+    if (!message) {
+        console.error('[Widget] Cannot append null/undefined message');
+        return;
+    }
+    
     const container = document.getElementById('widgetMessages');
+    if (!container) {
+        console.error('[Widget] Container "widgetMessages" not found');
+        return;
+    }
+    
+    const messageContent = message.content || message.messageContent;
+    if (!messageContent) {
+        console.error('[Widget] Message has no content:', message);
+        return;
+    }
+    
+    console.log('[Widget] Appending message:', {
+        senderId: message.senderId,
+        content: messageContent.substring(0, 30),
+        isOwn: message.senderId === widgetUserId
+    });
+    
     const messageDiv = document.createElement('div');
     
     const isOwn = message.senderId === widgetUserId;
@@ -227,7 +277,7 @@ function appendWidgetMessage(message) {
                          alt="Avatar" class="widget-message-avatar">` : ''}
         <div class="widget-message-content">
             <div class="widget-message-bubble">
-                ${escapeWidgetHtml(message.content || message.messageContent)}
+                ${escapeWidgetHtml(messageContent)}
             </div>
             <div class="widget-message-time">${formatWidgetMessageTime(message.createdAt)}</div>
         </div>
@@ -243,9 +293,18 @@ function widgetSendMessage() {
     const input = document.getElementById('widgetMessageInput');
     const content = input.value.trim();
     
-    if (!content || !widgetWebSocket || widgetWebSocket.readyState !== WebSocket.OPEN) {
+    if (!content) {
+        console.log('[Widget] Empty message, not sending');
         return;
     }
+    
+    if (!widgetWebSocket || widgetWebSocket.readyState !== WebSocket.OPEN) {
+        console.error('[Widget] WebSocket not connected');
+        alert('Không thể gửi tin nhắn. Vui lòng thử lại.');
+        return;
+    }
+    
+    console.log('[Widget] Sending message:', content);
     
     const message = {
         type: 'message',
@@ -254,7 +313,24 @@ function widgetSendMessage() {
         senderRole: widgetUserRole
     };
     
+    // Send via WebSocket
     widgetWebSocket.send(JSON.stringify(message));
+    
+    // Optimistically display user's own message immediately
+    const userMessage = {
+        senderId: widgetUserId,
+        messageContent: content,
+        content: content,
+        senderRole: widgetUserRole,
+        messageType: 'text',
+        createdAt: new Date().toISOString(),
+        isAiResponse: false
+    };
+    
+    appendWidgetMessage(userMessage);
+    scrollWidgetToBottom();
+    
+    // Clear input
     input.value = '';
     input.style.height = 'auto';
 }
@@ -340,6 +416,11 @@ function scrollWidgetToBottom() {
     const container = document.getElementById('widgetMessages');
     if (container) {
         container.scrollTop = container.scrollHeight;
+        
+        // Force scroll with a small delay to handle dynamic content
+        setTimeout(() => {
+            container.scrollTop = container.scrollHeight;
+        }, 10);
     }
 }
 
@@ -357,8 +438,36 @@ function formatWidgetTime(timestamp) {
 
 function formatWidgetMessageTime(timestamp) {
     if (!timestamp) return '';
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'});
+    
+    // Handle different timestamp formats
+    let date;
+    if (typeof timestamp === 'string') {
+        // Try to parse as ISO string first
+        date = new Date(timestamp);
+        // If that fails, try parsing as timestamp
+        if (isNaN(date.getTime())) {
+            date = new Date(parseInt(timestamp));
+        }
+        // If still fails, try parsing as MySQL datetime format
+        if (isNaN(date.getTime())) {
+            // Handle MySQL datetime format: "2024-01-01 12:00:00"
+            const mysqlDate = timestamp.replace(' ', 'T');
+            date = new Date(mysqlDate);
+        }
+    } else {
+        date = new Date(timestamp);
+    }
+    
+    if (isNaN(date.getTime())) {
+        console.warn('[Widget] Invalid timestamp:', timestamp);
+        return '';
+    }
+    
+    return date.toLocaleTimeString('vi-VN', {
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false
+    });
 }
 
 function escapeWidgetHtml(text) {

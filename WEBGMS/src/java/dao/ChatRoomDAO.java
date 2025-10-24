@@ -69,15 +69,18 @@ public class ChatRoomDAO extends DBConnection {
      */
     public ChatRoom findChatRoomBetweenUsers(Long user1Id, Long user2Id, Long productId) {
         String sql = "SELECT cr.* FROM chat_rooms cr " +
-                     "INNER JOIN chat_participants cp1 ON cr.room_id = cp1.room_id " +
-                     "INNER JOIN chat_participants cp2 ON cr.room_id = cp2.room_id " +
-                     "WHERE cp1.user_id = ? AND cp2.user_id = ? " +
-                     (productId != null ? "AND cr.product_id = ? " : "") +
-                     "AND cr.is_active = TRUE " +
+                     "INNER JOIN chat_participants cp1 ON cr.room_id = cp1.room_id AND cp1.user_id = ? " +
+                     "INNER JOIN chat_participants cp2 ON cr.room_id = cp2.room_id AND cp2.user_id = ? " +
+                     "WHERE cr.is_active = TRUE " +
+                     (productId != null ? "AND cr.product_id = ? " : "AND (cr.product_id IS NULL OR cr.product_id = 0) ") +
+                     "AND cr.room_type IN ('customer_admin', 'customer_seller', 'seller_admin') " +
+                     "ORDER BY cr.created_at DESC " +
                      "LIMIT 1";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            System.out.println("[ChatRoomDAO] Searching for room between users " + user1Id + " and " + user2Id + " (productId: " + productId + ")");
             
             ps.setLong(1, user1Id);
             ps.setLong(2, user2Id);
@@ -87,9 +90,13 @@ public class ChatRoomDAO extends DBConnection {
             
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return mapChatRoom(rs);
+                ChatRoom found = mapChatRoom(rs);
+                System.out.println("[ChatRoomDAO] Found existing room: " + found.getRoomId() + " (" + found.getRoomType() + ")");
+                return found;
             }
+            System.out.println("[ChatRoomDAO] No existing room found");
         } catch (Exception e) {
+            System.err.println("[ChatRoomDAO] Error finding room:");
             e.printStackTrace();
         }
         return null;
@@ -121,13 +128,14 @@ public class ChatRoomDAO extends DBConnection {
     }
     
     /**
-     * Get all chat rooms for a user
+     * Get all chat rooms for a user (excluding hidden ones)
      */
     public List<ChatRoom> getChatRoomsByUserId(Long userId) {
         List<ChatRoom> rooms = new ArrayList<>();
         String sql = "SELECT DISTINCT cr.* FROM chat_rooms cr " +
                      "INNER JOIN chat_participants cp ON cr.room_id = cp.room_id " +
                      "WHERE cp.user_id = ? AND cr.is_active = TRUE " +
+                     "AND (cp.is_hidden IS NULL OR cp.is_hidden = FALSE) " +
                      "ORDER BY cr.last_message_at DESC, cr.created_at DESC";
         
         try (Connection conn = DBConnection.getConnection();

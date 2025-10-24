@@ -140,6 +140,42 @@ public class ChatParticipantDAO extends DBConnection {
     }
 
     /**
+     * Hide chat room from user's view (soft delete)
+     */
+    public boolean hideRoom(Long roomId, Long userId) {
+        String sql = "UPDATE chat_participants SET is_hidden = TRUE WHERE room_id = ? AND user_id = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setLong(1, roomId);
+            ps.setLong(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    /**
+     * Unhide chat room for user
+     */
+    public boolean unhideRoom(Long roomId, Long userId) {
+        String sql = "UPDATE chat_participants SET is_hidden = FALSE WHERE room_id = ? AND user_id = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setLong(1, roomId);
+            ps.setLong(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    /**
      * Check if user is participant in room
      */
     public boolean isParticipant(Long roomId, Long userId) {
@@ -151,12 +187,13 @@ public class ChatParticipantDAO extends DBConnection {
             
             ps.setLong(1, roomId);
             ps.setLong(2, userId);
-            ResultSet rs = ps.executeQuery();
             
+            ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt("count") > 0;
             }
         } catch (Exception e) {
+            System.err.println("[ChatParticipantDAO] Error checking participant:");
             e.printStackTrace();
         }
         return false;

@@ -2,10 +2,12 @@ package service;
 
 import dao.AITemplateDAO;
 import dao.ChatMessageDAO;
+import dao.ChatRoomDAO;
 import dao.ProductDAO;
 import dao.OrderDAO;
 import model.chat.AITemplate;
 import model.chat.ChatMessage;
+import model.chat.ChatRoom;
 
 public class AIResponseService {
     
@@ -13,12 +15,14 @@ public class AIResponseService {
     private ChatMessageDAO chatMessageDAO;
     private ProductDAO productDAO;
     private OrderDAO orderDAO;
+    private ChatRoomDAO chatRoomDAO;
     
     public AIResponseService() {
         this.aiTemplateDAO = new AITemplateDAO();
         this.chatMessageDAO = new ChatMessageDAO();
         this.productDAO = new ProductDAO();
         this.orderDAO = new OrderDAO();
+        this.chatRoomDAO = new ChatRoomDAO();
     }
     
     /**
@@ -106,15 +110,30 @@ public class AIResponseService {
     
     /**
      * Check if AI should respond to this message
-     * AI ALWAYS responds to provide instant support
+     * AI only responds in designated AI chat rooms
      */
     public boolean shouldRespond(String messageContent, Long roomId) {
         if (messageContent == null || messageContent.trim().isEmpty()) {
             return false;
         }
         
-        // AI ALWAYS responds to every message for better customer support
-        return true;
+        // Check if this is an AI-designated chat room
+        ChatRoom room = chatRoomDAO.getChatRoomById(roomId);
+        if (room == null) {
+            return false;
+        }
+        
+        // AI only responds in specific room types
+        String roomType = room.getRoomType();
+        boolean isAIRoom = roomType != null && (
+            roomType.equals("customer_support_ai") ||
+            roomType.equals("ai_support") ||
+            roomType.equals("ai_chat")
+        );
+        
+        System.out.println("[AIResponseService] Room type: " + roomType + ", AI should respond: " + isAIRoom);
+        
+        return isAIRoom;
     }
     
     /**

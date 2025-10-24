@@ -112,9 +112,20 @@ public class ChatWebSocketServer {
      * Handle chat message
      */
     private void handleChatMessage(JsonObject jsonMessage, Long roomId, Long userId) {
+        System.out.println("[WebSocket] handleChatMessage called - roomId: " + roomId + ", userId: " + userId);
+        
         String messageContent = jsonMessage.get("content").getAsString();
         String messageType = jsonMessage.has("messageType") ? jsonMessage.get("messageType").getAsString() : "text";
         String senderRole = jsonMessage.has("senderRole") ? jsonMessage.get("senderRole").getAsString() : "customer";
+        
+        // Fix empty senderRole - default to "customer" if empty or null
+        if (senderRole == null || senderRole.trim().isEmpty()) {
+            senderRole = "customer";
+        }
+        
+        System.out.println("[WebSocket] Message content: " + messageContent);
+        System.out.println("[WebSocket] Sender role: " + senderRole);
+        System.out.println("[WebSocket] Calling chatMessageDAO.createMessage()...");
         
         // Save message to database
         ChatMessage chatMessage = chatMessageDAO.createMessage(
@@ -128,6 +139,7 @@ public class ChatWebSocketServer {
         );
         
         if (chatMessage != null) {
+            System.out.println("[WebSocket] Message saved successfully! Message ID: " + chatMessage.getMessageId());
             // Broadcast message to all users in room
             broadcastToRoom(roomId, createMessagePayload(chatMessage, "new_message"));
             
@@ -146,6 +158,8 @@ public class ChatWebSocketServer {
                     }
                 }).start();
             }
+        } else {
+            System.err.println("[WebSocket] ERROR: Failed to save message to database!");
         }
     }
     
@@ -212,18 +226,25 @@ public class ChatWebSocketServer {
     private void broadcastToRoom(Long roomId, JsonObject message, Long excludeUserId) {
         Map<Long, Session> roomSessions = chatRooms.get(roomId);
         if (roomSessions != null) {
+            System.out.println("[WebSocket] Broadcasting to room " + roomId + ", " + roomSessions.size() + " users connected");
             String messageText = gson.toJson(message);
             roomSessions.forEach((userId, session) -> {
                 if (excludeUserId == null || !userId.equals(excludeUserId)) {
                     if (session.isOpen()) {
                         try {
+                            System.out.println("[WebSocket] Sending to user " + userId + ": " + message.get("type"));
                             session.getBasicRemote().sendText(messageText);
                         } catch (IOException e) {
+                            System.err.println("[WebSocket] Failed to send to user " + userId);
                             e.printStackTrace();
                         }
+                    } else {
+                        System.out.println("[WebSocket] Session closed for user " + userId);
                     }
                 }
             });
+        } else {
+            System.out.println("[WebSocket] No sessions found for room " + roomId);
         }
     }
 }

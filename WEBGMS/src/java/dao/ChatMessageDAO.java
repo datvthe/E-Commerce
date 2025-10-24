@@ -13,12 +13,19 @@ public class ChatMessageDAO extends DBConnection {
     public ChatMessage createMessage(Long roomId, Long senderId, String senderRole, 
                                      String messageType, String messageContent, 
                                      String attachmentUrl, boolean isAiResponse) {
+        System.out.println("[ChatMessageDAO] Creating message - roomId: " + roomId + ", senderId: " + senderId + ", content: " + messageContent);
+        
         String sql = "INSERT INTO chat_messages (room_id, sender_id, sender_role, message_type, " +
-                     "message_content, attachment_url, is_ai_response, is_read, created_at) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, FALSE, NOW())";
+                     "message_content, attachment_url, is_ai_response, is_read) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, FALSE)";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            
+            if (conn == null) {
+                System.err.println("[ChatMessageDAO] ERROR: Database connection is null!");
+                return null;
+            }
             
             ps.setLong(1, roomId);
             if (senderId != null) {
@@ -32,16 +39,30 @@ public class ChatMessageDAO extends DBConnection {
             ps.setString(6, attachmentUrl);
             ps.setBoolean(7, isAiResponse);
             
+            System.out.println("[ChatMessageDAO] Executing SQL: " + sql);
             int affected = ps.executeUpdate();
+            System.out.println("[ChatMessageDAO] Rows affected: " + affected);
+            
             if (affected > 0) {
                 ResultSet keys = ps.getGeneratedKeys();
                 if (keys.next()) {
+                    Long messageId = keys.getLong(1);
+                    System.out.println("[ChatMessageDAO] Message created with ID: " + messageId);
+                    
                     // Update last message time in chat room
                     new ChatRoomDAO().updateLastMessageTime(roomId);
-                    return getMessageById(keys.getLong(1));
+                    
+                    ChatMessage message = getMessageById(messageId);
+                    System.out.println("[ChatMessageDAO] Retrieved message: " + (message != null ? "SUCCESS" : "FAILED"));
+                    return message;
+                } else {
+                    System.err.println("[ChatMessageDAO] ERROR: No generated keys returned!");
                 }
+            } else {
+                System.err.println("[ChatMessageDAO] ERROR: No rows affected by insert!");
             }
         } catch (Exception e) {
+            System.err.println("[ChatMessageDAO] EXCEPTION during message creation:");
             e.printStackTrace();
         }
         return null;
@@ -75,26 +96,39 @@ public class ChatMessageDAO extends DBConnection {
      * Get messages by room ID
      */
     public List<ChatMessage> getMessagesByRoomId(Long roomId, int limit, int offset) {
+        System.out.println("[ChatMessageDAO] Loading messages for room: " + roomId + ", limit: " + limit + ", offset: " + offset);
+        
         List<ChatMessage> messages = new ArrayList<>();
         String sql = "SELECT cm.*, u.full_name as sender_name, u.avatar_url as sender_avatar " +
                      "FROM chat_messages cm " +
                      "LEFT JOIN users u ON cm.sender_id = u.user_id " +
                      "WHERE cm.room_id = ? AND cm.is_deleted = FALSE " +
-                     "ORDER BY cm.created_at DESC " +
+                     "ORDER BY cm.message_id ASC " +
                      "LIMIT ? OFFSET ?";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            if (conn == null) {
+                System.err.println("[ChatMessageDAO] ERROR: Database connection is null!");
+                return messages;
+            }
             
             ps.setLong(1, roomId);
             ps.setInt(2, limit);
             ps.setInt(3, offset);
             ResultSet rs = ps.executeQuery();
             
+            int count = 0;
             while (rs.next()) {
                 messages.add(mapChatMessage(rs));
+                count++;
+                System.out.println("[ChatMessageDAO] Message #" + count + " - ID: " + rs.getLong("message_id") + ", Time: " + rs.getTimestamp("created_at"));
             }
+            
+            System.out.println("[ChatMessageDAO] Loaded " + count + " messages for room " + roomId);
         } catch (Exception e) {
+            System.err.println("[ChatMessageDAO] EXCEPTION while loading messages:");
             e.printStackTrace();
         }
         return messages;

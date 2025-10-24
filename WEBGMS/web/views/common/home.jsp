@@ -1240,22 +1240,30 @@
                     sessionStorage.removeItem('notificationShown');
                 }, 5000);
                 
-                // Initialize chat widget
-                try {
-                    const userId = ${sessionScope.user != null ? sessionScope.user.user_id : -1};
-                    const userRole = '${sessionScope.user != null ? sessionScope.user.default_role : "guest"}';
-                    initChatWidget('<%= request.getContextPath() %>', userId, userRole);
-                } catch(e) {
-                    console.log('Chat widget not loaded:', e);
-                }
+                // Chat widget initialized below
             });
         </script>
         
-        <!-- Chat Widget Assets -->
+        <!-- Chat Widget -->
         <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/chat-widget.css" />
         <jsp:include page="../component/chat-widget.jsp" />
         <script src="<%= request.getContextPath() %>/assets/js/chat-widget.js"></script>
         <script src="<%= request.getContextPath() %>/assets/js/aibot-widget.js"></script>
+        <script>
+            // Initialize chat widget after DOM is ready
+            document.addEventListener('DOMContentLoaded', function() {
+                try {
+                    const userId = ${sessionScope.user != null ? sessionScope.user.user_id : -1};
+                    const userRole = '${sessionScope.user != null ? sessionScope.user.default_role : "guest"}';
+                    if (typeof initChatWidget === 'function') {
+                        initChatWidget('<%= request.getContextPath() %>', userId, userRole);
+                        console.log('[Chat Widget] Initialized for home.jsp');
+                    }
+                } catch(e) {
+                    console.error('[Chat Widget] Init error:', e);
+                }
+            });
+        </script>
     </body>
 </html>
 

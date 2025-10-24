@@ -235,6 +235,10 @@ body {
     padding: 20px;
     overflow-y: auto;
     background: #f5f7fa;
+    scroll-behavior: smooth;
+    /* Ensure proper scrolling */
+    display: flex;
+    flex-direction: column;
 }
 
 .message {

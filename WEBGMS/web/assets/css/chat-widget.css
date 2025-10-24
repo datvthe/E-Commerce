@@ -144,25 +144,40 @@
 
 /* Search */
 .chat-widget-search {
-    padding: 10px;
+    padding: 12px 15px;
     border-bottom: 1px solid #e4e6eb;
     position: relative;
+    background: #fff;
+    z-index: 10;
 }
 
 .chat-widget-search-input {
     width: 100%;
-    padding: 10px 35px 10px 15px;
-    border: 1px solid #e4e6eb;
-    border-radius: 20px;
+    padding: 12px 40px 12px 15px;
+    border: 2px solid #e4e6eb;
+    border-radius: 25px;
     font-size: 14px;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.chat-widget-search-input:focus {
+    border-color: #ff6b35;
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+
+.chat-widget-search-input::placeholder {
+    color: #999;
 }
 
 .chat-widget-search i {
     position: absolute;
-    right: 25px;
+    right: 28px;
     top: 50%;
     transform: translateY(-50%);
-    color: #65676b;
+    color: #ff6b35;
+    font-size: 16px;
+    pointer-events: none;
 }
 
 /* Chat List */
@@ -404,6 +419,16 @@
     resize: none;
     max-height: 80px;
     min-width: 0; /* Allow flex shrink */
+    -moz-appearance: textfield; /* Remove spinner in Firefox */
+}
+
+/* Remove spinner arrows from textarea in Chrome, Safari, Edge */
+#widgetMessageInput::-webkit-inner-spin-button,
+#widgetMessageInput::-webkit-outer-spin-button,
+#aiBotMessageInput::-webkit-inner-spin-button,
+#aiBotMessageInput::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 #widgetMessageInput:focus,

@@ -114,22 +114,40 @@ function displayAIBotMessages(messages) {
 
 // Create message element
 function createMessageElement(msg) {
-    const div = document.createElement('div');
-    div.className = `chat-message ${msg.senderRole === 'ai' ? 'chat-message-ai' : 'chat-message-user'}`;
+    if (!msg) {
+        console.error('[AI Bot] Cannot create message element: msg is null/undefined');
+        return null;
+    }
     
-    const time = new Date(msg.createdAt).toLocaleTimeString('vi-VN', {
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    if (!msg.messageContent) {
+        console.error('[AI Bot] Cannot create message element: missing messageContent', msg);
+        return null;
+    }
+    
+    const div = document.createElement('div');
+    const isAi = msg.senderRole === 'ai' || msg.isAiResponse === true;
+    div.className = `chat-message ${isAi ? 'chat-message-ai' : 'chat-message-user'}`;
+    
+    let time = 'now';
+    if (msg.createdAt) {
+        try {
+            time = new Date(msg.createdAt).toLocaleTimeString('vi-VN', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } catch (e) {
+            console.warn('[AI Bot] Error formatting time:', e);
+        }
+    }
     
     // Format message content (convert markdown-like syntax to HTML)
-    let formattedContent = msg.messageContent
+    let formattedContent = String(msg.messageContent)
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Bold
         .replace(/\n/g, '<br>');  // Line breaks
     
     div.innerHTML = `
         <div class="chat-message-content">
-            ${msg.senderRole === 'ai' ? '<i class="fas fa-robot message-icon"></i>' : ''}
+            ${isAi ? '<i class="fas fa-robot message-icon"></i>' : ''}
             <div class="chat-message-bubble">
                 <p>${formattedContent}</p>
                 <span class="chat-message-time">${time}</span>
@@ -174,23 +192,38 @@ function sendToAIBot() {
             // Clear input
             input.value = '';
             
-            // Add user message
             const container = document.getElementById('aiBotMessages');
-            console.log('[AI Bot] User message:', data.userMessage);
-            container.appendChild(createMessageElement(data.userMessage));
             
-            // Add AI response
+            // Check if we have message data
+            if (!data.userMessage || !data.aiResponse) {
+                console.error('[AI Bot] Missing message data:', data);
+                showError('Lỗi: Không nhận được phản hồi đầy đủ');
+                return;
+            }
+            
+            // Add user message immediately
+            console.log('[AI Bot] User message:', data.userMessage);
+            const userMsgEl = createMessageElement(data.userMessage);
+            if (userMsgEl) {
+                container.appendChild(userMsgEl);
+                container.scrollTop = container.scrollHeight;
+            }
+            
+            // Add AI response with delay
             setTimeout(() => {
                 console.log('[AI Bot] AI response:', data.aiResponse);
-                container.appendChild(createMessageElement(data.aiResponse));
-                container.scrollTop = container.scrollHeight;
+                const aiMsgEl = createMessageElement(data.aiResponse);
+                if (aiMsgEl) {
+                    container.appendChild(aiMsgEl);
+                    container.scrollTop = container.scrollHeight;
+                }
                 
                 // Hide typing indicator
                 document.getElementById('aiBotTypingIndicator').style.display = 'none';
             }, 500);
         } else {
             console.error('[AI Bot] Send failed:', data.error);
-            showError('Không thể gửi tin nhắn: ' + (data.error || ''));
+            showError('Không thể gửi tin nhắn: ' + (data.error || 'Lỗi không xác định'));
         }
     })
     .catch(error => {

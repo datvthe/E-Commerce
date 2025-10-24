@@ -502,20 +502,7 @@
         </div>
         <!-- Navbar & Hero End -->
 
-        <!-- Chat Widget Include & Assets -->
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/chat-widget.css" />
-        <jsp:include page="chat-widget.jsp" />
-        <script src="${pageContext.request.contextPath}/assets/js/chat-widget.js"></script>
-        <script src="${pageContext.request.contextPath}/assets/js/aibot-widget.js"></script>
-        <script>
-            window.addEventListener('DOMContentLoaded', function(){
-                try {
-                    const userId = ${sessionScope.user != null ? sessionScope.user.user_id : -1};
-                    const userRole = '${sessionScope.user != null ? sessionScope.user.default_role : "guest"}';
-                    initChatWidget('<%= request.getContextPath() %>', userId, userRole);
-                } catch(e) {}
-            });
-        </script>
+        <!-- Chat Widget is loaded in footer.jsp -->
 
         <script>
             // Enhanced search functionality

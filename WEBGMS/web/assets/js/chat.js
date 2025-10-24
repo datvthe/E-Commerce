@@ -51,10 +51,18 @@ function createChatRoomElement(room) {
     const div = document.createElement('div');
     div.className = 'chat-item';
     div.dataset.roomId = room.roomId;
-    div.onclick = () => openChatRoom(room.roomId);
+    div.onclick = (e) => {
+        // Don't open chat if clicking avatar
+        if (!e.target.classList.contains('chat-item-avatar')) {
+            openChatRoom(room.roomId);
+        }
+    };
     
     div.innerHTML = `
-        <img src="${room.avatar || contextPath + '/assets/images/default-avatar.png'}" alt="Avatar" class="chat-item-avatar">
+        <img src="${room.avatar || contextPath + '/assets/images/default-avatar.png'}" 
+             alt="Avatar" 
+             class="chat-item-avatar" 
+             onclick="event.stopPropagation(); navigateToProfile('${room.otherUserId || room.userId}')">
         <div class="chat-item-content">
             <div class="chat-item-header">
                 <h4 class="chat-item-name">${room.roomName || 'Chat Room'}</h4>
@@ -126,14 +134,48 @@ function loadChatMessages(roomId) {
     fetch(contextPath + '/chat/messages/' + roomId)
         .then(response => response.json())
         .then(messages => {
+            console.log('[Chat] Received ' + messages.length + ' messages from server');
+            
+            // Sort messages by creation time to ensure proper order (oldest first)
+            // Since timestamps are corrupted, we'll use a more aggressive approach
+            messages.sort((a, b) => {
+                // Always use message_id as primary sort since timestamps are corrupted
+                const idA = parseInt(a.messageId) || 0;
+                const idB = parseInt(b.messageId) || 0;
+                
+                console.log('[Chat] Sorting by message_id - A:', idA, 'B:', idB);
+                return idA - idB; // Ascending order (oldest first)
+            });
+            
+            messages.forEach((msg, index) => {
+                const parsedTime = new Date(msg.createdAt);
+                console.log('[Chat] Message #' + (index + 1) + ' - ID: ' + msg.messageId + ', Raw Time: ' + msg.createdAt + ', Parsed Time: ' + parsedTime.toISOString() + ', Content: ' + (msg.content || msg.messageContent));
+            });
+            
+            // Debug: Log the final order
+            console.log('[Chat] Final message order:');
+            messages.forEach((msg, index) => {
+                console.log(`  ${index + 1}. ID: ${msg.messageId}, Content: "${msg.content || msg.messageContent}"`);
+            });
+            
             const chatMessages = document.getElementById('chatMessages');
             chatMessages.innerHTML = '';
             
-            messages.reverse().forEach(message => {
+            messages.forEach(message => {
                 appendMessage(message);
             });
             
-            scrollToBottom();
+            // Scroll to bottom immediately to show newest messages
+            setTimeout(() => {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                console.log('[Chat] Scrolled to bottom - scrollTop: ' + chatMessages.scrollTop + ', scrollHeight: ' + chatMessages.scrollHeight);
+                
+                // Force scroll to bottom again after a short delay to ensure it works
+                setTimeout(() => {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    console.log('[Chat] Force scrolled to bottom - scrollTop: ' + chatMessages.scrollTop + ', scrollHeight: ' + chatMessages.scrollHeight);
+                }, 100);
+            }, 50);
         })
         .catch(error => console.error('Error loading messages:', error));
 }
@@ -142,17 +184,20 @@ function loadChatMessages(roomId) {
  * Handle incoming WebSocket messages
  */
 function handleWebSocketMessage(message) {
+    console.log('[Chat] Received WebSocket message:', message.type, message);
+    
     switch (message.type) {
         case 'connected':
             console.log('Connected to chat room:', message.roomId);
             break;
             
         case 'new_message':
+            console.log('[Chat] Appending message from sender:', message.senderId, 'Current user:', currentUserId);
             appendMessage(message);
             scrollToBottom();
             
-            // Play notification sound if not sender
-            if (message.senderId !== currentUserId) {
+            // Play notification sound if not sender (use parseInt for comparison)
+            if (parseInt(message.senderId) !== parseInt(currentUserId)) {
                 playNotificationSound();
             }
             break;
@@ -176,17 +221,27 @@ function appendMessage(message) {
     const chatMessages = document.getElementById('chatMessages');
     const messageDiv = document.createElement('div');
     
-    const isOwn = message.senderId === currentUserId;
+    // Convert both to numbers for comparison (handle string/number mismatch)
+    const isOwn = parseInt(message.senderId) === parseInt(currentUserId);
     const isAI = message.isAiResponse || message.senderRole === 'ai';
+    
+    console.log('[Chat] Rendering message - senderId:', message.senderId, 'currentUserId:', currentUserId, 'isOwn:', isOwn);
     
     messageDiv.className = `message ${isOwn ? 'message-own' : 'message-other'} ${isAI ? 'message-ai' : ''}`;
     
+    // Handle both 'content' and 'messageContent' field names
+    const messageText = message.content || message.messageContent || '';
+    
     messageDiv.innerHTML = `
-        ${!isOwn ? `<img src="${message.senderAvatar || contextPath + '/assets/images/default-avatar.png'}" alt="Avatar" class="message-avatar">` : ''}
+        ${!isOwn ? `<img src="${message.senderAvatar || contextPath + '/assets/images/default-avatar.png'}" 
+                         alt="Avatar" 
+                         class="message-avatar" 
+                         style="cursor: pointer;" 
+                         onclick="navigateToProfile('${message.senderId}')">` : ''}
         <div class="message-content">
-            ${!isOwn ? `<div class="message-sender">${message.senderName}${isAI ? ' (AI)' : ''}</div>` : ''}
+            ${!isOwn ? `<div class="message-sender">${message.senderName || 'User'}${isAI ? ' (AI)' : ''}</div>` : ''}
             <div class="message-bubble">
-                ${escapeHtml(message.content)}
+                ${escapeHtml(messageText)}
                 ${message.isEdited ? '<span class="message-edited">(đã chỉnh sửa)</span>' : ''}
             </div>
             <div class="message-time">${formatMessageTime(message.createdAt)}</div>
@@ -207,13 +262,17 @@ function sendMessage() {
         return;
     }
     
+    // Use default role if not set
+    const senderRole = currentUserRole && currentUserRole.trim() !== '' ? currentUserRole : 'customer';
+    
     const message = {
         type: 'message',
         content: content,
         messageType: 'text',
-        senderRole: currentUserRole
+        senderRole: senderRole
     };
     
+    console.log('[Chat] Sending message:', content, 'with role:', senderRole);
     chatWebSocket.send(JSON.stringify(message));
     messageInput.value = '';
     adjustTextareaHeight(messageInput);
@@ -337,7 +396,11 @@ function updateChatHeader(data) {
     const otherParticipant = participants.find(p => p.userId !== currentUserId);
     
     if (otherParticipant) {
-        document.getElementById('chatAvatar').src = otherParticipant.userAvatar || contextPath + '/assets/images/default-avatar.png';
+        const avatarElement = document.getElementById('chatAvatar');
+        avatarElement.src = otherParticipant.userAvatar || contextPath + '/assets/images/default-avatar.png';
+        avatarElement.style.cursor = 'pointer';
+        avatarElement.onclick = () => navigateToProfile(otherParticipant.userId);
+        
         document.getElementById('chatName').textContent = otherParticipant.userName;
         document.getElementById('chatStatus').textContent = 'Online'; // Can be enhanced with real status
     }
@@ -346,9 +409,25 @@ function updateChatHeader(data) {
 /**
  * Utility functions
  */
-function scrollToBottom() {
+function scrollToBottom(smooth = true) {
     const chatMessages = document.getElementById('chatMessages');
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    if (chatMessages) {
+        if (smooth) {
+            // Use smooth scroll for better UX when sending messages
+            chatMessages.scrollTo({
+                top: chatMessages.scrollHeight,
+                behavior: 'smooth'
+            });
+        } else {
+            // Instant scroll for initial load - use multiple methods to ensure it works
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Force scroll with a small delay to handle dynamic content
+            setTimeout(() => {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 10);
+        }
+    }
 }
 
 function adjustTextareaHeight(textarea) {
@@ -358,21 +437,115 @@ function adjustTextareaHeight(textarea) {
 
 function formatTime(timestamp) {
     if (!timestamp) return '';
+    
+    // Parse timestamp properly
     const date = new Date(timestamp);
+    if (isNaN(date.getTime())) return '';
+    
     const now = new Date();
     const diff = now - date;
     
-    if (diff < 60000) return 'Vừa xong';
-    if (diff < 3600000) return Math.floor(diff / 60000) + ' phút trước';
-    if (diff < 86400000) return Math.floor(diff / 3600000) + ' giờ trước';
+    // Just now (less than 1 minute)
+    if (diff < 60000 && diff >= 0) return 'Vừa xong';
     
-    return date.toLocaleDateString('vi-VN');
+    // Minutes ago (less than 1 hour)
+    if (diff < 3600000 && diff >= 0) {
+        const minutes = Math.floor(diff / 60000);
+        return minutes + ' phút trước';
+    }
+    
+    // Hours ago (less than 24 hours)
+    if (diff < 86400000 && diff >= 0) {
+        const hours = Math.floor(diff / 3600000);
+        return hours + ' giờ trước';
+    }
+    
+    // Days ago (less than 7 days)
+    if (diff < 604800000 && diff >= 0) {
+        const days = Math.floor(diff / 86400000);
+        return days + ' ngày trước';
+    }
+    
+    // Show full date for older messages
+    return date.toLocaleDateString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
 }
 
 function formatMessageTime(timestamp) {
     if (!timestamp) return '';
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    
+    // Handle different timestamp formats
+    let date;
+    if (typeof timestamp === 'string') {
+        // Try to parse as ISO string first
+        date = new Date(timestamp);
+        // If that fails, try parsing as timestamp
+        if (isNaN(date.getTime())) {
+            date = new Date(parseInt(timestamp));
+        }
+        // If still fails, try parsing as MySQL datetime format
+        if (isNaN(date.getTime())) {
+            // Handle MySQL datetime format: "2024-01-01 12:00:00"
+            const mysqlDate = timestamp.replace(' ', 'T');
+            date = new Date(mysqlDate);
+        }
+    } else {
+        date = new Date(timestamp);
+    }
+    
+    if (isNaN(date.getTime())) {
+        console.warn('[Chat] Invalid timestamp:', timestamp);
+        return '';
+    }
+    
+    // Debug: Log the parsed date
+    console.log('[Chat] Parsed timestamp:', timestamp, '->', date.toISOString());
+    
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const messageDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const diffDays = Math.floor((today - messageDate) / 86400000);
+    
+    // Today: show time only
+    if (diffDays === 0) {
+        return date.toLocaleTimeString('vi-VN', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: false
+        });
+    }
+    
+    // Yesterday
+    if (diffDays === 1) {
+        return 'Hôm qua ' + date.toLocaleTimeString('vi-VN', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: false
+        });
+    }
+    
+    // This week (within 7 days)
+    if (diffDays < 7) {
+        const weekdays = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+        return weekdays[date.getDay()] + ' ' + date.toLocaleTimeString('vi-VN', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: false
+        });
+    }
+    
+    // Older: show date and time
+    return date.toLocaleDateString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit'
+    }) + ' ' + date.toLocaleTimeString('vi-VN', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false
+    });
 }
 
 function escapeHtml(text) {
@@ -401,4 +574,15 @@ function closeNewChatModal() {
 function createNewChat() {
     // Implement new chat creation
     alert('Feature coming soon!');
+}
+
+/**
+ * Navigate to user profile
+ */
+function navigateToProfile(userId) {
+    if (!userId) {
+        console.error('User ID is required to navigate to profile');
+        return;
+    }
+    window.location.href = contextPath + '/profile?id=' + userId;
 }
