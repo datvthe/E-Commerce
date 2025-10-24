@@ -416,15 +416,6 @@
                 if (verificationCodeInput) {
                     verificationCodeInput.focus();
                 }
-                
-                // Auto-hide alerts after showing them once (prevent re-showing on back navigation)
-                const alerts = document.querySelectorAll('.alert');
-                alerts.forEach(alert => {
-                    setTimeout(() => {
-                        const bsAlert = new bootstrap.Alert(alert);
-                        bsAlert.close();
-                    }, 5000);
-                });
             });
         </script>
     </body>

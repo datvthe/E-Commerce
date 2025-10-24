@@ -23,7 +23,7 @@
         }
         .nav-link.active {
             font-weight: 600;
-            color: #f97316 !important;
+            color: #764ba2 !important;
         }
         * {
             margin: 0;
@@ -45,7 +45,7 @@
         }
         
         .header {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 2rem 0;
             margin-bottom: 2rem;
@@ -143,7 +143,7 @@
         
         .product-category {
             display: inline-block;
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
@@ -196,12 +196,12 @@
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
         }
         
         .btn-primary:hover {
-            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
             transform: translateY(-1px);
         }
         
@@ -248,7 +248,7 @@
         }
         
         .btn-large {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            background: linear-gradient(135deg, #3b71ca 0%, #2563eb 100%);
             color: white;
             padding: 1rem 2rem;
             border: none;
@@ -261,7 +261,7 @@
         }
         
         .btn-large:hover {
-            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+            background: linear-gradient(135deg, #2c5aa0 0%, #1d4ed8 100%);
             transform: translateY(-1px);
             color: white;
         }
@@ -308,14 +308,14 @@
         }
         
         .page-link:hover {
-            background: #fff7ed;
-            color: #f97316;
+            background: #f1f5f9;
+            color: #3b71ca;
         }
         
         .page-link.active {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            background: linear-gradient(135deg, #3b71ca 0%, #2563eb 100%);
             color: white;
-            border-color: #f97316;
+            border-color: #3b71ca;
         }
         
         .actions-footer {

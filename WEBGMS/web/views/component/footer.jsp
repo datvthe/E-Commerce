@@ -59,6 +59,9 @@
 </div>
 <!-- Footer End -->
 
+<!-- Back to Top -->
+<a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+
 <!-- Electro Bootstrap Scripts -->
 <!-- jQuery (CDN fallback because local copy not bundled) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
@@ -81,22 +84,3 @@
     <script src="<%= request.getContextPath() %>/views/assets/electro/lib/lightbox/js/lightbox.min.js" defer></script>
 </c:if>
 <script src="<%= request.getContextPath() %>/views/assets/electro/js/main.js" defer></script>
-
-<!-- Chat Widget for All Pages -->
-<link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/chat-widget.css" />
-<jsp:include page="chat-widget.jsp" />
-<script src="<%= request.getContextPath() %>/assets/js/chat-widget.js"></script>
-<script src="<%= request.getContextPath() %>/assets/js/aibot-widget.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        try {
-            const userId = ${sessionScope.user != null ? sessionScope.user.user_id : -1};
-            const userRole = '${sessionScope.user != null ? sessionScope.user.default_role : "guest"}';
-            if (typeof initChatWidget === 'function') {
-                initChatWidget('<%= request.getContextPath() %>', userId, userRole);
-            }
-        } catch(e) {
-            console.log('Chat widget init error:', e);
-        }
-    });
-</script>
