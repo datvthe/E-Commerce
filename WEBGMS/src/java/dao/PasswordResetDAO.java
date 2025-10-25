@@ -58,17 +58,17 @@ public class PasswordResetDAO extends DBConnection {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
             ps.setInt(1, resetId);
-            ResultSet rs = ps.executeQuery();
-            
-            if (rs.next()) {
-                passwordReset = new PasswordReset();
-                passwordReset.setReset_id(rs.getInt("reset_id"));
-                passwordReset.setEmail(rs.getString("email"));
-                passwordReset.setVerification_code(rs.getString("verification_code"));
-                passwordReset.setCreated_at(rs.getTimestamp("created_at"));
-                passwordReset.setExpires_at(rs.getTimestamp("expires_at"));
-                passwordReset.setUsed(rs.getBoolean("used"));
-                passwordReset.setUsed_at(rs.getTimestamp("used_at"));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    passwordReset = new PasswordReset();
+                    passwordReset.setReset_id(rs.getInt("reset_id"));
+                    passwordReset.setEmail(rs.getString("email"));
+                    passwordReset.setVerification_code(rs.getString("verification_code"));
+                    passwordReset.setCreated_at(rs.getTimestamp("created_at"));
+                    passwordReset.setExpires_at(rs.getTimestamp("expires_at"));
+                    passwordReset.setUsed(rs.getBoolean("used"));
+                    passwordReset.setUsed_at(rs.getTimestamp("used_at"));
+                }
             }
             
         } catch (Exception e) {
@@ -92,17 +92,17 @@ public class PasswordResetDAO extends DBConnection {
             
             ps.setString(1, email);
             ps.setString(2, verificationCode);
-            ResultSet rs = ps.executeQuery();
-            
-            if (rs.next()) {
-                passwordReset = new PasswordReset();
-                passwordReset.setReset_id(rs.getInt("reset_id"));
-                passwordReset.setEmail(rs.getString("email"));
-                passwordReset.setVerification_code(rs.getString("verification_code"));
-                passwordReset.setCreated_at(rs.getTimestamp("created_at"));
-                passwordReset.setExpires_at(rs.getTimestamp("expires_at"));
-                passwordReset.setUsed(rs.getBoolean("used"));
-                passwordReset.setUsed_at(rs.getTimestamp("used_at"));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    passwordReset = new PasswordReset();
+                    passwordReset.setReset_id(rs.getInt("reset_id"));
+                    passwordReset.setEmail(rs.getString("email"));
+                    passwordReset.setVerification_code(rs.getString("verification_code"));
+                    passwordReset.setCreated_at(rs.getTimestamp("created_at"));
+                    passwordReset.setExpires_at(rs.getTimestamp("expires_at"));
+                    passwordReset.setUsed(rs.getBoolean("used"));
+                    passwordReset.setUsed_at(rs.getTimestamp("used_at"));
+                }
             }
             
         } catch (Exception e) {
@@ -175,8 +175,9 @@ public class PasswordResetDAO extends DBConnection {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
             ps.setString(1, email);
-            ResultSet rs = ps.executeQuery();
-            return rs.next();
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
             
         } catch (Exception e) {
             e.printStackTrace();

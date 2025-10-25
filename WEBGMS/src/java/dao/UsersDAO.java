@@ -19,45 +19,47 @@ public class UsersDAO extends DBConnection {
                 + "WHERE (email = ? OR phone_number = ?) "
                 + "AND status = 'active'";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, account);
             ps.setString(2, account);
 
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                String storedPassword = rs.getString("password_hash");
-                
-                // Check if password is hashed or plain text (for migration)
-                boolean passwordMatch = false;
-                if (PasswordUtil.isHashed(storedPassword)) {
-                    // Password is hashed with new format (hash:salt), verify with hash
-                    passwordMatch = PasswordUtil.verifyPassword(password, storedPassword);
-                } else if (storedPassword.length() > 50 && !storedPassword.contains(":")) {
-                    // Password is hashed with old format (Base64 combined), verify with old method
-                    passwordMatch = verifyOldPassword(password, storedPassword);
-                } else {
-                    // Password is plain text, check directly (for migration)
-                    passwordMatch = password.equals(storedPassword);
-                }
-                
-                if (passwordMatch) {
-                    user = new Users();
-                    user.setUser_id(rs.getInt("user_id"));
-                    user.setFull_name(rs.getString("full_name"));
-                    user.setEmail(rs.getString("email"));
-                    user.setPassword(rs.getString("password_hash"));
-                    user.setPhone_number(rs.getString("phone_number"));
-                    user.setGender(rs.getString("gender"));
-                    user.setDate_of_birth(rs.getDate("date_of_birth"));
-                    user.setAddress(rs.getString("address"));
-                    user.setAvatar_url(rs.getString("avatar_url"));
-                    user.setStatus(rs.getString("status"));
-                    user.setEmail_verified(rs.getBoolean("email_verified"));
-                    user.setLast_login_at(rs.getDate("last_login_at"));
-                    user.setCreated_at(rs.getDate("created_at"));
-                    user.setUpdated_at(rs.getDate("updated_at"));
-                    user.setDeleted_at(rs.getDate("deleted_at"));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String storedPassword = rs.getString("password_hash");
+                    
+                    // Check if password is hashed or plain text (for migration)
+                    boolean passwordMatch = false;
+                    if (PasswordUtil.isHashed(storedPassword)) {
+                        // Password is hashed with new format (hash:salt), verify with hash
+                        passwordMatch = PasswordUtil.verifyPassword(password, storedPassword);
+                    } else if (storedPassword.length() > 50 && !storedPassword.contains(":")) {
+                        // Password is hashed with old format (Base64 combined), verify with old method
+                        passwordMatch = verifyOldPassword(password, storedPassword);
+                    } else {
+                        // Password is plain text, check directly (for migration)
+                        passwordMatch = password.equals(storedPassword);
+                    }
+                    
+                    if (passwordMatch) {
+                        user = new Users();
+                        user.setUser_id(rs.getInt("user_id"));
+                        user.setFull_name(rs.getString("full_name"));
+                        user.setEmail(rs.getString("email"));
+                        user.setPassword(rs.getString("password_hash"));
+                        user.setPhone_number(rs.getString("phone_number"));
+                        user.setGender(rs.getString("gender"));
+                        user.setDate_of_birth(rs.getDate("date_of_birth"));
+                        user.setAddress(rs.getString("address"));
+                        user.setAvatar_url(rs.getString("avatar_url"));
+                        user.setStatus(rs.getString("status"));
+                        user.setEmail_verified(rs.getBoolean("email_verified"));
+                        user.setLast_login_at(rs.getDate("last_login_at"));
+                        user.setCreated_at(rs.getDate("created_at"));
+                        user.setUpdated_at(rs.getDate("updated_at"));
+                        user.setDeleted_at(rs.getDate("deleted_at"));
+                    }
                 }
             }
 
@@ -84,16 +86,18 @@ public class UsersDAO extends DBConnection {
         String sql = "SELECT u.* FROM users u "
                 + "JOIN User_Tokens t ON u.user_id = t.user_id "
                 + "WHERE t.token = ? AND t.expiry > NOW()";
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, token);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                user = new Users();
-                user.setUser_id(rs.getInt("user_id"));
-                user.setFull_name(rs.getString("full_name"));
-                user.setEmail(rs.getString("email"));
-                user.setPhone_number(rs.getString("phone_number"));
-                user.setStatus(rs.getString("status"));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    user = new Users();
+                    user.setUser_id(rs.getInt("user_id"));
+                    user.setFull_name(rs.getString("full_name"));
+                    user.setEmail(rs.getString("email"));
+                    user.setPhone_number(rs.getString("phone_number"));
+                    user.setStatus(rs.getString("status"));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -116,21 +120,23 @@ public class UsersDAO extends DBConnection {
         String sql = "SELECT * FROM User_Roles "
                 + "WHERE user_id = ?";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, user_id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                UsersDAO userDao = new UsersDAO();
-                Users user = userDao.getUserById(rs.getInt("user_id"));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    UsersDAO userDao = new UsersDAO();
+                    Users user = userDao.getUserById(rs.getInt("user_id"));
 
-                RoleDAO roleDao = new RoleDAO();
-                Roles role = roleDao.getRoleById(rs.getInt("role_id"));
+                    RoleDAO roleDao = new RoleDAO();
+                    Roles role = roleDao.getRoleById(rs.getInt("role_id"));
 
-                userRole = new UserRoles();
-                userRole.setUser_role_id(rs.getInt("user_role_id"));
-                userRole.setUser_id(user);
-                userRole.setRole_id(role);
-                userRole.setAssigned_at(rs.getTimestamp("assigned_at"));
+                    userRole = new UserRoles();
+                    userRole.setUser_role_id(rs.getInt("user_role_id"));
+                    userRole.setUser_id(user);
+                    userRole.setRole_id(role);
+                    userRole.setAssigned_at(rs.getTimestamp("assigned_at"));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -166,34 +172,34 @@ public class UsersDAO extends DBConnection {
             return false;
         }
     }
-<<<<<<< HEAD
 
     public Users getUserById(int userId) {
         Users user = null;
         String sql = "SELECT * FROM users WHERE user_id = ?";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                user = new Users();
-                user.setUser_id(rs.getInt("user_id"));
-                user.setFull_name(rs.getString("full_name"));
-                user.setEmail(rs.getString("email"));
-                user.setPassword(rs.getString("password_hash"));
-                user.setPhone_number(rs.getString("phone_number"));
-                user.setGender(rs.getString("gender"));
-                user.setDate_of_birth(rs.getDate("date_of_birth"));
-                user.setAddress(rs.getString("address"));
-                user.setAvatar_url(rs.getString("avatar_url"));
-                user.setStatus(rs.getString("status"));
-                user.setEmail_verified(rs.getBoolean("email_verified"));
-                user.setLast_login_at(rs.getDate("last_login_at"));
-                user.setCreated_at(rs.getDate("created_at"));
-                user.setUpdated_at(rs.getDate("updated_at"));
-                user.setDeleted_at(rs.getDate("deleted_at"));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    user = new Users();
+                    user.setUser_id(rs.getInt("user_id"));
+                    user.setFull_name(rs.getString("full_name"));
+                    user.setEmail(rs.getString("email"));
+                    user.setPassword(rs.getString("password_hash"));
+                    user.setPhone_number(rs.getString("phone_number"));
+                    user.setGender(rs.getString("gender"));
+                    user.setDate_of_birth(rs.getDate("date_of_birth"));
+                    user.setAddress(rs.getString("address"));
+                    user.setAvatar_url(rs.getString("avatar_url"));
+                    user.setStatus(rs.getString("status"));
+                    user.setEmail_verified(rs.getBoolean("email_verified"));
+                    user.setLast_login_at(rs.getDate("last_login_at"));
+                    user.setCreated_at(rs.getDate("created_at"));
+                    user.setUpdated_at(rs.getDate("updated_at"));
+                    user.setDeleted_at(rs.getDate("deleted_at"));
+                }
             }
 
         } catch (Exception e) {
@@ -203,11 +209,6 @@ public class UsersDAO extends DBConnection {
         return user;
     }
 
-    public boolean isEmailExists(String email) {
-        String sql = "SELECT 1 FROM users WHERE email = ? LIMIT 1";
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-=======
-    
     /**
      * Check if email already exists
      */
@@ -215,25 +216,18 @@ public class UsersDAO extends DBConnection {
         String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
->>>>>>> adfffa2ca17758b7b0f2e7aa138910e53f368132
             ps.setString(1, email);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
-<<<<<<< HEAD
 
-    public boolean isPhoneExists(String phoneNumber) {
-        String sql = "SELECT 1 FROM users WHERE phone_number = ? LIMIT 1";
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, phoneNumber);
-=======
-    
     /**
      * Check if phone number already exists
      */
@@ -242,33 +236,34 @@ public class UsersDAO extends DBConnection {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, phone);
->>>>>>> adfffa2ca17758b7b0f2e7aa138910e53f368132
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
-<<<<<<< HEAD
 
     public Users createUser(String fullName, String email, String password, String phoneNumber) {
         Users user = null;
         // Password is already hashed in CommonRegisterController, don't hash again
         String sql = "INSERT INTO users (full_name, email, password_hash, phone_number, status, email_verified, default_role, created_at) VALUES (?, ?, ?, ?, 'active', 0, 'customer', NOW())";
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, fullName);
             ps.setString(2, email);
             ps.setString(3, password);
             ps.setString(4, phoneNumber);
             int affected = ps.executeUpdate();
             if (affected > 0) {
-                ResultSet keys = ps.getGeneratedKeys();
-                if (keys.next()) {
-                    int userId = keys.getInt(1);
-                    user = getUserById(userId);
+                try (ResultSet keys = ps.getGeneratedKeys()) {
+                    if (keys.next()) {
+                        int userId = keys.getInt(1);
+                        user = getUserById(userId);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -302,26 +297,28 @@ public class UsersDAO extends DBConnection {
     public Users getUserByEmail(String email) {
         Users user = null;
         String sql = "SELECT * FROM users WHERE email = ?";
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                user = new Users();
-                user.setUser_id(rs.getInt("user_id"));
-                user.setFull_name(rs.getString("full_name"));
-                user.setEmail(rs.getString("email"));
-                user.setPassword(rs.getString("password_hash"));
-                user.setPhone_number(rs.getString("phone_number"));
-                user.setGender(rs.getString("gender"));
-                user.setDate_of_birth(rs.getDate("date_of_birth"));
-                user.setAddress(rs.getString("address"));
-                user.setAvatar_url(rs.getString("avatar_url"));
-                user.setStatus(rs.getString("status"));
-                user.setEmail_verified(rs.getBoolean("email_verified"));
-                user.setLast_login_at(rs.getDate("last_login_at"));
-                user.setCreated_at(rs.getDate("created_at"));
-                user.setUpdated_at(rs.getDate("updated_at"));
-                user.setDeleted_at(rs.getDate("deleted_at"));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    user = new Users();
+                    user.setUser_id(rs.getInt("user_id"));
+                    user.setFull_name(rs.getString("full_name"));
+                    user.setEmail(rs.getString("email"));
+                    user.setPassword(rs.getString("password_hash"));
+                    user.setPhone_number(rs.getString("phone_number"));
+                    user.setGender(rs.getString("gender"));
+                    user.setDate_of_birth(rs.getDate("date_of_birth"));
+                    user.setAddress(rs.getString("address"));
+                    user.setAvatar_url(rs.getString("avatar_url"));
+                    user.setStatus(rs.getString("status"));
+                    user.setEmail_verified(rs.getBoolean("email_verified"));
+                    user.setLast_login_at(rs.getDate("last_login_at"));
+                    user.setCreated_at(rs.getDate("created_at"));
+                    user.setUpdated_at(rs.getDate("updated_at"));
+                    user.setDeleted_at(rs.getDate("deleted_at"));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -386,9 +383,10 @@ public class UsersDAO extends DBConnection {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, limit);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(mapUser(rs));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapUser(rs));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -422,11 +420,13 @@ public class UsersDAO extends DBConnection {
         List<Users> list = new ArrayList<>();
         int offset = (page - 1) * pageSize;
         String sql = "SELECT * FROM users WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT ? OFFSET ?";
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, pageSize);
             ps.setInt(2, offset);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) list.add(mapUser(rs));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(mapUser(rs));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -452,7 +452,8 @@ public class UsersDAO extends DBConnection {
             params.add(role.toLowerCase());
         }
         sql.append("ORDER BY created_at DESC LIMIT ? OFFSET ?");
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             int idx = 1;
             for (Object p : params) {
                 if (p instanceof String) ps.setString(idx++, (String) p);
@@ -460,8 +461,9 @@ public class UsersDAO extends DBConnection {
             }
             ps.setInt(idx++, pageSize);
             ps.setInt(idx, offset);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) list.add(mapUser(rs));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(mapUser(rs));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -484,14 +486,16 @@ public class UsersDAO extends DBConnection {
             sql.append("AND default_role = ? ");
             params.add(role.toLowerCase());
         }
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             int idx = 1;
             for (Object p : params) {
                 if (p instanceof String) ps.setString(idx++, (String) p);
                 else if (p instanceof Integer) ps.setInt(idx++, (Integer) p);
             }
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt(1);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -500,9 +504,11 @@ public class UsersDAO extends DBConnection {
 
     public int getTotalUsers() {
         String sql = "SELECT COUNT(*) FROM users WHERE deleted_at IS NULL";
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt(1);
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -531,6 +537,4 @@ public class UsersDAO extends DBConnection {
         }
         return false;
     }
-=======
->>>>>>> adfffa2ca17758b7b0f2e7aa138910e53f368132
 }

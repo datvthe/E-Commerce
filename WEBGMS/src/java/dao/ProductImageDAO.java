@@ -22,23 +22,24 @@ public class ProductImageDAO extends DBConnection {
                 + "WHERE product_id = ? "
                 + "ORDER BY is_primary DESC, image_id ASC";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, productId);
-            ResultSet rs = ps.executeQuery();
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ProductImages image = new ProductImages();
+                    image.setImage_id(rs.getInt("image_id"));
 
-            while (rs.next()) {
-                ProductImages image = new ProductImages();
-                image.setImage_id(rs.getInt("image_id"));
+                    Products product = new Products();
+                    product.setProduct_id(productId);
+                    image.setProduct_id(product);
 
-                Products product = new Products();
-                product.setProduct_id(productId);
-                image.setProduct_id(product);
-
-                image.setUrl(rs.getString("url"));
-                image.setAlt_text(rs.getString("alt_text"));
-                image.setIs_primary(rs.getBoolean("is_primary"));
-                images.add(image);
+                    image.setUrl(rs.getString("url"));
+                    image.setAlt_text(rs.getString("alt_text"));
+                    image.setIs_primary(rs.getBoolean("is_primary"));
+                    images.add(image);
+                }
             }
 
         } catch (Exception e) {
@@ -56,22 +57,23 @@ public class ProductImageDAO extends DBConnection {
                 + "WHERE product_id = ? AND is_primary = 1 "
                 + "LIMIT 1";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, productId);
-            ResultSet rs = ps.executeQuery();
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    image = new ProductImages();
+                    image.setImage_id(rs.getInt("image_id"));
 
-            if (rs.next()) {
-                image = new ProductImages();
-                image.setImage_id(rs.getInt("image_id"));
+                    Products product = new Products();
+                    product.setProduct_id(productId);
+                    image.setProduct_id(product);
 
-                Products product = new Products();
-                product.setProduct_id(productId);
-                image.setProduct_id(product);
-
-                image.setUrl(rs.getString("url"));
-                image.setAlt_text(rs.getString("alt_text"));
-                image.setIs_primary(rs.getBoolean("is_primary"));
+                    image.setUrl(rs.getString("url"));
+                    image.setAlt_text(rs.getString("alt_text"));
+                    image.setIs_primary(rs.getBoolean("is_primary"));
+                }
             }
 
         } catch (Exception e) {

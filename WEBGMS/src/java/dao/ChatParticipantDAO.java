@@ -46,10 +46,10 @@ public class ChatParticipantDAO extends DBConnection {
             
             ps.setLong(1, roomId);
             ps.setLong(2, userId);
-            ResultSet rs = ps.executeQuery();
-            
-            if (rs.next()) {
-                return mapParticipant(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapParticipant(rs);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,10 +72,10 @@ public class ChatParticipantDAO extends DBConnection {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
             ps.setLong(1, roomId);
-            ResultSet rs = ps.executeQuery();
-            
-            while (rs.next()) {
-                participants.add(mapParticipant(rs));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    participants.add(mapParticipant(rs));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -188,9 +188,10 @@ public class ChatParticipantDAO extends DBConnection {
             ps.setLong(1, roomId);
             ps.setLong(2, userId);
             
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("count") > 0;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("count") > 0;
+                }
             }
         } catch (Exception e) {
             System.err.println("[ChatParticipantDAO] Error checking participant:");

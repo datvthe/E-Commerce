@@ -55,8 +55,7 @@ public class ContactController extends HttpServlet {
         }
         
         try {
-            // TODO: Implement email sending functionality
-            // For now, just log the contact form data
+            // Log the contact form data
             System.out.println("Contact Form Submission:");
             System.out.println("Name: " + name);
             System.out.println("Email: " + email);

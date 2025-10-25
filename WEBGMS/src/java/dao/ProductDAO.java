@@ -6,12 +6,9 @@ import model.user.Users;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-<<<<<<< HEAD
 import java.sql.Statement;
 import java.sql.Timestamp;
-=======
 import java.sql.SQLException;
->>>>>>> adfffa2ca17758b7b0f2e7aa138910e53f368132
 import java.util.ArrayList;
 import java.util.List;
 import model.product.ProductImages;
@@ -548,8 +545,6 @@ public class ProductDAO extends DBConnection {
         }
         return 0;
     }
-
-<<<<<<< HEAD
     private Products mapProductLite(ResultSet rs) throws Exception {
         Products product = new Products();
         product.setProduct_id(rs.getLong("product_id"));
@@ -571,7 +566,6 @@ public class ProductDAO extends DBConnection {
         s = s.replaceAll("-+", "-");
         return s;
     }
-=======
     public int countFilteredProducts(String search, String category) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) AS total FROM Products WHERE status = 'active' AND deleted_at IS NULL");
 
@@ -649,6 +643,4 @@ public class ProductDAO extends DBConnection {
         }
         return images;
     }
-
->>>>>>> adfffa2ca17758b7b0f2e7aa138910e53f368132
 }

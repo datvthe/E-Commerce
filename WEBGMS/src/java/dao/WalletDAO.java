@@ -13,9 +13,10 @@ public double getBalance(int userId) {
     try (Connection conn = DBConnection.getConnection();
          PreparedStatement ps = conn.prepareStatement(sql)) {
         ps.setInt(1, userId);
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            return rs.getDouble("balance");
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble("balance");
+            }
         }
     } catch (Exception e) {
         e.printStackTrace();
@@ -26,13 +27,15 @@ public double getBalance(int userId) {
 
 public void processTopUp(int userId, double amount, String transactionId, String bank) throws SQLException {
     Connection conn = null;
+    PreparedStatement ps1 = null;
+    PreparedStatement ps2 = null;
     try {
         conn = DBConnection.getConnection();
         conn.setAutoCommit(false);
 
         // 1️⃣ Ghi lịch sử
         String sql1 = "INSERT INTO transactions (transaction_id, user_id, amount, status, note, created_at) VALUES (?, ?, ?, ?, ?, NOW())";
-        PreparedStatement ps1 = conn.prepareStatement(sql1);
+        ps1 = conn.prepareStatement(sql1);
         ps1.setString(1, transactionId);
         ps1.setInt(2, userId);
         ps1.setDouble(3, amount);
@@ -42,7 +45,7 @@ public void processTopUp(int userId, double amount, String transactionId, String
 
         // 2️⃣ Cập nhật số dư ví
         String sql2 = "UPDATE wallets SET balance = balance + ? WHERE user_id = ?";
-        PreparedStatement ps2 = conn.prepareStatement(sql2);
+        ps2 = conn.prepareStatement(sql2);
         ps2.setDouble(1, amount);
         ps2.setInt(2, userId);
         ps2.executeUpdate();
@@ -52,7 +55,9 @@ public void processTopUp(int userId, double amount, String transactionId, String
         if (conn != null) conn.rollback();
         throw e;
     } finally {
-        if (conn != null) conn.close();
+        if (ps1 != null) try { ps1.close(); } catch (Exception ignored) {}
+        if (ps2 != null) try { ps2.close(); } catch (Exception ignored) {}
+        if (conn != null) try { conn.close(); } catch (Exception ignored) {}
     }
 }
 
@@ -171,11 +176,13 @@ public boolean deductBalance(int userId, double amount) {
     /** ✅ Lấy số dư của người dùng (BigDecimal) */
     public java.math.BigDecimal getBalanceByUserId(int userId) {
         String sql = "SELECT balance FROM wallets WHERE user_id = ?";
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getBigDecimal("balance");
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBigDecimal("balance");
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

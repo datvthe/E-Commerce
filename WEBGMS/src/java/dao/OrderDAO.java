@@ -26,8 +26,9 @@ public class OrderDAO extends DBConnection {
     // ===== Admin-wide metrics =====
     public int getTotalOrders() {
         String sql = "SELECT COUNT(*) FROM orders";
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
             if (rs.next()) return rs.getInt(1);
         } catch (Exception e) {
             e.printStackTrace();
@@ -37,8 +38,9 @@ public class OrderDAO extends DBConnection {
 
     public int getOrdersToday() {
         String sql = "SELECT COUNT(*) FROM orders WHERE DATE(created_at) = CURDATE()";
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
             if (rs.next()) return rs.getInt(1);
         } catch (Exception e) {
             e.printStackTrace();
@@ -48,8 +50,9 @@ public class OrderDAO extends DBConnection {
 
     public java.math.BigDecimal getRevenueTodayAll() {
         String sql = "SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE DATE(created_at) = CURDATE()";
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
             if (rs.next()) return rs.getBigDecimal(1);
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,27 +67,29 @@ public class OrderDAO extends DBConnection {
                      "LEFT JOIN users b ON o.buyer_id = b.user_id " +
                      "LEFT JOIN users s ON o.seller_id = s.user_id " +
                      "ORDER BY o.created_at DESC LIMIT ?";
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, limit);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Orders order = new Orders();
-                order.setOrder_id(rs.getInt("order_id"));
-                order.setStatus(rs.getString("status"));
-                order.setTotal_amount(rs.getBigDecimal("total_amount"));
-                order.setCurrency(rs.getString("currency"));
-                order.setCreated_at(rs.getTimestamp("created_at"));
-                // buyer
-                Users buyer = new Users();
-                buyer.setUser_id(rs.getInt("buyer_user_id"));
-                buyer.setFull_name(rs.getString("buyer_name"));
-                order.setBuyer_id(buyer);
-                // seller
-                Users seller = new Users();
-                seller.setUser_id(rs.getInt("seller_user_id"));
-                seller.setFull_name(rs.getString("seller_name"));
-                order.setSeller_id(seller);
-                orders.add(order);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Orders order = new Orders();
+                    order.setOrder_id(rs.getInt("order_id"));
+                    order.setStatus(rs.getString("status"));
+                    order.setTotal_amount(rs.getBigDecimal("total_amount"));
+                    order.setCurrency(rs.getString("currency"));
+                    order.setCreated_at(rs.getTimestamp("created_at"));
+                    // buyer
+                    Users buyer = new Users();
+                    buyer.setUser_id(rs.getInt("buyer_user_id"));
+                    buyer.setFull_name(rs.getString("buyer_name"));
+                    order.setBuyer_id(buyer);
+                    // seller
+                    Users seller = new Users();
+                    seller.setUser_id(rs.getInt("seller_user_id"));
+                    seller.setFull_name(rs.getString("seller_name"));
+                    order.setSeller_id(seller);
+                    orders.add(order);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -97,8 +102,9 @@ public class OrderDAO extends DBConnection {
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, sellerId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt(1);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -110,8 +116,9 @@ public class OrderDAO extends DBConnection {
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, sellerId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getDouble(1);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getDouble(1);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -140,29 +147,30 @@ public class OrderDAO extends DBConnection {
             }
             ps.setInt(idx++, pageSize);
             ps.setInt(idx, offset);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Orders order = new Orders();
-                order.setOrder_id(rs.getInt("order_id"));
-                order.setStatus(rs.getString("status"));
-                order.setTotal_amount(rs.getBigDecimal("total_amount"));
-                order.setCurrency(rs.getString("currency"));
-                order.setShipping_address(rs.getString("shipping_address"));
-                order.setShipping_method(rs.getString("shipping_method"));
-                order.setTracking_number(rs.getString("tracking_number"));
-                order.setCreated_at(rs.getTimestamp("created_at"));
-                order.setUpdated_at(rs.getTimestamp("updated_at"));
-                Users buyer = new Users();
-                buyer.setUser_id(rs.getInt("buyer_user_id"));
-                buyer.setFull_name(rs.getString("buyer_name"));
-                buyer.setEmail(rs.getString("buyer_email"));
-                order.setBuyer_id(buyer);
-                Users seller = new Users();
-                seller.setUser_id(rs.getInt("seller_user_id"));
-                seller.setFull_name(rs.getString("seller_name"));
-                seller.setEmail(rs.getString("seller_email"));
-                order.setSeller_id(seller);
-                orders.add(order);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Orders order = new Orders();
+                    order.setOrder_id(rs.getInt("order_id"));
+                    order.setStatus(rs.getString("status"));
+                    order.setTotal_amount(rs.getBigDecimal("total_amount"));
+                    order.setCurrency(rs.getString("currency"));
+                    order.setShipping_address(rs.getString("shipping_address"));
+                    order.setShipping_method(rs.getString("shipping_method"));
+                    order.setTracking_number(rs.getString("tracking_number"));
+                    order.setCreated_at(rs.getTimestamp("created_at"));
+                    order.setUpdated_at(rs.getTimestamp("updated_at"));
+                    Users buyer = new Users();
+                    buyer.setUser_id(rs.getInt("buyer_user_id"));
+                    buyer.setFull_name(rs.getString("buyer_name"));
+                    buyer.setEmail(rs.getString("buyer_email"));
+                    order.setBuyer_id(buyer);
+                    Users seller = new Users();
+                    seller.setUser_id(rs.getInt("seller_user_id"));
+                    seller.setFull_name(rs.getString("seller_name"));
+                    seller.setEmail(rs.getString("seller_email"));
+                    order.setSeller_id(seller);
+                    orders.add(order);
+                }
             }
         } catch (Exception e) {
             System.err.println("Error getAllOrders: " + e.getMessage());
@@ -176,12 +184,14 @@ public class OrderDAO extends DBConnection {
         if (status != null && !status.trim().isEmpty()) {
             sql.append("WHERE status = ?");
         }
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             if (status != null && !status.trim().isEmpty()) {
                 ps.setString(1, status);
             }
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt(1);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
         } catch (Exception e) {
             System.err.println("Error getOrderCount: " + e.getMessage());
             e.printStackTrace();
@@ -239,8 +249,9 @@ public class OrderDAO extends DBConnection {
             ps.setString(8, order.getTracking_number());
             int affected = ps.executeUpdate();
             if (affected > 0) {
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) return rs.getInt(1);
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) return rs.getInt(1);
+                }
             }
         } catch (Exception e) {
             System.err.println("Error createOrder: " + e.getMessage());
@@ -258,30 +269,32 @@ public class OrderDAO extends DBConnection {
                 "LEFT JOIN users b ON o.buyer_id = b.user_id " +
                 "LEFT JOIN users s ON o.seller_id = s.user_id " +
                 "WHERE o.order_id = ?";
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, orderId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                order = new Orders();
-                order.setOrder_id(rs.getInt("order_id"));
-                order.setStatus(rs.getString("status"));
-                order.setTotal_amount(rs.getBigDecimal("total_amount"));
-                order.setCurrency(rs.getString("currency"));
-                order.setShipping_address(rs.getString("shipping_address"));
-                order.setShipping_method(rs.getString("shipping_method"));
-                order.setTracking_number(rs.getString("tracking_number"));
-                order.setCreated_at(rs.getTimestamp("created_at"));
-                order.setUpdated_at(rs.getTimestamp("updated_at"));
-                Users buyer = new Users();
-                buyer.setUser_id(rs.getInt("buyer_user_id"));
-                buyer.setFull_name(rs.getString("buyer_name"));
-                buyer.setEmail(rs.getString("buyer_email"));
-                order.setBuyer_id(buyer);
-                Users seller = new Users();
-                seller.setUser_id(rs.getInt("seller_user_id"));
-                seller.setFull_name(rs.getString("seller_name"));
-                seller.setEmail(rs.getString("seller_email"));
-                order.setSeller_id(seller);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    order = new Orders();
+                    order.setOrder_id(rs.getInt("order_id"));
+                    order.setStatus(rs.getString("status"));
+                    order.setTotal_amount(rs.getBigDecimal("total_amount"));
+                    order.setCurrency(rs.getString("currency"));
+                    order.setShipping_address(rs.getString("shipping_address"));
+                    order.setShipping_method(rs.getString("shipping_method"));
+                    order.setTracking_number(rs.getString("tracking_number"));
+                    order.setCreated_at(rs.getTimestamp("created_at"));
+                    order.setUpdated_at(rs.getTimestamp("updated_at"));
+                    Users buyer = new Users();
+                    buyer.setUser_id(rs.getInt("buyer_user_id"));
+                    buyer.setFull_name(rs.getString("buyer_name"));
+                    buyer.setEmail(rs.getString("buyer_email"));
+                    order.setBuyer_id(buyer);
+                    Users seller = new Users();
+                    seller.setUser_id(rs.getInt("seller_user_id"));
+                    seller.setFull_name(rs.getString("seller_name"));
+                    seller.setEmail(rs.getString("seller_email"));
+                    order.setSeller_id(seller);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -294,24 +307,26 @@ public class OrderDAO extends DBConnection {
         String sql = "SELECT oi.*, p.product_id, p.name, p.price, p.currency FROM order_items oi " +
                 "LEFT JOIN products p ON oi.product_id = p.product_id " +
                 "WHERE oi.order_id = ?";
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, orderId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                OrderItems item = new OrderItems();
-                item.setOrderItemId(rs.getInt("order_item_id"));
-                Orders order = new Orders(); order.setOrder_id(orderId); item.setOrderId(order);
-                Products product = new Products();
-                product.setProduct_id(rs.getLong("product_id"));
-                product.setName(rs.getString("name"));
-                product.setPrice(rs.getBigDecimal("price"));
-                product.setCurrency(rs.getString("currency"));
-                item.setProductId(product);
-                item.setQuantity(rs.getInt("quantity"));
-                item.setPriceAtPurchase(rs.getBigDecimal("price_at_purchase"));
-                item.setDiscountApplied(rs.getBigDecimal("discount_applied"));
-                item.setSubtotal(rs.getBigDecimal("subtotal"));
-                items.add(item);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    OrderItems item = new OrderItems();
+                    item.setOrderItemId(rs.getInt("order_item_id"));
+                    Orders order = new Orders(); order.setOrder_id(orderId); item.setOrderId(order);
+                    Products product = new Products();
+                    product.setProduct_id(rs.getLong("product_id"));
+                    product.setName(rs.getString("name"));
+                    product.setPrice(rs.getBigDecimal("price"));
+                    product.setCurrency(rs.getString("currency"));
+                    item.setProductId(product);
+                    item.setQuantity(rs.getInt("quantity"));
+                    item.setPriceAtPurchase(rs.getBigDecimal("price_at_purchase"));
+                    item.setDiscountApplied(rs.getBigDecimal("discount_applied"));
+                    item.setSubtotal(rs.getBigDecimal("subtotal"));
+                    items.add(item);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -351,19 +366,20 @@ public class OrderDAO extends DBConnection {
             }
             ps.setInt(idx++, pageSize);
             ps.setInt(idx, offset);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Orders order = new Orders();
-                order.setOrder_id(rs.getInt("order_id"));
-                order.setStatus(rs.getString("status"));
-                order.setTotal_amount(rs.getBigDecimal("total_amount"));
-                order.setCurrency(rs.getString("currency"));
-                order.setCreated_at(rs.getTimestamp("created_at"));
-                Users buyer = new Users();
-                buyer.setUser_id(rs.getInt("buyer_user_id"));
-                buyer.setFull_name(rs.getString("buyer_name"));
-                order.setBuyer_id(buyer);
-                orders.add(order);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Orders order = new Orders();
+                    order.setOrder_id(rs.getInt("order_id"));
+                    order.setStatus(rs.getString("status"));
+                    order.setTotal_amount(rs.getBigDecimal("total_amount"));
+                    order.setCurrency(rs.getString("currency"));
+                    order.setCreated_at(rs.getTimestamp("created_at"));
+                    Users buyer = new Users();
+                    buyer.setUser_id(rs.getInt("buyer_user_id"));
+                    buyer.setFull_name(rs.getString("buyer_name"));
+                    order.setBuyer_id(buyer);
+                    orders.add(order);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -376,13 +392,15 @@ public class OrderDAO extends DBConnection {
         if (status != null && !status.trim().isEmpty()) {
             sql.append("AND status = ?");
         }
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             ps.setInt(1, sellerId);
             if (status != null && !status.trim().isEmpty()) {
                 ps.setString(2, status);
             }
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt(1);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -394,13 +412,15 @@ public class OrderDAO extends DBConnection {
         if (status != null && !status.trim().isEmpty()) {
             sql.append("AND status = ? ");
         }
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             ps.setInt(1, sellerId);
             if (status != null && !status.trim().isEmpty()) {
                 ps.setString(2, status);
             }
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getBigDecimal(1);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getBigDecimal(1);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

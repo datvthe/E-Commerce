@@ -81,10 +81,10 @@ public class ChatMessageDAO extends DBConnection {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
             ps.setLong(1, messageId);
-            ResultSet rs = ps.executeQuery();
-            
-            if (rs.next()) {
-                return mapChatMessage(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapChatMessage(rs);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -117,16 +117,16 @@ public class ChatMessageDAO extends DBConnection {
             ps.setLong(1, roomId);
             ps.setInt(2, limit);
             ps.setInt(3, offset);
-            ResultSet rs = ps.executeQuery();
-            
-            int count = 0;
-            while (rs.next()) {
-                messages.add(mapChatMessage(rs));
-                count++;
-                System.out.println("[ChatMessageDAO] Message #" + count + " - ID: " + rs.getLong("message_id") + ", Time: " + rs.getTimestamp("created_at"));
+            try (ResultSet rs = ps.executeQuery()) {
+                int count = 0;
+                while (rs.next()) {
+                    messages.add(mapChatMessage(rs));
+                    count++;
+                    System.out.println("[ChatMessageDAO] Message #" + count + " - ID: " + rs.getLong("message_id") + ", Time: " + rs.getTimestamp("created_at"));
+                }
+                
+                System.out.println("[ChatMessageDAO] Loaded " + count + " messages for room " + roomId);
             }
-            
-            System.out.println("[ChatMessageDAO] Loaded " + count + " messages for room " + roomId);
         } catch (Exception e) {
             System.err.println("[ChatMessageDAO] EXCEPTION while loading messages:");
             e.printStackTrace();
@@ -172,10 +172,10 @@ public class ChatMessageDAO extends DBConnection {
             
             ps.setLong(1, roomId);
             ps.setLong(2, userId);
-            ResultSet rs = ps.executeQuery();
-            
-            if (rs.next()) {
-                return rs.getInt("count");
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("count");
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -233,10 +233,10 @@ public class ChatMessageDAO extends DBConnection {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
             ps.setLong(1, roomId);
-            ResultSet rs = ps.executeQuery();
-            
-            if (rs.next()) {
-                return mapChatMessage(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapChatMessage(rs);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
