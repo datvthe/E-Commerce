@@ -24,15 +24,8 @@
         <servlet-name>ForgotPasswordController</servlet-name>
         <url-pattern>/forgot-password</url-pattern>
     </servlet-mapping>
-    <servlet>
-        <servlet-name>SellerDashboardController</servlet-name>
-        <servlet-class>controller.seller.SellerDashboardController</servlet-class>
-    </servlet>
 
-    <servlet-mapping>
-        <servlet-name>SellerDashboardController</servlet-name>
-        <url-pattern>/seller/dashboard</url-pattern>
-    </servlet-mapping>
+
     <servlet>
     <servlet-name>RegisterSellerController</servlet-name>
     <servlet-class>controller.seller.RegisterSellerController</servlet-class>

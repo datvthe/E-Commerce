@@ -1,12 +1,15 @@
 package dao;
 
 import model.user.Users;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import model.user.Roles;
 import model.user.UserRoles;
 import util.PasswordUtil;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UsersDAO extends DBConnection {
 
@@ -135,7 +138,6 @@ public class UsersDAO extends DBConnection {
 
         return userRole;
     }
-<<<<<<< Updated upstream
     
     /**
      * Verify password with old format (Base64 combined salt + hash)
@@ -160,26 +162,6 @@ public class UsersDAO extends DBConnection {
             
             // Compare hashes
             return java.security.MessageDigest.isEqual(storedHash, computedHash);
-=======
-
-    public void assignDefaultUserRole(int userId) {
-        // Resolve role ID by name to avoid mismatches between seeds and code
-        int roleId = 3; // default fallback to CUSTOMER in code constants
-        try {
-            Roles customer = new RoleDAO().getRoleByName("customer");
-            if (customer != null) {
-                roleId = customer.getRole_id();
-            }
-        } catch (Exception ignore) {
-        }
-
-        String sql = "INSERT INTO User_Roles (user_id, role_id, assigned_at) VALUES (?, ?, NOW())";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ps.setInt(2, roleId);
-            ps.executeUpdate();
->>>>>>> Stashed changes
         } catch (Exception e) {
             return false;
         }
@@ -268,9 +250,21 @@ public class UsersDAO extends DBConnection {
     }
 
     public void assignDefaultUserRole(int userId) {
-        String sql = "INSERT INTO User_Roles (user_id, role_id, assigned_at) VALUES (?, 3, NOW())";
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        // Resolve role ID by name to avoid mismatches between seeds and code
+        int roleId = 3; // default fallback to CUSTOMER in code constants
+        try {
+            Roles customer = new RoleDAO().getRoleByName("customer");
+            if (customer != null) {
+                roleId = customer.getRole_id();
+            }
+        } catch (Exception ignore) {
+        }
+
+        String sql = "INSERT INTO User_Roles (user_id, role_id, assigned_at) VALUES (?, ?, NOW())";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
+            ps.setInt(2, roleId);
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -356,9 +350,6 @@ public class UsersDAO extends DBConnection {
         }
         return false;
     }
-<<<<<<< Updated upstream
-    
-=======
 
     // ===== Admin dashboard helpers =====
     public List<Users> getRecentUsers(int limit) {
@@ -376,5 +367,140 @@ public class UsersDAO extends DBConnection {
         }
         return list;
     }
->>>>>>> Stashed changes
+
+    private Users mapUser(ResultSet rs) throws Exception {
+        Users user = new Users();
+        user.setUser_id(rs.getInt("user_id"));
+        user.setFull_name(rs.getString("full_name"));
+        user.setEmail(rs.getString("email"));
+        user.setPassword(rs.getString("password_hash"));
+        user.setPhone_number(rs.getString("phone_number"));
+        user.setGender(rs.getString("gender"));
+        user.setDate_of_birth(rs.getDate("date_of_birth"));
+        user.setAddress(rs.getString("address"));
+        user.setAvatar_url(rs.getString("avatar_url"));
+        user.setStatus(rs.getString("status"));
+        user.setEmail_verified(rs.getBoolean("email_verified"));
+        user.setLast_login_at(rs.getDate("last_login_at"));
+        user.setCreated_at(rs.getDate("created_at"));
+        user.setUpdated_at(rs.getDate("updated_at"));
+        user.setDeleted_at(rs.getDate("deleted_at"));
+        user.setDefault_role(rs.getString("default_role"));
+        return user;
+    }
+
+    // ===== Admin: Users listing & management =====
+    public List<Users> getAllUsers(int page, int pageSize) {
+        List<Users> list = new ArrayList<>();
+        int offset = (page - 1) * pageSize;
+        String sql = "SELECT * FROM users WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, pageSize);
+            ps.setInt(2, offset);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) list.add(mapUser(rs));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Users> searchUsers(String keyword, String status, String role, int page, int pageSize) {
+        List<Users> list = new ArrayList<>();
+        int offset = (page - 1) * pageSize;
+        StringBuilder sql = new StringBuilder("SELECT * FROM users WHERE deleted_at IS NULL ");
+        List<Object> params = new ArrayList<>();
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND (full_name LIKE ? OR email LIKE ? OR phone_number LIKE ?) ");
+            String k = "%" + keyword.trim() + "%";
+            params.add(k); params.add(k); params.add(k);
+        }
+        if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
+            sql.append("AND status = ? ");
+            params.add(status);
+        }
+        if (role != null && !role.trim().isEmpty() && !"all".equalsIgnoreCase(role)) {
+            sql.append("AND default_role = ? ");
+            params.add(role.toLowerCase());
+        }
+        sql.append("ORDER BY created_at DESC LIMIT ? OFFSET ?");
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int idx = 1;
+            for (Object p : params) {
+                if (p instanceof String) ps.setString(idx++, (String) p);
+                else if (p instanceof Integer) ps.setInt(idx++, (Integer) p);
+            }
+            ps.setInt(idx++, pageSize);
+            ps.setInt(idx, offset);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) list.add(mapUser(rs));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int countUsers(String keyword, String status, String role) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM users WHERE deleted_at IS NULL ");
+        List<Object> params = new ArrayList<>();
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND (full_name LIKE ? OR email LIKE ? OR phone_number LIKE ?) ");
+            String k = "%" + keyword.trim() + "%";
+            params.add(k); params.add(k); params.add(k);
+        }
+        if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
+            sql.append("AND status = ? ");
+            params.add(status);
+        }
+        if (role != null && !role.trim().isEmpty() && !"all".equalsIgnoreCase(role)) {
+            sql.append("AND default_role = ? ");
+            params.add(role.toLowerCase());
+        }
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int idx = 1;
+            for (Object p : params) {
+                if (p instanceof String) ps.setString(idx++, (String) p);
+                else if (p instanceof Integer) ps.setInt(idx++, (Integer) p);
+            }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int getTotalUsers() {
+        String sql = "SELECT COUNT(*) FROM users WHERE deleted_at IS NULL";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public boolean deleteUser(int userId) {
+        String sql = "UPDATE users SET status = 'inactive', deleted_at = NOW() WHERE user_id = ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateUserStatus(int userId, String status) {
+        String sql = "UPDATE users SET status = ?, updated_at = NOW() WHERE user_id = ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

@@ -15,7 +15,7 @@ import dao.UsersDAO;
  * Role-Based Access Control Filter Intercepts requests and checks user
  * permissions based on their role
  */
-@WebFilter(filterName = "RoleBasedAccessFilter", urlPatterns = {"/admin/*", "/seller/*", "/moderator/*", "/customer/*"})
+//@WebFilter(filterName = "RoleBasedAccessFilter", urlPatterns = {"/admin/*", "/seller/*", "/moderator/*", "/customer/*"})
 public class RoleBasedAccessFilter implements Filter {
 
     private RoleBasedAccessControl rbac;
