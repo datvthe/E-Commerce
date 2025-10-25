@@ -41,10 +41,7 @@ public class ProductDAO extends DBConnection {
                 product.setDescription(rs.getString("description"));
                 product.setPrice(rs.getBigDecimal("price"));
                 product.setCurrency(rs.getString("currency"));
-                try { product.setQuantity(rs.getInt("quantity")); } catch (Exception ignored) {}
                 product.setStatus(rs.getString("status"));
-                product.setIs_digital(rs.getInt("is_digital"));
-                product.setDelivery_time(rs.getString("delivery_time"));
                 product.setAverage_rating(rs.getDouble("average_rating"));
                 product.setTotal_reviews(rs.getInt("total_reviews"));
                 product.setCreated_at(rs.getTimestamp("created_at"));
@@ -53,7 +50,7 @@ public class ProductDAO extends DBConnection {
                 // Set category
                 if (rs.getLong("category_id") > 0) {
                     ProductCategories category = new ProductCategories();
-                    category.setCategory_id(rs.getInt("category_id"));
+                    category.setCategory_id(rs.getLong("category_id"));
                     category.setName(rs.getString("category_name"));
                     category.setSlug(rs.getString("category_slug"));
                     product.setCategory_id(category);
@@ -102,19 +99,16 @@ public class ProductDAO extends DBConnection {
                 product.setDescription(rs.getString("description"));
                 product.setPrice(rs.getBigDecimal("price"));
                 product.setCurrency(rs.getString("currency"));
-                try { product.setQuantity(rs.getInt("quantity")); } catch (Exception ignored) {}
                 product.setStatus(rs.getString("status"));
-                product.setIs_digital(rs.getInt("is_digital"));
-                product.setDelivery_time(rs.getString("delivery_time"));
                 product.setAverage_rating(rs.getDouble("average_rating"));
                 product.setTotal_reviews(rs.getInt("total_reviews"));
                 product.setCreated_at(rs.getTimestamp("created_at"));
                 product.setUpdated_at(rs.getTimestamp("updated_at"));
 
                 // Set category
-                if (rs.getInt("category_id") > 0) {
+                if (rs.getLong("category_id") > 0) {
                     ProductCategories category = new ProductCategories();
-                    category.setCategory_id(rs.getInt("category_id"));
+                    category.setCategory_id(rs.getLong("category_id"));
                     category.setName(rs.getString("category_name"));
                     category.setSlug(rs.getString("category_slug"));
                     product.setCategory_id(category);
@@ -276,96 +270,6 @@ public class ProductDAO extends DBConnection {
             e.printStackTrace();
         }
 
-        return products;
-    }
-
-    /**
-     * Search products by keyword with optional category filter
-     */
-    public List<Products> searchProducts(String keyword, Long categoryId, int page, int pageSize) {
-        List<Products> products = new ArrayList<>();
-        int offset = (page - 1) * pageSize;
-        
-        String sql = "SELECT * FROM Products "
-                + "WHERE (name LIKE ? OR description LIKE ?) "
-                + "AND status = 'active' AND deleted_at IS NULL ";
-        
-        if (categoryId != null) {
-            sql += "AND category_id = ? ";
-        }
-        
-        sql += "ORDER BY created_at DESC LIMIT ? OFFSET ?";
-        
-        try (Connection conn = DBConnection.getConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            String searchPattern = "%" + keyword + "%";
-            ps.setString(1, searchPattern);
-            ps.setString(2, searchPattern);
-            
-            int paramIndex = 3;
-            if (categoryId != null) {
-                ps.setLong(paramIndex++, categoryId);
-            }
-            
-            ps.setInt(paramIndex++, pageSize);
-            ps.setInt(paramIndex, offset);
-            
-            ResultSet rs = ps.executeQuery();
-            
-            while (rs.next()) {
-                Products product = new Products();
-                product.setProduct_id(rs.getLong("product_id"));
-                product.setName(rs.getString("name"));
-                product.setSlug(rs.getString("slug"));
-                product.setPrice(rs.getBigDecimal("price"));
-                product.setCurrency(rs.getString("currency"));
-                product.setAverage_rating(rs.getDouble("average_rating"));
-                product.setTotal_reviews(rs.getInt("total_reviews"));
-                products.add(product);
-            }
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return products;
-    }
-    
-    /**
-     * Get products by category with pagination
-     */
-    public List<Products> getProductsByCategory(Long categoryId, int page, int pageSize) {
-        List<Products> products = new ArrayList<>();
-        int offset = (page - 1) * pageSize;
-        
-        String sql = "SELECT * FROM Products "
-                + "WHERE category_id = ? AND status = 'active' AND deleted_at IS NULL "
-                + "ORDER BY created_at DESC "
-                + "LIMIT ? OFFSET ?";
-        
-        try (Connection conn = DBConnection.getConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setLong(1, categoryId);
-            ps.setInt(2, pageSize);
-            ps.setInt(3, offset);
-            ResultSet rs = ps.executeQuery();
-            
-            while (rs.next()) {
-                Products product = new Products();
-                product.setProduct_id(rs.getLong("product_id"));
-                product.setName(rs.getString("name"));
-                product.setSlug(rs.getString("slug"));
-                product.setPrice(rs.getBigDecimal("price"));
-                product.setCurrency(rs.getString("currency"));
-                product.setAverage_rating(rs.getDouble("average_rating"));
-                product.setTotal_reviews(rs.getInt("total_reviews"));
-                products.add(product);
-            }
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         return products;
     }
 

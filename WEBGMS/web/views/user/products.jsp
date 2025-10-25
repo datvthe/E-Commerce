@@ -192,9 +192,6 @@
     </head>
 
     <body>
-        <!-- Header -->
-        <jsp:include page="/views/component/header.jsp" />
-
         <!-- Breadcrumb -->
         <div class="container-fluid py-3 bg-light">
             <div class="container">
@@ -276,23 +273,15 @@
                             <c:forEach var="product" items="${products}">
                                 <div class="col-sm-6 col-md-4 col-lg-3">
                                     <div class="product-card">
-
-                                        <!-- ✅ Find the primary image or fallback -->
-                                        <c:set var="primaryImage" value="" />
-                                        <c:forEach var="img" items="${product.productImages}">
-                                            <c:if test="${img.is_primary}">
-                                                <c:set var="primaryImage" value="${img.url}" />
-                                            </c:if>
-                                        </c:forEach>
-
-                                        <!-- ✅ If no primary found, use default -->
-                                        <c:if test="${empty primaryImage}">
-                                            <c:set var="primaryImage" value='${pageContext.request.contextPath}/views/assets/user/img/product-1.png' />
-                                        </c:if>
-
-
                                         <a href="<%= request.getContextPath() %>/product/${product.slug}">
-                                            <img src="${primaryImage}" alt="${product.name}" class="product-image">
+                                            <c:choose>
+                                                <c:when test="${not empty product.productImages}">
+                                                    <img src="${product.productImages[0].url}" alt="${product.name}" class="product-image">
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <img src="${pageContext.request.contextPath}/views/assets/user/img/product-1.png" alt="${product.name}" class="product-image">
+                                                </c:otherwise>
+                                            </c:choose>
                                         </a>
 
                                         <div class="product-card-body">
@@ -360,90 +349,9 @@
             </div>
         </div>
 
-        <jsp:include page="/views/component/footer.jsp" />
-
-        <!-- AJAX Logic (Not using right now) -->
         <script>
-            async function applyFilters() {
-                const search = document.getElementById('searchInput').value.trim();
-                const category = document.getElementById('categorySelect').value;
-                const sort = document.getElementById('sortSelect').value;
-                const pageSize = document.getElementById('pageSizeSelect').value;
-
-                const params = new URLSearchParams({search, category, sort, pageSize});
-
-                try {
-                    const response = await fetch('<%= request.getContextPath() %>/products?' + params.toString(), {
-                        headers: {'X-Requested-With': 'XMLHttpRequest'}
-                    });
-
-                    if (!response.ok)
-                        throw new Error('Network error');
-
-                    const products = await response.json();
-                    console.log(products)
-                    renderProducts(products);
-                } catch (err) {
-                    console.error('Error fetching products:', err);
-                    showNotification("Không thể tải sản phẩm.", "error");
-                }
-            }
-
             function clearFilters() {
-                document.getElementById('searchInput').value = '';
-                document.getElementById('categorySelect').value = '';
-                document.getElementById('sortSelect').value = '';
-                document.getElementById('pageSizeSelect').value = '12';
-                applyFilters();
-            }
-
-            function renderProducts(products) {
-                const container = document.getElementById('productsContainer');
-                container.innerHTML = '';
-
-                if (products.length === 0) {
-                    container.innerHTML = `
-                        <div class="col-12 text-center py-5">
-                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                            <h4 class="text-muted">Không tìm thấy sản phẩm nào</h4>
-                        </div>`;
-                    return;
-                }
-
-                products.forEach(p => {
-                    console.log(p)
-                    container.insertAdjacentHTML('beforeend', `
-                        <div class="col-sm-6 col-md-4 col-lg-3">
-                            <div class="product-card">
-                                <a href="${p.slug}">
-                                    <img src="${p.imageUrl}"
-                                         alt="${p.name}" class="product-image">
-                                </a>
-                                <div class="product-card-body">
-                                    <a href="${p.slug}" class="product-title">${p.name}</a>
-                                    <div class="product-price">${p.price}₫</div>
-                                </div>
-                            </div>
-                        </div>
-                    `);
-                });
-            }
-
-            document.getElementById('searchInput').addEventListener('keypress', e => {
-                if (e.key === 'Enter')
-                    applyFilters();
-            });
-
-            function showNotification(message, type) {
-                const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-                const notification = `
-                    <div class="alert ${alertClass} alert-dismissible fade show position-fixed"
-                         style="top: 20px; right: 20px; z-index: 9999;">
-            ${message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>`;
-                document.body.insertAdjacentHTML('beforeend', notification);
-                setTimeout(() => document.querySelector('.alert')?.remove(), 3000);
+                window.location.href = '<%= request.getContextPath() %>/products';
             }
         </script>
     </body>
