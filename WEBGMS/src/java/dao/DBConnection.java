@@ -8,7 +8,11 @@ import java.sql.ResultSet;
 
 public class DBConnection {
 
+<<<<<<< HEAD
     private static final String URL = "jdbc:mysql://localhost:3306/gicungco?zeroDateTimeBehavior=CONVERT_TO_NULL&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8";
+=======
+    private static final String URL = "jdbc:mysql://localhost:3306/gicungco?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&zeroDateTimeBehavior=CONVERT_TO_NULL";
+>>>>>>> adfffa2ca17758b7b0f2e7aa138910e53f368132
     private static final String USER = "root";
     private static final String PASSWORD = "123456";
 
@@ -44,7 +48,7 @@ public class DBConnection {
 
         if (conn != null) {
             try {
-                String sql = "SELECT user_id, full_name, email FROM users LIMIT 5";
+                String sql = "SELECT user_id, full_name, email FROM gicungco.users LIMIT 5";
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql);
 

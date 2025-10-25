@@ -8,6 +8,7 @@ package model.product;
 import model.user.Users;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
 
 public class Products {
 
@@ -23,9 +24,12 @@ public class Products {
     private BigDecimal price;
     private String currency;
     private String status; // kept for compatibility; use getStatusEnum/setStatusEnum for type-safety
+    private int is_digital;
+    private String delivery_time;
     private ProductCategories category_id;
     private double average_rating;
     private int total_reviews;
+    private List<ProductImages> productImages;
     private Timestamp created_at;
     private Timestamp updated_at;
     private Timestamp deleted_at;
@@ -218,6 +222,22 @@ public class Products {
         this.deleted_at = deleted_at;
     }
 
+    public int getIs_digital() {
+        return is_digital;
+    }
+
+    public void setIs_digital(int is_digital) {
+        this.is_digital = is_digital;
+    }
+
+    public String getDelivery_time() {
+        return delivery_time;
+    }
+
+    public void setDelivery_time(String delivery_time) {
+        this.delivery_time = delivery_time;
+    }
+
     // Additional camelCase accessors
     public long getProductId() { return product_id; }
     public void setProductId(long productId) { this.product_id = productId; }
@@ -242,6 +262,16 @@ public class Products {
 
     public Timestamp getDeletedAt() { return deleted_at; }
     public void setDeletedAt(Timestamp deletedAt) { this.deleted_at = deletedAt; }
+    
+    // Additional properties for wishlist display
+    private String category_name; // For displaying category name in wishlist
+    private String imageUrl; // For displaying product image
+    
+    public String getCategory_name() { return category_name; }
+    public void setCategory_name(String category_name) { this.category_name = category_name; }
+    
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     // Wishlist projection helpers
     public String getCategory_name() { return category_name; }
@@ -249,6 +279,14 @@ public class Products {
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public List<ProductImages> getProductImages() {
+        return productImages;
+    }
+
+    public void setProductImages(List<ProductImages> productImages) {
+        this.productImages = productImages;
+    }
 
     @Override
     public int hashCode() {

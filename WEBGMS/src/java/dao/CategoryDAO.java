@@ -1,229 +1,176 @@
 package dao;
 
-import model.product.ProductCategories;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import model.Category;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * CategoryDAO - Data Access Object for Category operations
+ */
 public class CategoryDAO extends DBConnection {
-    
-    // Get all categories with pagination
-    public List<ProductCategories> getAllCategories(int page, int pageSize) {
-        List<ProductCategories> categories = new ArrayList<>();
-        int offset = (page - 1) * pageSize;
-        String sql = "SELECT * FROM Product_Categories ORDER BY created_at DESC LIMIT ? OFFSET ?";
+
+    /**
+     * Get all active categories
+     */
+    public List<Category> getAllCategories() {
+        List<Category> categories = new ArrayList<>();
+        String query = "SELECT c.*, COUNT(p.product_id) as product_count " +
+                      "FROM product_categories c " +
+                      "LEFT JOIN products p ON c.category_id = p.category_id AND p.status = 'active' " +
+                      "WHERE c.status = 'active' " +
+                      "GROUP BY c.category_id " +
+                      "ORDER BY c.name ASC";
         
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setInt(1, pageSize);
-            ps.setInt(2, offset);
-            ResultSet rs = ps.executeQuery();
-            
-            while (rs.next()) {
-                categories.add(mapResultSetToCategory(rs));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return categories;
-    }
-    
-    // Search categories with filter and pagination
-    public List<ProductCategories> searchCategories(String keyword, String status, int page, int pageSize) {
-        List<ProductCategories> categories = new ArrayList<>();
-        int offset = (page - 1) * pageSize;
-        StringBuilder sql = new StringBuilder("SELECT * FROM Product_Categories WHERE 1=1");
-        
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append(" AND (name LIKE ? OR description LIKE ?)");
-        }
-        if (status != null && !status.trim().isEmpty() && !status.equals("all")) {
-            sql.append(" AND status = ?");
-        }
-        
-        sql.append(" ORDER BY created_at DESC LIMIT ? OFFSET ?");
-        
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            
-            int paramIndex = 1;
-            if (keyword != null && !keyword.trim().isEmpty()) {
-                String searchPattern = "%" + keyword + "%";
-                ps.setString(paramIndex++, searchPattern);
-                ps.setString(paramIndex++, searchPattern);
-            }
-            if (status != null && !status.trim().isEmpty() && !status.equals("all")) {
-                ps.setString(paramIndex++, status);
-            }
-            ps.setInt(paramIndex++, pageSize);
-            ps.setInt(paramIndex++, offset);
-            
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                categories.add(mapResultSetToCategory(rs));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return categories;
-    }
-    
-    // Count total categories
-    public int getTotalCategories() {
-        String sql = "SELECT COUNT(*) FROM Product_Categories";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
+             PreparedStatement ps = conn.prepareStatement(query);
              ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt(1);
+            
+            while (rs.next()) {
+                Category category = extractCategoryFromResultSet(rs);
+                category.setProductCount(rs.getInt("product_count"));
+                categories.add(category);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return 0;
-    }
-    
-    // Count categories with filter
-    public int countCategories(String keyword, String status) {
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM Product_Categories WHERE 1=1");
         
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append(" AND (name LIKE ? OR description LIKE ?)");
-        }
-        if (status != null && !status.trim().isEmpty() && !status.equals("all")) {
-            sql.append(" AND status = ?");
-        }
+        return categories;
+    }
+
+    /**
+     * Get parent categories (top level)
+     */
+    public List<Category> getParentCategories() {
+        List<Category> categories = new ArrayList<>();
+        String query = "SELECT c.*, COUNT(p.product_id) as product_count " +
+                      "FROM product_categories c " +
+                      "LEFT JOIN products p ON c.category_id = p.category_id AND p.status = 'active' " +
+                      "WHERE c.status = 'active' AND c.parent_id IS NULL " +
+                      "GROUP BY c.category_id " +
+                      "ORDER BY c.name ASC";
         
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+             PreparedStatement ps = conn.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
             
-            int paramIndex = 1;
-            if (keyword != null && !keyword.trim().isEmpty()) {
-                String searchPattern = "%" + keyword + "%";
-                ps.setString(paramIndex++, searchPattern);
-                ps.setString(paramIndex++, searchPattern);
+            while (rs.next()) {
+                Category category = extractCategoryFromResultSet(rs);
+                category.setProductCount(rs.getInt("product_count"));
+                categories.add(category);
             }
-            if (status != null && !status.trim().isEmpty() && !status.equals("all")) {
-                ps.setString(paramIndex++, status);
-            }
-            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return categories;
+    }
+
+    /**
+     * Get subcategories by parent ID
+     */
+    public List<Category> getSubcategories(Long parentId) {
+        List<Category> categories = new ArrayList<>();
+        String query = "SELECT c.*, COUNT(p.product_id) as product_count " +
+                      "FROM product_categories c " +
+                      "LEFT JOIN products p ON c.category_id = p.category_id AND p.status = 'active' " +
+                      "WHERE c.status = 'active' AND c.parent_id = ? " +
+                      "GROUP BY c.category_id " +
+                      "ORDER BY c.name ASC";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setLong(1, parentId);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1);
+            
+            while (rs.next()) {
+                Category category = extractCategoryFromResultSet(rs);
+                category.setProductCount(rs.getInt("product_count"));
+                categories.add(category);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return 0;
+        
+        return categories;
     }
-    
-    // Get category by ID
-    public ProductCategories getCategoryById(long categoryId) {
-        String sql = "SELECT * FROM Product_Categories WHERE category_id = ?";
+
+    /**
+     * Get category by ID
+     */
+    public Category getCategoryById(Long categoryId) {
+        String query = "SELECT c.*, p.name as parent_name, COUNT(prod.product_id) as product_count " +
+                      "FROM product_categories c " +
+                      "LEFT JOIN product_categories p ON c.parent_id = p.category_id " +
+                      "LEFT JOIN products prod ON c.category_id = prod.category_id AND prod.status = 'active' " +
+                      "WHERE c.category_id = ? " +
+                      "GROUP BY c.category_id";
+        
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
+             PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setLong(1, categoryId);
             ResultSet rs = ps.executeQuery();
             
             if (rs.next()) {
-                return mapResultSetToCategory(rs);
+                Category category = extractCategoryFromResultSet(rs);
+                category.setProductCount(rs.getInt("product_count"));
+                category.setParentName(rs.getString("parent_name"));
+                return category;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        
         return null;
     }
-    
-    // Create new category
-    public boolean createCategory(ProductCategories category) {
-        String sql = "INSERT INTO Product_Categories (name, slug, description, status, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())";
+
+    /**
+     * Get category by slug
+     */
+    public Category getCategoryBySlug(String slug) {
+        String query = "SELECT c.*, p.name as parent_name, COUNT(prod.product_id) as product_count " +
+                      "FROM product_categories c " +
+                      "LEFT JOIN product_categories p ON c.parent_id = p.category_id " +
+                      "LEFT JOIN products prod ON c.category_id = prod.category_id AND prod.status = 'active' " +
+                      "WHERE c.slug = ? AND c.status = 'active' " +
+                      "GROUP BY c.category_id";
+        
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setString(1, category.getName());
-            ps.setString(2, category.getSlug());
-            ps.setString(3, category.getDescription());
-            ps.setString(4, category.getStatus());
-            
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-    
-    // Update category
-    public boolean updateCategory(ProductCategories category) {
-        String sql = "UPDATE Product_Categories SET name = ?, slug = ?, description = ?, status = ?, updated_at = NOW() WHERE category_id = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setString(1, category.getName());
-            ps.setString(2, category.getSlug());
-            ps.setString(3, category.getDescription());
-            ps.setString(4, category.getStatus());
-            ps.setLong(5, category.getCategory_id());
-            
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-    
-    // Delete category
-    public boolean deleteCategory(long categoryId) {
-        String sql = "DELETE FROM Product_Categories WHERE category_id = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setLong(1, categoryId);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-    
-    // Check if category name exists
-    public boolean isCategoryNameExists(String name, Long excludeId) {
-        String sql = excludeId == null 
-            ? "SELECT COUNT(*) FROM Product_Categories WHERE name = ?"
-            : "SELECT COUNT(*) FROM Product_Categories WHERE name = ? AND category_id != ?";
-            
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setString(1, name);
-            if (excludeId != null) {
-                ps.setLong(2, excludeId);
-            }
-            
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, slug);
             ResultSet rs = ps.executeQuery();
+            
             if (rs.next()) {
-                return rs.getInt(1) > 0;
+                Category category = extractCategoryFromResultSet(rs);
+                category.setProductCount(rs.getInt("product_count"));
+                category.setParentName(rs.getString("parent_name"));
+                return category;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
+        
+        return null;
     }
-    
-    // Helper method to map ResultSet to ProductCategories
-    private ProductCategories mapResultSetToCategory(ResultSet rs) throws SQLException {
-        ProductCategories category = new ProductCategories();
-        category.setCategory_id(rs.getLong("category_id"));
+
+    /**
+     * Extract Category object from ResultSet
+     */
+    private Category extractCategoryFromResultSet(ResultSet rs) throws SQLException {
+        Category category = new Category();
+        category.setCategoryId(rs.getLong("category_id"));
+        category.setParentId(rs.getObject("parent_id") != null ? rs.getLong("parent_id") : null);
         category.setName(rs.getString("name"));
         category.setSlug(rs.getString("slug"));
         category.setDescription(rs.getString("description"));
         category.setStatus(rs.getString("status"));
-        category.setCreated_at(rs.getTimestamp("created_at"));
-        category.setUpdated_at(rs.getTimestamp("updated_at"));
+        category.setCreatedAt(rs.getTimestamp("created_at"));
+        category.setUpdatedAt(rs.getTimestamp("updated_at"));
         return category;
     }
+<<<<<<< HEAD
 }
+=======
+
+}
+>>>>>>> adfffa2ca17758b7b0f2e7aa138910e53f368132

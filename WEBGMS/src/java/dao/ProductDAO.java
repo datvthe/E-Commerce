@@ -6,10 +6,15 @@ import model.user.Users;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+<<<<<<< HEAD
 import java.sql.Statement;
 import java.sql.Timestamp;
+=======
+import java.sql.SQLException;
+>>>>>>> adfffa2ca17758b7b0f2e7aa138910e53f368132
 import java.util.ArrayList;
 import java.util.List;
+import model.product.ProductImages;
 
 /**
  * DAO class for Products operations
@@ -42,6 +47,8 @@ public class ProductDAO extends DBConnection {
                 product.setPrice(rs.getBigDecimal("price"));
                 product.setCurrency(rs.getString("currency"));
                 product.setStatus(rs.getString("status"));
+                product.setIs_digital(rs.getInt("is_digital"));
+                product.setDelivery_time(rs.getString("delivery_time"));
                 product.setAverage_rating(rs.getDouble("average_rating"));
                 product.setTotal_reviews(rs.getInt("total_reviews"));
                 product.setCreated_at(rs.getTimestamp("created_at"));
@@ -100,6 +107,8 @@ public class ProductDAO extends DBConnection {
                 product.setPrice(rs.getBigDecimal("price"));
                 product.setCurrency(rs.getString("currency"));
                 product.setStatus(rs.getString("status"));
+                product.setIs_digital(rs.getInt("is_digital"));
+                product.setDelivery_time(rs.getString("delivery_time"));
                 product.setAverage_rating(rs.getDouble("average_rating"));
                 product.setTotal_reviews(rs.getInt("total_reviews"));
                 product.setCreated_at(rs.getTimestamp("created_at"));
@@ -197,6 +206,166 @@ public class ProductDAO extends DBConnection {
                 products.add(product);
             }
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return products;
+    }
+
+    public List<Products> filterProducts(int page, int pageSize, String search, String category, String sort) {
+        List<Products> products = new ArrayList<>();
+        int offset = (page - 1) * pageSize;
+
+        StringBuilder sql = new StringBuilder("SELECT * FROM Products WHERE status = 'active' AND deleted_at IS NULL");
+
+        // Filter by category
+        if (category != null && !category.isEmpty()) {
+            sql.append(" AND category_id = ?");
+        }
+
+        // Search by name
+        if (search != null && !search.isEmpty()) {
+            sql.append(" AND name LIKE ?");
+        }
+
+        // Sorting
+        if ("priceAsc".equals(sort)) {
+            sql.append(" ORDER BY price ASC");
+        } else if ("priceDesc".equals(sort)) {
+            sql.append(" ORDER BY price DESC");
+        } else if ("rating".equals(sort)) {
+            sql.append(" ORDER BY average_rating DESC");
+        } else if ("newest".equals(sort)) {
+            sql.append(" ORDER BY created_at DESC");
+        } else {
+            sql.append(" ORDER BY created_at DESC"); // Default
+        }
+
+        sql.append(" LIMIT ? OFFSET ?");
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            int paramIndex = 1;
+
+            if (category != null && !category.isEmpty()) {
+                ps.setString(paramIndex++, category);
+            }
+
+            if (search != null && !search.isEmpty()) {
+                ps.setString(paramIndex++, "%" + search + "%");
+            }
+
+            ps.setInt(paramIndex++, pageSize);
+            ps.setInt(paramIndex, offset);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Products product = new Products();
+                product.setProduct_id(rs.getLong("product_id"));
+                product.setName(rs.getString("name"));
+                product.setSlug(rs.getString("slug"));
+                product.setPrice(rs.getBigDecimal("price"));
+                product.setCurrency(rs.getString("currency"));
+                product.setAverage_rating(rs.getDouble("average_rating"));
+                product.setTotal_reviews(rs.getInt("total_reviews"));
+
+                List<ProductImages> images = getProductImages(conn, product.getProduct_id());
+                product.setProductImages(images);
+
+                products.add(product);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return products;
+    }
+
+    /**
+     * Search products by keyword with optional category filter
+     */
+    public List<Products> searchProducts(String keyword, Long categoryId, int page, int pageSize) {
+        List<Products> products = new ArrayList<>();
+        int offset = (page - 1) * pageSize;
+        
+        String sql = "SELECT * FROM Products "
+                + "WHERE (name LIKE ? OR description LIKE ?) "
+                + "AND status = 'active' AND deleted_at IS NULL ";
+        
+        if (categoryId != null) {
+            sql += "AND category_id = ? ";
+        }
+        
+        sql += "ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            String searchPattern = "%" + keyword + "%";
+            ps.setString(1, searchPattern);
+            ps.setString(2, searchPattern);
+            
+            int paramIndex = 3;
+            if (categoryId != null) {
+                ps.setLong(paramIndex++, categoryId);
+            }
+            
+            ps.setInt(paramIndex++, pageSize);
+            ps.setInt(paramIndex, offset);
+            
+            ResultSet rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                Products product = new Products();
+                product.setProduct_id(rs.getLong("product_id"));
+                product.setName(rs.getString("name"));
+                product.setSlug(rs.getString("slug"));
+                product.setPrice(rs.getBigDecimal("price"));
+                product.setCurrency(rs.getString("currency"));
+                product.setAverage_rating(rs.getDouble("average_rating"));
+                product.setTotal_reviews(rs.getInt("total_reviews"));
+                products.add(product);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return products;
+    }
+    
+    /**
+     * Get products by category with pagination
+     */
+    public List<Products> getProductsByCategory(Long categoryId, int page, int pageSize) {
+        List<Products> products = new ArrayList<>();
+        int offset = (page - 1) * pageSize;
+        
+        String sql = "SELECT * FROM Products "
+                + "WHERE category_id = ? AND status = 'active' AND deleted_at IS NULL "
+                + "ORDER BY created_at DESC "
+                + "LIMIT ? OFFSET ?";
+        
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setLong(1, categoryId);
+            ps.setInt(2, pageSize);
+            ps.setInt(3, offset);
+            ResultSet rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                Products product = new Products();
+                product.setProduct_id(rs.getLong("product_id"));
+                product.setName(rs.getString("name"));
+                product.setSlug(rs.getString("slug"));
+                product.setPrice(rs.getBigDecimal("price"));
+                product.setCurrency(rs.getString("currency"));
+                product.setAverage_rating(rs.getDouble("average_rating"));
+                product.setTotal_reviews(rs.getInt("total_reviews"));
+                products.add(product);
+            }
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -380,6 +549,7 @@ public class ProductDAO extends DBConnection {
         return 0;
     }
 
+<<<<<<< HEAD
     private Products mapProductLite(ResultSet rs) throws Exception {
         Products product = new Products();
         product.setProduct_id(rs.getLong("product_id"));
@@ -401,4 +571,84 @@ public class ProductDAO extends DBConnection {
         s = s.replaceAll("-+", "-");
         return s;
     }
+=======
+    public int countFilteredProducts(String search, String category) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) AS total FROM Products WHERE status = 'active' AND deleted_at IS NULL");
+
+        if (category != null && !category.isEmpty()) {
+            sql.append(" AND category_id = ?");
+        }
+
+        if (search != null && !search.isEmpty()) {
+            sql.append(" AND name LIKE ?");
+        }
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            int paramIndex = 1;
+
+            if (category != null && !category.isEmpty()) {
+                ps.setString(paramIndex++, category);
+            }
+
+            if (search != null && !search.isEmpty()) {
+                ps.setString(paramIndex++, "%" + search + "%");
+            }
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public List<ProductCategories> getAllCategories() {
+        List<ProductCategories> categories = new ArrayList<>();
+        String sql = "SELECT * FROM product_categories";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                ProductCategories category = new ProductCategories();
+                category.setCategory_id(rs.getLong("category_id"));
+                //category.setParent_id(rs.getLong("parent_id"));
+                category.setName(rs.getString("name"));
+                category.setDescription(rs.getString("description"));
+                category.setSlug(rs.getString("slug"));
+                category.setUpdated_at(rs.getTimestamp("updated_at"));
+                category.setCreated_at(rs.getTimestamp("created_at"));
+                categories.add(category);
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting categories: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return categories;
+    }
+
+    private List<ProductImages> getProductImages(Connection conn, long productId) throws SQLException {
+        List<ProductImages> images = new ArrayList<>();
+        String sql = "SELECT * FROM product_images WHERE product_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, productId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                ProductImages img = new ProductImages();
+                img.setImage_id(rs.getInt("image_id"));
+                img.setUrl(rs.getString("url"));
+                img.setAlt_text(rs.getString("alt_text"));
+                img.setIs_primary(rs.getBoolean("is_primary"));
+                images.add(img);
+            }
+        }
+        return images;
+    }
+
+>>>>>>> adfffa2ca17758b7b0f2e7aa138910e53f368132
 }

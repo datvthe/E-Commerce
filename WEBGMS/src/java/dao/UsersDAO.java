@@ -166,6 +166,7 @@ public class UsersDAO extends DBConnection {
             return false;
         }
     }
+<<<<<<< HEAD
 
     public Users getUserById(int userId) {
         Users user = null;
@@ -205,26 +206,53 @@ public class UsersDAO extends DBConnection {
     public boolean isEmailExists(String email) {
         String sql = "SELECT 1 FROM users WHERE email = ? LIMIT 1";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+=======
+    
+    /**
+     * Check if email already exists
+     */
+    public boolean isEmailExists(String email) {
+        String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+>>>>>>> adfffa2ca17758b7b0f2e7aa138910e53f368132
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
-            return rs.next();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
+<<<<<<< HEAD
 
     public boolean isPhoneExists(String phoneNumber) {
         String sql = "SELECT 1 FROM users WHERE phone_number = ? LIMIT 1";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, phoneNumber);
+=======
+    
+    /**
+     * Check if phone number already exists
+     */
+    public boolean isPhoneExists(String phone) {
+        String sql = "SELECT COUNT(*) FROM users WHERE phone_number = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, phone);
+>>>>>>> adfffa2ca17758b7b0f2e7aa138910e53f368132
             ResultSet rs = ps.executeQuery();
-            return rs.next();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
+<<<<<<< HEAD
 
     public Users createUser(String fullName, String email, String password, String phoneNumber) {
         Users user = null;
@@ -503,4 +531,6 @@ public class UsersDAO extends DBConnection {
         }
         return false;
     }
+=======
+>>>>>>> adfffa2ca17758b7b0f2e7aa138910e53f368132
 }
