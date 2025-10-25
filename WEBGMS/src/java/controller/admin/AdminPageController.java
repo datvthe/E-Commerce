@@ -1,6 +1,5 @@
 package controller.admin;
 
-import dao.PageDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,14 +15,13 @@ import java.io.IOException;
 @WebServlet(name = "AdminPageController", urlPatterns = {"/admin/cms/pages"})
 public class AdminPageController extends HttpServlet {
 
-    private final PageDAO pageDAO = new PageDAO();
     private final RoleBasedAccessControl rbac = new RoleBasedAccessControl();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!rbac.isAdmin(request)) { response.sendRedirect(request.getContextPath()+"/home?error=access_denied"); return; }
         String slug = param(request, "slug", "about"); // default to about page
-        Page page = pageDAO.findBySlug(slug);
+        Page page = new dao.PageDAO().findBySlug(slug);
         if (page == null) {
             page = new Page();
             page.setSlug(slug);
@@ -52,7 +50,7 @@ public class AdminPageController extends HttpServlet {
         page.setStatus(status);
         page.setUpdatedBy(current);
 
-        boolean ok = pageDAO.upsert(page);
+        boolean ok = new dao.PageDAO().upsert(page);
         if (ok) {
             response.sendRedirect(request.getContextPath()+"/admin/cms/pages?slug="+slug+"&saved=1");
         } else {

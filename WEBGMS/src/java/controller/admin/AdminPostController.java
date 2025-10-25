@@ -1,6 +1,5 @@
 package controller.admin;
 
-import dao.PostDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,7 +16,6 @@ import java.util.List;
 @WebServlet(name = "AdminPostController", urlPatterns = {"/admin/cms/posts"})
 public class AdminPostController extends HttpServlet {
 
-    private final PostDAO postDAO = new PostDAO();
     private final RoleBasedAccessControl rbac = new RoleBasedAccessControl();
 
     @Override
@@ -30,7 +28,7 @@ public class AdminPostController extends HttpServlet {
             String q = request.getParameter("q");
             int page = parseInt(request.getParameter("page"), 1);
             int pageSize = parseInt(request.getParameter("pageSize"), 20);
-            List<Post> posts = postDAO.list(type, status, q, page, pageSize);
+            List<Post> posts = new dao.PostDAO().list(type, status, q, page, pageSize);
             request.setAttribute("posts", posts);
             request.getRequestDispatcher("/views/admin/cms-posts.jsp").forward(request, response);
         } else if (action.equals("create")) {
@@ -38,13 +36,13 @@ public class AdminPostController extends HttpServlet {
             request.getRequestDispatcher("/views/admin/cms-post-form.jsp").forward(request, response);
         } else if (action.equals("edit")) {
             int id = parseInt(request.getParameter("id"), 0);
-            Post p = postDAO.findById(id);
+            Post p = new dao.PostDAO().findById(id);
             request.setAttribute("post", p);
             request.setAttribute("mode", "edit");
             request.getRequestDispatcher("/views/admin/cms-post-form.jsp").forward(request, response);
         } else if (action.equals("delete")) {
             int id = parseInt(request.getParameter("id"), 0);
-            postDAO.delete(id);
+            new dao.PostDAO().delete(id);
             response.sendRedirect(request.getContextPath()+"/admin/cms/posts");
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid action");
@@ -79,7 +77,7 @@ public class AdminPostController extends HttpServlet {
             p.setStatus(status);
             p.setAuthor(current);
 
-            boolean ok = (id == 0) ? postDAO.create(p) : postDAO.update(p);
+            boolean ok = (id == 0) ? new dao.PostDAO().create(p) : new dao.PostDAO().update(p);
             if (ok) {
                 response.sendRedirect(request.getContextPath()+"/admin/cms/posts");
             } else {
