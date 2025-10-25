@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -31,7 +31,7 @@
                                     <nav aria-label="breadcrumb">
                                         <ol class="breadcrumb">
                                             <li class="breadcrumb-item">
-                                                <a href="<%= request.getContextPath() %>/admin/dashboard">Dashboard</a>
+<a href="<%= request.getContextPath() %>/admin/dashboard">Bảng điều khiển</a>
                                             </li>
                                             <li class="breadcrumb-item">
                                                 <a href="<%= request.getContextPath() %>/admin/categories">Danh mục</a>
@@ -76,7 +76,7 @@
                                     </div>
 
                                     <div class="input-style-1 mb-20">
-                                        <label>Slug <span class="text-danger">*</span></label>
+<label>Đường dẫn <span class="text-danger">*</span></label>
                                         <input type="text" name="slug" class="form-control" 
                                                value="${category.slug}" required id="categorySlug">
                                         <small class="text-muted">URL thân thiện (tự động tạo từ tên)</small>
@@ -119,7 +119,7 @@
                                 </div>
 
                                 <div class="mb-20">
-                                    <p class="text-sm mb-2"><strong>Slug:</strong></p>
+<p class="text-sm mb-2"><strong>Đường dẫn:</strong></p>
                                     <p class="text-sm text-muted">URL thân thiện SEO. Tự động tạo từ tên danh mục. Ví dụ: "dien-thoai", "laptop"</p>
                                 </div>
 

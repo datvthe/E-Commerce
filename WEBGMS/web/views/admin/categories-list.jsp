@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -31,7 +31,7 @@
                                     <nav aria-label="breadcrumb">
                                         <ol class="breadcrumb">
                                             <li class="breadcrumb-item">
-                                                <a href="<%= request.getContextPath() %>/admin/dashboard">Dashboard</a>
+<a href="<%= request.getContextPath() %>/admin/dashboard">Bảng điều khiển</a>
                                             </li>
                                             <li class="breadcrumb-item active" aria-current="page">
                                                 Danh mục
@@ -102,7 +102,7 @@
                                             <tr>
                                                 <th><h6>ID</h6></th>
                                                 <th><h6>Tên danh mục</h6></th>
-                                                <th><h6>Slug</h6></th>
+<th><h6>Đường dẫn</h6></th>
                                                 <th><h6>Mô tả</h6></th>
                                                 <th><h6>Trạng thái</h6></th>
                                                 <th><h6>Ngày tạo</h6></th>

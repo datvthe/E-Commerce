@@ -26,6 +26,28 @@ public class AdminDashboardController extends HttpServlet {
             return;
         }
         
-        request.getRequestDispatcher("/views/admin/dashboard.jsp").forward(request, response);
+        // Load metrics
+        dao.UsersDAO usersDAO = new dao.UsersDAO();
+        dao.ProductDAO productDAO = new dao.ProductDAO();
+        dao.OrderDAO orderDAO = new dao.OrderDAO();
+        
+        int totalUsers = usersDAO.getTotalUsers();
+        int totalProducts = productDAO.getTotalProductCount();
+        int totalOrders = orderDAO.getTotalOrders();
+        int ordersToday = orderDAO.getOrdersToday();
+        java.math.BigDecimal revenueToday = orderDAO.getRevenueTodayAll();
+        
+        java.util.List<model.user.Users> recentUsers = usersDAO.getRecentUsers(5);
+        java.util.List<model.order.Orders> recentOrders = orderDAO.getRecentOrders(5);
+        
+        request.setAttribute("totalUsers", totalUsers);
+        request.setAttribute("totalProducts", totalProducts);
+        request.setAttribute("totalOrders", totalOrders);
+        request.setAttribute("ordersToday", ordersToday);
+        request.setAttribute("revenueToday", revenueToday);
+        request.setAttribute("recentUsers", recentUsers);
+        request.setAttribute("recentOrders", recentOrders);
+        
+        request.getRequestDispatcher("/views/admin/admin-dashboard.jsp").forward(request, response);
     }
 }

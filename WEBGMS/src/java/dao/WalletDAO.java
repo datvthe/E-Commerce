@@ -94,7 +94,7 @@ public int findUserIdByDescription(String desc) {
         String[] parts = desc.split("TOPUP-");
         if (parts.length < 2) return -1;
 
-        String idPart = parts[1].trim().split("\\s+")[0]; // cắt theo khoảng trắng nếu có
+        String idPart = parts[1].trim().split("\s+")[0]; // cắt theo khoảng trắng nếu có
         return Integer.parseInt(idPart);
     } catch (Exception e) {
         e.printStackTrace();

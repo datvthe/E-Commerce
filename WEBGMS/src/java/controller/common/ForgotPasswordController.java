@@ -7,27 +7,18 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import dao.PasswordResetDAO;
-import service.EmailService;
 import model.user.PasswordReset;
 
 @WebServlet(name = "ForgotPasswordController", urlPatterns = {"/forgot-password"})
 public class ForgotPasswordController extends HttpServlet {
 
     private PasswordResetDAO passwordResetDAO;
-    private EmailService emailService;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        // Initialize only DAO - EmailService will be initialized when needed
+        // Initialize only DAO - EmailService will be initialized lazily when needed
         passwordResetDAO = new PasswordResetDAO();
-    }
-    
-    private EmailService getEmailService() {
-        if (emailService == null) {
-            emailService = new EmailService();
-        }
-        return emailService;
     }
 
     @Override
@@ -82,8 +73,14 @@ public class ForgotPasswordController extends HttpServlet {
             PasswordReset passwordReset = passwordResetDAO.createPasswordResetRequest(email);
             
             if (passwordReset != null) {
-                // Send verification code via email
-                boolean emailSent = getEmailService().sendPasswordResetEmail(email, passwordReset.getVerification_code());
+                // Send verification code via email (lazy instantiate to avoid class loading at startup)
+                boolean emailSent = false;
+                try {
+                    emailSent = new service.EmailService().sendPasswordResetEmail(email, passwordReset.getVerification_code());
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    emailSent = false;
+                }
                 
                 if (emailSent) {
                     request.getSession().setAttribute("message", 

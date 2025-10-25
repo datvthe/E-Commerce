@@ -1,19 +1,16 @@
--- Update password column to password_hash in users table
--- This script will rename the password column to password_hash
-
+-- Migrate legacy `password` column to `password_hash` (what the app uses)
 USE gicungco;
 
--- First, add the new password_hash column
-ALTER TABLE `users` ADD COLUMN `password_hash` LONGTEXT NOT NULL AFTER `password`;
+-- Add password_hash if missing
+ALTER TABLE `users` ADD COLUMN IF NOT EXISTS `password_hash` LONGTEXT NULL AFTER `email`;
 
--- Copy existing password data to password_hash column
-UPDATE `users` SET `password_hash` = `password`;
+-- Copy legacy values if present
+UPDATE `users` SET `password_hash` = `password` 
+WHERE (`password_hash` IS NULL OR `password_hash` = '') AND `password` IS NOT NULL;
 
--- Drop the old password column
-ALTER TABLE `users` DROP COLUMN `password`;
+-- Drop legacy column if present (MySQL 8+)
+ALTER TABLE `users` DROP COLUMN IF EXISTS `password`;
 
--- Rename password_hash to password (to match the code expectations)
-ALTER TABLE `users` CHANGE `password_hash` `password` LONGTEXT NOT NULL;
-
--- Verify the changes
-SELECT user_id, username, email, password, full_name, role FROM users LIMIT 5;
+-- Verify
+SELECT user_id, email, LEFT(password_hash, 16) AS hash_prefix, LOCATE(':', password_hash) AS colon_pos 
+FROM users LIMIT 5;

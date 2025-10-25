@@ -240,4 +240,3 @@ public class WishlistDAO extends DBConnection {
         public void setAveragePrice(java.math.BigDecimal averagePrice) { this.averagePrice = averagePrice; }
     }
 }
-

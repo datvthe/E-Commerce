@@ -168,5 +168,9 @@ public class CategoryDAO extends DBConnection {
         category.setUpdatedAt(rs.getTimestamp("updated_at"));
         return category;
     }
+<<<<<<< HEAD
+}
+=======
 
 }
+>>>>>>> adfffa2ca17758b7b0f2e7aa138910e53f368132

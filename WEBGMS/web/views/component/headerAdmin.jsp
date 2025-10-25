@@ -20,12 +20,12 @@
                             <div class="header-left d-flex align-items-center">
                                 <div class="menu-toggle-btn mr-15">
                                     <button id="menu-toggle" class="main-btn primary-btn btn-hover">
-                                        <i class="lni lni-chevron-left me-2"></i> Menu
+<i class="lni lni-chevron-left me-2"></i> Danh mục
                                     </button>
                                 </div>
                                 <div class="header-search d-none d-md-flex">
                                     <form action="#">
-                                        <input type="text" placeholder="Search..." />
+<input type="text" placeholder="Tìm kiếm..." />
                                         <button><i class="lni lni-search-alt"></i></button>
                                     </form>
                                 </div>
@@ -177,23 +177,23 @@
                                         <li class="divider"></li>
                                         <li>
                                             <a href="#0">
-                                                <i class="lni lni-user"></i> View Profile
+<i class="lni lni-user"></i> Xem hồ sơ
                                             </a>
                                         </li>
                                         <li>
                                             <a href="#0">
-                                                <i class="lni lni-alarm"></i> Notifications
+<i class="lni lni-alarm"></i> Thông báo
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="#0"> <i class="lni lni-inbox"></i> Messages </a>
+<a href="#0"> <i class="lni lni-inbox"></i> Tin nhắn </a>
                                         </li>
                                         <li>
-                                            <a href="#0"> <i class="lni lni-cog"></i> Settings </a>
+<a href="#0"> <i class="lni lni-cog"></i> Cài đặt </a>
                                         </li>
                                         <li class="divider"></li>
                                         <li>
-                                            <a href="#0"> <i class="lni lni-exit"></i> Sign Out </a>
+<a href="#0"> <i class="lni lni-exit"></i> Đăng xuất </a>
                                         </li>
                                     </ul>
                                 </div>

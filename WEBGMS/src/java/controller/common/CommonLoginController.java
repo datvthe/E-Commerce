@@ -1,6 +1,7 @@
 package controller.common;
 
 import dao.UsersDAO;
+import dao.SellerDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.Cookie;
@@ -13,7 +14,6 @@ import java.util.UUID;
 import model.user.UserRoles;
 import model.user.Users;
 import service.RoleBasedAccessControl;
-import util.PasswordUtil;
 
 @WebServlet(name = "CommonLoginController", urlPatterns = {"/login"})
 public class CommonLoginController extends HttpServlet {
@@ -24,7 +24,6 @@ public class CommonLoginController extends HttpServlet {
         try {
             String force = request.getParameter("force");
 
-            // ✅ Logout + clear cookies if force param is set
             if ("1".equals(force) || "true".equalsIgnoreCase(force)) {
                 HttpSession session = request.getSession(false);
                 if (session != null) {
@@ -50,26 +49,23 @@ public class CommonLoginController extends HttpServlet {
                 return;
             }
 
-            // ✅ Already logged in → redirect
             if (request.getSession().getAttribute("user") != null) {
                 Users user = (Users) request.getSession().getAttribute("user");
-                int roleId = new UsersDAO().getRoleByUserId(user.getUser_id()).getRole_id().getRole_id();
+                UserRoles ur = new UsersDAO().getRoleByUserId(user.getUser_id());
+                int roleId = (ur != null && ur.getRole_id() != null)
+                        ? ur.getRole_id().getRole_id()
+                        : RoleBasedAccessControl.ROLE_CUSTOMER;
                 response.sendRedirect(request.getContextPath() + getRedirectPathByRole(roleId));
                 return;
             }
 
-            // ✅ Auto-login via cookie token
             String token = null;
             String roleCookieVal = null;
 
             if (request.getCookies() != null) {
                 for (Cookie c : request.getCookies()) {
-                    if ("remember_token".equals(c.getName())) {
-                        token = c.getValue();
-                    }
-                    if ("role_id".equals(c.getName())) {
-                        roleCookieVal = c.getValue();
-                    }
+                    if ("remember_token".equals(c.getName())) token = c.getValue();
+                    if ("role_id".equals(c.getName())) roleCookieVal = c.getValue();
                 }
             }
 
@@ -111,55 +107,49 @@ public class CommonLoginController extends HttpServlet {
             }
 
             UsersDAO userDAO = new UsersDAO();
-            Users user = userDAO.getUserByAccount(account); // ✅ tách riêng get theo email/sđt
+            Users user = userDAO.checkLogin(account, password);
 
             if (user != null) {
-                String storedHash = user.getPassword();
+                HttpSession session = request.getSession();
+                session.setAttribute("user", user);
+                session.setAttribute("message", "Đăng nhập thành công!");
 
-                // ✅ Kiểm tra mật khẩu hash (SHA-256 + salt)
-                boolean verified = PasswordUtil.verifyPassword(password, storedHash);
+                SellerDAO sellerDAO = new SellerDAO();
+                boolean isSeller = sellerDAO.existsByUserId(user.getUser_id());
+                session.setAttribute("isSeller", isSeller);
 
-                if (verified) {
-                    // Đăng nhập thành công
-                    HttpSession session = request.getSession();
-                    session.setAttribute("user", user);
-                    session.setAttribute("message", "Đăng nhập thành công!");
+                UserRoles userRole = userDAO.getRoleByUserId(user.getUser_id());
+                RoleBasedAccessControl rbac = new RoleBasedAccessControl();
+                session.setAttribute("rbac", rbac);
+                session.setAttribute("userRole", userRole);
 
-                    // ✅ Kiểm tra nếu user đã là người bán
-                    dao.SellerDAO sellerDAO = new dao.SellerDAO();
-                    boolean isSeller = sellerDAO.existsByUserId(user.getUser_id());
-                    session.setAttribute("isSeller", isSeller);
+                int roleId = (userRole != null && userRole.getRole_id() != null)
+                        ? userRole.getRole_id().getRole_id()
+                        : RoleBasedAccessControl.ROLE_CUSTOMER;
 
-                    UserRoles userRole = userDAO.getRoleByUserId(user.getUser_id());
-                    RoleBasedAccessControl rbac = new RoleBasedAccessControl();
-                    session.setAttribute("rbac", rbac);
-                    session.setAttribute("userRole", userRole);
+                if ("on".equalsIgnoreCase(remember) || "true".equalsIgnoreCase(remember) || "1".equals(remember)) {
+                    String token = UUID.randomUUID().toString();
+                    Cookie cookie = new Cookie("remember_token", token);
+                    cookie.setMaxAge(60 * 60 * 24 * 3);
+                    cookie.setPath(request.getContextPath());
+                    response.addCookie(cookie);
 
-                    int roleId = userRole.getRole_id().getRole_id();
+                    Cookie roleCookie = new Cookie("role_id", String.valueOf(roleId));
+                    roleCookie.setMaxAge(60 * 60 * 24 * 3);
+                    roleCookie.setPath(request.getContextPath());
+                    response.addCookie(roleCookie);
 
-                    // ✅ Remember me token
-                    if ("on".equalsIgnoreCase(remember) || "true".equalsIgnoreCase(remember) || "1".equals(remember)) {
-                        String token = UUID.randomUUID().toString();
-                        Cookie cookie = new Cookie("remember_token", token);
-                        cookie.setMaxAge(60 * 60 * 24 * 3); // 3 ngày
-                        cookie.setPath(request.getContextPath());
-                        response.addCookie(cookie);
-
-                        Cookie roleCookie = new Cookie("role_id", String.valueOf(roleId));
-                        roleCookie.setMaxAge(60 * 60 * 24 * 3);
-                        roleCookie.setPath(request.getContextPath());
-                        response.addCookie(roleCookie);
-
+                    try {
                         userDAO.saveUserToken(user.getUser_id(), token, 3);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
                     }
-
-                    // ✅ Chuyển hướng theo quyền
-                    response.sendRedirect(request.getContextPath() + getRedirectPathByRole(roleId));
-                    return;
                 }
+
+                response.sendRedirect(request.getContextPath() + getRedirectPathByRole(roleId));
+                return;
             }
 
-            // ❌ Sai mật khẩu hoặc không tồn tại
             request.getSession().setAttribute("error", "Sai email/số điện thoại hoặc mật khẩu!");
             response.sendRedirect(request.getContextPath() + "/login");
 
