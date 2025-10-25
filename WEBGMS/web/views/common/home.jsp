@@ -292,43 +292,49 @@ uri="jakarta.tags.core" %>
                 <ul class="list-unstyled categories-bars">
                   <li>
                     <div class="categories-bars-item">
-                      <a href="#"
+                      <a
+                        href="<%= request.getContextPath() %>/products?category=1"
                         ><i class="fas fa-graduation-cap me-2"></i>Học tập</a
                       ><span>(1,250)</span>
                     </div>
                   </li>
                   <li>
                     <div class="categories-bars-item">
-                      <a href="#"
+                      <a
+                        href="<%= request.getContextPath() %>/products?category=2"
                         ><i class="fas fa-play-circle me-2"></i>Xem phim</a
                       ><span>(850)</span>
                     </div>
                   </li>
                   <li>
                     <div class="categories-bars-item">
-                      <a href="#"
+                      <a
+                        href="<%= request.getContextPath() %>/products?category=3"
                         ><i class="fas fa-laptop-code me-2"></i>Phần mềm</a
                       ><span>(2,100)</span>
                     </div>
                   </li>
                   <li>
                     <div class="categories-bars-item">
-                      <a href="#"
+                      <a
+                        href="<%= request.getContextPath() %>/products?category=4"
                         ><i class="fas fa-file-alt me-2"></i>Tài liệu</a
                       ><span>(680)</span>
                     </div>
                   </li>
                   <li>
                     <div class="categories-bars-item">
-                      <a href="#"><i class="fas fa-gift me-2"></i>Thẻ cào</a
+                      <a
+                        href="<%= request.getContextPath() %>/products?category=5"
+                        ><i class="fas fa-gift me-2"></i>Thẻ cào</a
                       ><span>(1,500)</span>
                     </div>
                   </li>
                   <li>
                     <div class="categories-bars-item">
-                      <a href="#"
-                        ><i class="fas fa-user-circle me-2"></i>Tài khoản
-                        Game</a
+                      <a
+                        href="<%= request.getContextPath() %>/products?category=6"
+                        ><i class="fas fa-gamepad me-2"></i>Tài khoản Game</a
                       ><span>(2,300)</span>
                     </div>
                   </li>
@@ -375,20 +381,35 @@ uri="jakarta.tags.core" %>
                     >Danh mục</a
                   >
                   <div class="dropdown-menu m-0">
-                    <a href="#" class="dropdown-item"
+                    <a
+                      href="<%= request.getContextPath() %>/products?category=1"
+                      class="dropdown-item"
                       ><i class="fas fa-graduation-cap me-2"></i>Học tập</a
                     >
-                    <a href="#" class="dropdown-item"
+                    <a
+                      href="<%= request.getContextPath() %>/products?category=2"
+                      class="dropdown-item"
                       ><i class="fas fa-play-circle me-2"></i>Xem phim</a
                     >
-                    <a href="#" class="dropdown-item"
+                    <a
+                      href="<%= request.getContextPath() %>/products?category=3"
+                      class="dropdown-item"
                       ><i class="fas fa-laptop-code me-2"></i>Phần mềm</a
                     >
-                    <a href="#" class="dropdown-item"
+                    <a
+                      href="<%= request.getContextPath() %>/products?category=4"
+                      class="dropdown-item"
                       ><i class="fas fa-file-alt me-2"></i>Tài liệu</a
                     >
-                    <a href="#" class="dropdown-item"
-                      ><i class="fas fa-ellipsis-h me-2"></i>Khác</a
+                    <a
+                      href="<%= request.getContextPath() %>/products?category=5"
+                      class="dropdown-item"
+                      ><i class="fas fa-gift me-2"></i>Thẻ cào</a
+                    >
+                    <a
+                      href="<%= request.getContextPath() %>/products?category=6"
+                      class="dropdown-item"
+                      ><i class="fas fa-gamepad me-2"></i>Tài khoản Game</a
                     >
                   </div>
                 </div>
@@ -410,7 +431,8 @@ uri="jakarta.tags.core" %>
                     <ul class="list-unstyled categories-bars">
                       <li>
                         <div class="categories-bars-item">
-                          <a href="#"
+                          <a
+                            href="<%= request.getContextPath() %>/products?category=1"
                             ><i class="fas fa-graduation-cap me-2"></i>Học
                             tập</a
                           ><span>(1,250)</span>
@@ -418,29 +440,43 @@ uri="jakarta.tags.core" %>
                       </li>
                       <li>
                         <div class="categories-bars-item">
-                          <a href="#"
+                          <a
+                            href="<%= request.getContextPath() %>/products?category=2"
                             ><i class="fas fa-play-circle me-2"></i>Xem phim</a
                           ><span>(850)</span>
                         </div>
                       </li>
                       <li>
                         <div class="categories-bars-item">
-                          <a href="#"
+                          <a
+                            href="<%= request.getContextPath() %>/products?category=3"
                             ><i class="fas fa-laptop-code me-2"></i>Phần mềm</a
                           ><span>(2,100)</span>
                         </div>
                       </li>
                       <li>
                         <div class="categories-bars-item">
-                          <a href="#"
+                          <a
+                            href="<%= request.getContextPath() %>/products?category=4"
                             ><i class="fas fa-file-alt me-2"></i>Tài liệu</a
                           ><span>(680)</span>
                         </div>
                       </li>
                       <li>
                         <div class="categories-bars-item">
-                          <a href="#"><i class="fas fa-gift me-2"></i>Thẻ cào</a
+                          <a
+                            href="<%= request.getContextPath() %>/products?category=5"
+                            ><i class="fas fa-gift me-2"></i>Thẻ cào</a
                           ><span>(1,500)</span>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="categories-bars-item">
+                          <a
+                            href="<%= request.getContextPath() %>/products?category=6"
+                            ><i class="fas fa-gamepad me-2"></i>Tài khoản
+                            Game</a
+                          ><span>(2,300)</span>
                         </div>
                       </li>
                     </ul>
@@ -504,64 +540,106 @@ uri="jakarta.tags.core" %>
         </div>
         <div class="row g-4">
           <div class="col-lg-2 col-md-4 col-6">
-            <div
-              class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
+            <a
+              href="<%= request.getContextPath() %>/products?category=1"
+              class="text-decoration-none"
             >
-              <div class="category-icon mb-3">
-                <i class="fas fa-graduation-cap fa-3x text-primary"></i>
+              <div
+                class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
+              >
+                <div class="category-icon mb-3">
+                  <i class="fas fa-graduation-cap fa-3x text-primary"></i>
+                </div>
+                <h5 class="fw-bold text-dark">Học tập</h5>
+                <p class="text-muted small">Khóa học, tài liệu, ebook</p>
+                <span class="badge bg-primary">1,250+ sản phẩm</span>
               </div>
-              <h5 class="fw-bold">Học tập</h5>
-              <p class="text-muted small">Khóa học, tài liệu, ebook</p>
-              <span class="badge bg-primary">1,250+ sản phẩm</span>
-            </div>
+            </a>
           </div>
           <div class="col-lg-2 col-md-4 col-6">
-            <div
-              class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
+            <a
+              href="<%= request.getContextPath() %>/products?category=2"
+              class="text-decoration-none"
             >
-              <div class="category-icon mb-3">
-                <i class="fas fa-play-circle fa-3x text-danger"></i>
+              <div
+                class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
+              >
+                <div class="category-icon mb-3">
+                  <i class="fas fa-play-circle fa-3x text-danger"></i>
+                </div>
+                <h5 class="fw-bold text-dark">Xem phim</h5>
+                <p class="text-muted small">Netflix, Disney+, HBO</p>
+                <span class="badge bg-danger">850+ sản phẩm</span>
               </div>
-              <h5 class="fw-bold">Xem phim</h5>
-              <p class="text-muted small">Netflix, Disney+, HBO</p>
-              <span class="badge bg-danger">850+ sản phẩm</span>
-            </div>
+            </a>
           </div>
           <div class="col-lg-2 col-md-4 col-6">
-            <div
-              class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
+            <a
+              href="<%= request.getContextPath() %>/products?category=3"
+              class="text-decoration-none"
             >
-              <div class="category-icon mb-3">
-                <i class="fas fa-laptop-code fa-3x text-success"></i>
+              <div
+                class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
+              >
+                <div class="category-icon mb-3">
+                  <i class="fas fa-laptop-code fa-3x text-success"></i>
+                </div>
+                <h5 class="fw-bold text-dark">Phần mềm</h5>
+                <p class="text-muted small">Adobe, Office, Antivirus</p>
+                <span class="badge bg-success">2,100+ sản phẩm</span>
               </div>
-              <h5 class="fw-bold">Phần mềm</h5>
-              <p class="text-muted small">Adobe, Office, Antivirus</p>
-              <span class="badge bg-success">2,100+ sản phẩm</span>
-            </div>
+            </a>
           </div>
           <div class="col-lg-2 col-md-4 col-6">
-            <div
-              class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
+            <a
+              href="<%= request.getContextPath() %>/products?category=4"
+              class="text-decoration-none"
             >
-              <div class="category-icon mb-3">
-                <i class="fas fa-file-alt fa-3x text-warning"></i>
+              <div
+                class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
+              >
+                <div class="category-icon mb-3">
+                  <i class="fas fa-file-alt fa-3x text-warning"></i>
+                </div>
+                <h5 class="fw-bold text-dark">Tài liệu</h5>
+                <p class="text-muted small">Template, báo cáo, CV</p>
+                <span class="badge bg-warning">680+ sản phẩm</span>
               </div>
-              <h5 class="fw-bold">Tài liệu</h5>
-              <p class="text-muted small">Template, báo cáo, CV</p>
-              <span class="badge bg-warning">680+ sản phẩm</span>
-            </div>
+            </a>
           </div>
           <div class="col-lg-2 col-md-4 col-6">
-            <div
-              class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
+            <a
+              href="<%= request.getContextPath() %>/products?category=5"
+              class="text-decoration-none"
             >
-              <div class="category-icon mb-3">
-                <i class="fas fa-ellipsis-h fa-3x text-info"></i>
+              <div
+                class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
+              >
+                <div class="category-icon mb-3">
+                  <i class="fas fa-gift fa-3x text-primary"></i>
+                </div>
+                <h5 class="fw-bold text-dark">Thẻ cào</h5>
+                <p class="text-muted small">Viettel, Mobi, Vina</p>
+                <span class="badge bg-primary">1,500+ sản phẩm</span>
               </div>
-              <h5 class="fw-bold">Khác</h5>
-              <p class="text-muted small">Thẻ cào, tài khoản game</p>
-              <span class="badge bg-info">3,200+ sản phẩm</span>
-            </div>
+            </a>
+          </div>
+          <div class="col-lg-2 col-md-4 col-6">
+            <a
+              href="<%= request.getContextPath() %>/products?category=6"
+              class="text-decoration-none"
+            >
+              <div
+                class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
+              >
+                <div class="category-icon mb-3">
+                  <i class="fas fa-gamepad fa-3x text-info"></i>
+                </div>
+                <h5 class="fw-bold text-dark">Tài khoản Game</h5>
+                <p class="text-muted small">LOL, PUBG, Valorant</p>
+                <span class="badge bg-info">2,300+ sản phẩm</span>
+              </div>
+            </a>
           </div>
         </div>
       </div>
