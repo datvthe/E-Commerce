@@ -6,59 +6,54 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html lang="en">
-    <head>
+<html lang="vi">
+  <head>
+    <title>Quản lý danh mục| Quản trị</title>
+  </head>
+  <body>
+    <jsp:include page="/views/component/sidebar.jsp" />
 
-        <title>Blank Page | PlainAdmin Demo</title>
+    <main class="main-wrapper">
+      <jsp:include page="/views/component/headerAdmin.jsp" />
 
-    </head>
-    <body>
-        <jsp:include page="/views/component/sidebar.jsp" />
-
-
-        <!-- ======== main-wrapper start =========== -->
-        <main class="main-wrapper">
-
-            <jsp:include page="/views/component/headerAdmin.jsp" />
-
-            <!-- ========== section start ========== -->
-            <section class="section">
-                <div class="container-fluid">
-                    <!-- ========== title-wrapper start ========== -->
-                    <div class="title-wrapper pt-30">
-                        <div class="row align-items-center">
-                            <div class="col-md-6">
-                                <div class="title">
-                                    <h2>Title</h2>
-                                </div>
-                            </div>
-                            <!-- end col -->
-                            <div class="col-md-6">
-                                <div class="breadcrumb-wrapper">
-                                    <nav aria-label="breadcrumb">
-                                        <ol class="breadcrumb">
-                                            <li class="breadcrumb-item">
-                                                <a href="#0">Dashboard</a>
-                                            </li>
-                                            <li class="breadcrumb-item active" aria-current="page">
-                                                Page
-                                            </li>
-                                        </ol>
-                                    </nav>
-                                </div>
-                            </div>
-                            <!-- end col -->
-                        </div>
-                        <!-- end row -->
-                    </div>
-                    <!-- ========== title-wrapper end ========== -->
+      <section class="section">
+        <div class="container-fluid">
+          <div class="title-wrapper pt-30">
+            <div class="row align-items-center">
+              <div class="col-md-6">
+                <div class="title">
+                  <h2>Liên kết nhanh</h2>
                 </div>
-                <!-- end container -->
-            </section>
-            <!-- ========== section end ========== -->
+              </div>
+              <div class="col-md-6">
+                <div class="breadcrumb-wrapper">
+                  <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                      <li class="breadcrumb-item">
+                        <a href="<%= request.getContextPath() %>/admin/dashboard">Bảng điều khiển</a>
+                      </li>
+                      <li class="breadcrumb-item active" aria-current="page">
+                        Quản lý danh mục
+                      </li>
+                    </ol>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
 
-
-        </main>
-
-    </body>
+          <div class="card-style p-4">
+            <div class="d-flex gap-2 flex-wrap">
+              <a class="main-btn primary-btn btn-hover" href="<%= request.getContextPath() %>/admin/users">
+                Quản lý người dùng
+              </a>
+              <a class="main-btn primary-btn btn-hover" href="<%= request.getContextPath() %>/admin/categories">
+                Quản lý danh mục
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
 </html>

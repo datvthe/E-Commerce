@@ -52,8 +52,9 @@ public class SellerDAO {
     try (Connection conn = DBConnection.getConnection();
          PreparedStatement ps = conn.prepareStatement(sql)) {
         ps.setInt(1, userId);
-        ResultSet rs = ps.executeQuery();
-        return rs.next();
+        try (ResultSet rs = ps.executeQuery()) {
+            return rs.next();
+        }
     } catch (Exception e) {
         e.printStackTrace();
     }
@@ -64,18 +65,19 @@ public class SellerDAO {
     try (Connection conn = DBConnection.getConnection();
          PreparedStatement ps = conn.prepareStatement(sql)) {
         ps.setInt(1, userId);
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            Seller s = new Seller();
-            s.setSellerId(rs.getInt("seller_id"));
-            s.setUserId(rs.getInt("user_id"));
-            s.setShopName(rs.getString("shop_name"));
-            s.setShopDescription(rs.getString("shop_description"));
-            s.setMainCategory(rs.getString("main_category"));
-            s.setBankName(rs.getString("bank_name"));
-            s.setBankAccount(rs.getString("bank_account"));
-            s.setAccountOwner(rs.getString("account_owner"));
-            return s;
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                Seller s = new Seller();
+                s.setSellerId(rs.getInt("seller_id"));
+                s.setUserId(rs.getInt("user_id"));
+                s.setShopName(rs.getString("shop_name"));
+                s.setShopDescription(rs.getString("shop_description"));
+                s.setMainCategory(rs.getString("main_category"));
+                s.setBankName(rs.getString("bank_name"));
+                s.setBankAccount(rs.getString("bank_account"));
+                s.setAccountOwner(rs.getString("account_owner"));
+                return s;
+            }
         }
     } catch (Exception e) {
         e.printStackTrace();

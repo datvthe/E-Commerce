@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -31,7 +31,7 @@
                                     <nav aria-label="breadcrumb">
                                         <ol class="breadcrumb">
                                             <li class="breadcrumb-item">
-                                                <a href="<%= request.getContextPath() %>/admin/dashboard">Dashboard</a>
+<a href="<%= request.getContextPath() %>/admin/dashboard">Bảng điều khiển</a>
                                             </li>
                                             <li class="breadcrumb-item active" aria-current="page">
                                                 Người dùng
@@ -91,10 +91,10 @@
                                         <div class="col-md-3">
                                             <select name="role" class="form-select">
                                                 <option value="all" ${role == 'all' || empty role ? 'selected' : ''}>Tất cả vai trò</option>
-                                                <option value="Admin" ${role == 'Admin' ? 'selected' : ''}>Admin</option>
-                                                <option value="Manager" ${role == 'Manager' ? 'selected' : ''}>Manager</option>
-                                                <option value="Seller" ${role == 'Seller' ? 'selected' : ''}>Seller</option>
-                                                <option value="Customer" ${role == 'Customer' ? 'selected' : ''}>Customer</option>
+<option value="Admin" ${role == 'Admin' ? 'selected' : ''}>Quản trị viên</option>
+                                                <option value="Manager" ${role == 'Manager' ? 'selected' : ''}>Quản lý</option>
+                                                <option value="Seller" ${role == 'Seller' ? 'selected' : ''}>Người bán</option>
+                                                <option value="Customer" ${role == 'Customer' ? 'selected' : ''}>Khách hàng</option>
                                             </select>
                                         </div>
                                         <div class="col-md-2">

@@ -70,8 +70,9 @@ public class WishlistDAO extends DBConnection {
 
             ps.setInt(1, userId);
             ps.setLong(2, productId);
-            ResultSet rs = ps.executeQuery();
-            return rs.next();
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -110,36 +111,36 @@ public class WishlistDAO extends DBConnection {
             ps.setInt(1, userId);
             ps.setInt(2, limit);
             ps.setInt(3, offset);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                Wishlist wishlist = new Wishlist();
-                wishlist.setWishlistId(rs.getInt("wishlist_id"));
-                
-                Users user = new Users();
-                user.setUser_id(userId);
-                wishlist.setUserId(user);
-                
-                Products product = new Products();
-                product.setProduct_id(rs.getLong("product_id"));
-                product.setName(rs.getString("name"));
-                product.setPrice(rs.getBigDecimal("price"));
-                product.setCurrency(rs.getString("currency"));
-                product.setSlug(rs.getString("slug"));
-                product.setDescription(rs.getString("description"));
-                product.setAverage_rating(rs.getDouble("average_rating"));
-                product.setTotal_reviews(rs.getInt("total_reviews"));
-                
-                if (rs.getString("category_name") != null) {
-                    product.setCategory_name(rs.getString("category_name"));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Wishlist wishlist = new Wishlist();
+                    wishlist.setWishlistId(rs.getInt("wishlist_id"));
+                    
+                    Users user = new Users();
+                    user.setUser_id(userId);
+                    wishlist.setUserId(user);
+                    
+                    Products product = new Products();
+                    product.setProduct_id(rs.getLong("product_id"));
+                    product.setName(rs.getString("name"));
+                    product.setPrice(rs.getBigDecimal("price"));
+                    product.setCurrency(rs.getString("currency"));
+                    product.setSlug(rs.getString("slug"));
+                    product.setDescription(rs.getString("description"));
+                    product.setAverage_rating(rs.getDouble("average_rating"));
+                    product.setTotal_reviews(rs.getInt("total_reviews"));
+                    
+                    if (rs.getString("category_name") != null) {
+                        product.setCategory_name(rs.getString("category_name"));
+                    }
+                    if (rs.getString("image_url") != null) {
+                        product.setImageUrl(rs.getString("image_url"));
+                    }
+                    
+                    wishlist.setProductId(product);
+                    wishlist.setAddedAt(rs.getTimestamp("added_at"));
+                    wishlistItems.add(wishlist);
                 }
-                if (rs.getString("image_url") != null) {
-                    product.setImageUrl(rs.getString("image_url"));
-                }
-                
-                wishlist.setProductId(product);
-                wishlist.setAddedAt(rs.getTimestamp("added_at"));
-                wishlistItems.add(wishlist);
             }
 
         } catch (Exception e) {
@@ -161,10 +162,10 @@ public class WishlistDAO extends DBConnection {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                count = rs.getInt("count");
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt("count");
+                }
             }
 
         } catch (Exception e) {
@@ -207,12 +208,12 @@ public class WishlistDAO extends DBConnection {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                summary.setTotalItems(rs.getInt("total_items"));
-                summary.setTotalValue(rs.getBigDecimal("total_value"));
-                summary.setAveragePrice(rs.getBigDecimal("avg_price"));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    summary.setTotalItems(rs.getInt("total_items"));
+                    summary.setTotalValue(rs.getBigDecimal("total_value"));
+                    summary.setAveragePrice(rs.getBigDecimal("avg_price"));
+                }
             }
 
         } catch (Exception e) {
@@ -240,4 +241,3 @@ public class WishlistDAO extends DBConnection {
         public void setAveragePrice(java.math.BigDecimal averagePrice) { this.averagePrice = averagePrice; }
     }
 }
-

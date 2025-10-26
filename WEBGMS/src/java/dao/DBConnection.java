@@ -10,7 +10,7 @@ public class DBConnection {
 
     private static final String URL = "jdbc:mysql://localhost:3306/gicungco?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&zeroDateTimeBehavior=CONVERT_TO_NULL";
     private static final String USER = "root";
-    private static final String PASSWORD = "1234";
+    private static final String PASSWORD = "Josee0368558694@";
 
     public static Connection getConnection() {
         Connection conn = null;
@@ -22,6 +22,8 @@ public class DBConnection {
             System.out.println("Không tìm thấy Driver MySQL: " + e.getMessage());
         } catch (SQLException e) {
             System.out.println("Lỗi kết nối MySQL: " + e.getMessage());
+            // Gợi ý thường gặp
+            System.out.println("Gợi ý: kiểm tra allowPublicKeyRetrieval, useSSL, serverTimezone, user/password, và DB name (gicungco)");
         }
         return conn;
     }

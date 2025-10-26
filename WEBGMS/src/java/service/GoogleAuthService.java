@@ -39,10 +39,6 @@ public class GoogleAuthService {
      */
     public String getGoogleAuthUrl() {
         try {
-            // Debug: Print redirect URI
-            System.out.println("Google OAuth Redirect URI: " + GOOGLE_REDIRECT_URI);
-            System.out.println("Google OAuth Client ID: " + GOOGLE_CLIENT_ID);
-            
             Map<String, String> params = new HashMap<>();
             params.put("client_id", GOOGLE_CLIENT_ID);
             params.put("redirect_uri", GOOGLE_REDIRECT_URI);

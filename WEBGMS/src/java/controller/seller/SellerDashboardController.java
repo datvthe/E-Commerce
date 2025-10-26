@@ -2,8 +2,6 @@ package controller.seller;
 
 import dao.OrderDAO;
 import dao.ProductDAO;
-import dao.SellerDAO;
-import dao.WalletDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -17,8 +15,6 @@ public class SellerDashboardController extends HttpServlet {
 
     private final OrderDAO orderDAO = new OrderDAO();
     private final ProductDAO productDAO = new ProductDAO();
-    private final SellerDAO sellerDAO = new SellerDAO();
-    private final WalletDAO walletDAO = new WalletDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -34,7 +30,7 @@ public class SellerDashboardController extends HttpServlet {
 
         try {
             // Lấy thông tin seller
-            Seller seller = sellerDAO.getSellerByUserId(user.getUser_id());
+            Seller seller = new dao.SellerDAO().getSellerByUserId(user.getUser_id());
             if (seller == null) {
                 request.setAttribute("error", "❌ Không tìm thấy thông tin seller! Vui lòng đăng ký làm seller trước.");
                 request.getRequestDispatcher("/views/common/error.jsp").forward(request, response);
@@ -47,7 +43,7 @@ public class SellerDashboardController extends HttpServlet {
 
             // Try to get wallet balance safely
             try {
-                BigDecimal walletBalance = walletDAO.getBalanceByUserId(user.getUser_id());
+                BigDecimal walletBalance = new dao.WalletDAO().getBalanceByUserId(user.getUser_id());
                 request.setAttribute("walletBalance", walletBalance != null ? walletBalance : BigDecimal.ZERO);
             } catch (Exception e) {
                 request.setAttribute("walletBalance", BigDecimal.ZERO);
@@ -80,7 +76,7 @@ public class SellerDashboardController extends HttpServlet {
 
             // Try to get withdraw count safely
             try {
-                int withdrawCount = walletDAO.getWithdrawCountByUserId(user.getUser_id());
+                int withdrawCount = new dao.WalletDAO().getWithdrawCountByUserId(user.getUser_id());
                 request.setAttribute("withdrawCount", withdrawCount);
             } catch (Exception e) {
                 request.setAttribute("withdrawCount", 0);
