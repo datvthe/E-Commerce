@@ -6,13 +6,15 @@ package controller.common;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
+import java.util.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import dao.ProductCategoriesDAO;
 import dao.CategoryDAO;
+import model.product.ProductCategories;
 import model.Category;
 
 @WebServlet(name = "HomeController", urlPatterns = {"/home"})
@@ -55,11 +57,35 @@ public class CommonHomeController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Load categories for search dropdown
-        CategoryDAO categoryDAO = new CategoryDAO();
+        // Load categories from both legacy and admin-managed tables
+        ProductCategoriesDAO productCategoriesDAO = new ProductCategoriesDAO();
+        CategoryDAO legacyDAO = new CategoryDAO();
         try {
-            List<Category> categories = categoryDAO.getParentCategories();
-            request.setAttribute("categories", categories);
+            // Ensure default featured categories exist
+            productCategoriesDAO.ensureDefaultDigitalCategories();
+
+            List<Category> pinnedCategories = legacyDAO.getParentCategories();
+            request.setAttribute("pinnedCategories", pinnedCategories);
+
+            List<ProductCategories> allAdminCats = productCategoriesDAO.getAllCategories();
+            // Filter out names already present in legacy list (case-insensitive)
+            Set<String> legacyNames = new HashSet<>();
+            for (Category c : pinnedCategories) {
+                if (c.getName() != null) legacyNames.add(c.getName().trim().toLowerCase());
+            }
+            List<ProductCategories> extraCategories = new ArrayList<>();
+            for (ProductCategories c : allAdminCats) {
+                String name = c.getName();
+                if (name == null) continue;
+                String key = name.trim().toLowerCase();
+                if (!legacyNames.contains(key)) extraCategories.add(c);
+            }
+            request.setAttribute("extraCategories", extraCategories);
+            // For places that expect "categories", provide the full combined list
+            List<Object> combined = new ArrayList<>();
+            combined.addAll(pinnedCategories);
+            combined.addAll(extraCategories);
+            request.setAttribute("categories", combined);
         } catch (Exception e) {
             e.printStackTrace();
         }

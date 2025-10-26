@@ -1,6 +1,6 @@
 package controller.admin;
 
-import dao.CategoryDAO;
+import dao.ProductCategoriesDAO;
 import model.product.ProductCategories;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -83,12 +83,12 @@ public class AdminCategoryController extends HttpServlet {
             }
         }
         
-        CategoryDAO categoryDAO = new CategoryDAO();
+        ProductCategoriesDAO categoryDAO = new ProductCategoriesDAO();
         List<ProductCategories> categories;
         int totalCategories;
         
         if ((keyword != null && !keyword.trim().isEmpty()) || 
-            (status != null && !status.equals("all"))) {
+            (status != null && !"all".equals(status))) {
             categories = categoryDAO.searchCategories(keyword, status, page, PAGE_SIZE);
             totalCategories = categoryDAO.countCategories(keyword, status);
         } else {
@@ -124,7 +124,7 @@ public class AdminCategoryController extends HttpServlet {
         }
         
         long categoryId = Long.parseLong(categoryIdStr);
-        CategoryDAO categoryDAO = new CategoryDAO();
+        ProductCategoriesDAO categoryDAO = new ProductCategoriesDAO();
         ProductCategories category = categoryDAO.getCategoryById(categoryId);
         
         if (category == null) {
@@ -146,7 +146,7 @@ public class AdminCategoryController extends HttpServlet {
         String description = request.getParameter("description");
         String status = request.getParameter("status");
         
-        CategoryDAO categoryDAO = new CategoryDAO();
+        ProductCategoriesDAO categoryDAO = new ProductCategoriesDAO();
         
         if (categoryDAO.isCategoryNameExists(name, null)) {
             request.setAttribute("error", "Tên danh mục đã tồn tại");
@@ -181,7 +181,7 @@ public class AdminCategoryController extends HttpServlet {
         String status = request.getParameter("status");
         
         long categoryId = Long.parseLong(categoryIdStr);
-        CategoryDAO categoryDAO = new CategoryDAO();
+        ProductCategoriesDAO categoryDAO = new ProductCategoriesDAO();
         ProductCategories category = categoryDAO.getCategoryById(categoryId);
         
         if (category == null) {
@@ -225,7 +225,7 @@ public class AdminCategoryController extends HttpServlet {
         }
         
         long categoryId = Long.parseLong(categoryIdStr);
-        CategoryDAO categoryDAO = new CategoryDAO();
+        ProductCategoriesDAO categoryDAO = new ProductCategoriesDAO();
         boolean success = categoryDAO.deleteCategory(categoryId);
         
         if (success) {

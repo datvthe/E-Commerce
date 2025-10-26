@@ -1,5 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%> <%@ taglib prefix="c"
 uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -290,54 +291,25 @@ uri="jakarta.tags.core" %>
             <div class="collapse navbar-collapse rounded-bottom" id="allCat">
               <div class="navbar-nav ms-auto py-0">
                 <ul class="list-unstyled categories-bars">
-                  <li>
-                    <div class="categories-bars-item">
-                      <a
-                        href="<%= request.getContextPath() %>/products?category=1"
-                        ><i class="fas fa-graduation-cap me-2"></i>Học tập</a
-                      ><span>(1,250)</span>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="categories-bars-item">
-                      <a
-                        href="<%= request.getContextPath() %>/products?category=2"
-                        ><i class="fas fa-play-circle me-2"></i>Xem phim</a
-                      ><span>(850)</span>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="categories-bars-item">
-                      <a
-                        href="<%= request.getContextPath() %>/products?category=3"
-                        ><i class="fas fa-laptop-code me-2"></i>Phần mềm</a
-                      ><span>(2,100)</span>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="categories-bars-item">
-                      <a
-                        href="<%= request.getContextPath() %>/products?category=4"
-                        ><i class="fas fa-file-alt me-2"></i>Tài liệu</a
-                      ><span>(680)</span>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="categories-bars-item">
-                      <a
-                        href="<%= request.getContextPath() %>/products?category=5"
-                        ><i class="fas fa-gift me-2"></i>Thẻ cào</a
-                      ><span>(1,500)</span>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="categories-bars-item">
-                      <a
-                        href="<%= request.getContextPath() %>/products?category=6"
-                        ><i class="fas fa-gamepad me-2"></i>Tài khoản Game</a
-                      ><span>(2,300)</span>
-                    </div>
-                  </li>
+                  <c:forEach var="cat" items="${pinnedCategories}">
+                    <li>
+                      <div class="categories-bars-item">
+                        <a href="<%= request.getContextPath() %>/products?category=${cat.categoryId}">
+                          <i class="fas fa-folder-open me-2"></i>${cat.name}
+                        </a>
+                        <c:if test="${cat.productCount > 0}"><span>(${cat.productCount})</span></c:if>
+                      </div>
+                    </li>
+                  </c:forEach>
+                  <c:forEach var="cat" items="${extraCategories}">
+                    <li>
+                      <div class="categories-bars-item">
+                        <a href="<%= request.getContextPath() %>/products?category=${cat.category_id}">
+                          <i class="fas fa-folder-open me-2"></i>${cat.name}
+                        </a>
+                      </div>
+                    </li>
+                  </c:forEach>
                 </ul>
               </div>
             </div>
@@ -381,39 +353,21 @@ uri="jakarta.tags.core" %>
                     >Danh mục</a
                   >
                   <div class="dropdown-menu m-0">
-                    <a
-                      href="<%= request.getContextPath() %>/products?category=1"
-                      class="dropdown-item"
-                      ><i class="fas fa-graduation-cap me-2"></i>Học tập</a
-                    >
-                    <a
-                      href="<%= request.getContextPath() %>/products?category=2"
-                      class="dropdown-item"
-                      ><i class="fas fa-play-circle me-2"></i>Xem phim</a
-                    >
-                    <a
-                      href="<%= request.getContextPath() %>/products?category=3"
-                      class="dropdown-item"
-                      ><i class="fas fa-laptop-code me-2"></i>Phần mềm</a
-                    >
-                    <a
-                      href="<%= request.getContextPath() %>/products?category=4"
-                      class="dropdown-item"
-                      ><i class="fas fa-file-alt me-2"></i>Tài liệu</a
-                    >
-                    <a
-                      href="<%= request.getContextPath() %>/products?category=5"
-                      class="dropdown-item"
-                      ><i class="fas fa-gift me-2"></i>Thẻ cào</a
-                    >
-                    <a
-                      href="<%= request.getContextPath() %>/products?category=6"
-                      class="dropdown-item"
-                      ><i class="fas fa-gamepad me-2"></i>Tài khoản Game</a
-                    >
+                    <c:forEach var="cat" items="${pinnedCategories}">
+                      <a href="<%= request.getContextPath() %>/products?category=${cat.categoryId}"
+                         class="dropdown-item">
+                        <i class="fas fa-folder-open me-2"></i>${cat.name}
+                      </a>
+                    </c:forEach>
+                    <c:forEach var="cat" items="${extraCategories}">
+                      <a href="<%= request.getContextPath() %>/products?category=${cat.category_id}"
+                         class="dropdown-item">
+                        <i class="fas fa-folder-open me-2"></i>${cat.name}
+                      </a>
+                    </c:forEach>
                   </div>
                 </div>
-                <a href="#" class="nav-item nav-link">Tin tức</a>
+                <a href="<%= request.getContextPath() %>/blog" class="nav-item nav-link">Tin tức</a>
                 <a href="#" class="nav-item nav-link">Chia sẻ</a>
                 <a
                   href="<%= request.getContextPath() %>/contact"
@@ -539,109 +493,58 @@ uri="jakarta.tags.core" %>
           </p>
         </div>
         <div class="row g-4">
-          <div class="col-lg-2 col-md-4 col-6">
-            <a
-              href="<%= request.getContextPath() %>/products?category=1"
-              class="text-decoration-none"
-            >
-              <div
-                class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
-              >
-                <div class="category-icon mb-3">
-                  <i class="fas fa-graduation-cap fa-3x text-primary"></i>
-                </div>
-                <h5 class="fw-bold text-dark">Học tập</h5>
-                <p class="text-muted small">Khóa học, tài liệu, ebook</p>
-                <span class="badge bg-primary">1,250+ sản phẩm</span>
+          <c:forEach var="cat" items="${pinnedCategories}" varStatus="s">
+            <c:if test="${s.index < 6}">
+              <div class="col-lg-2 col-md-4 col-6">
+                <a href="<%= request.getContextPath() %>/products?category=${cat.categoryId}" class="text-decoration-none">
+                  <div class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100">
+                    <div class="category-icon mb-3">
+                      <c:choose>
+                        <c:when test="${(s.index % 6) == 0}"><i class="fas fa-graduation-cap fa-3x text-primary"></i></c:when>
+                        <c:when test="${(s.index % 6) == 1}"><i class="fas fa-play-circle fa-3x text-danger"></i></c:when>
+                        <c:when test="${(s.index % 6) == 2}"><i class="fas fa-laptop-code fa-3x text-success"></i></c:when>
+                        <c:when test="${(s.index % 6) == 3}"><i class="fas fa-file-alt fa-3x text-warning"></i></c:when>
+                        <c:when test="${(s.index % 6) == 4}"><i class="fas fa-gift fa-3x text-primary"></i></c:when>
+                        <c:otherwise><i class="fas fa-gamepad fa-3x text-info"></i></c:otherwise>
+                      </c:choose>
+                    </div>
+                    <h5 class="fw-bold text-dark">${cat.name}</h5>
+                    <p class="text-muted small">${empty cat.description ? 'Danh mục sản phẩm' : cat.description}</p>
+                    <span class="badge bg-primary">Mới</span>
+                  </div>
+                </a>
               </div>
-            </a>
-          </div>
-          <div class="col-lg-2 col-md-4 col-6">
-            <a
-              href="<%= request.getContextPath() %>/products?category=2"
-              class="text-decoration-none"
-            >
-              <div
-                class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
-              >
-                <div class="category-icon mb-3">
-                  <i class="fas fa-play-circle fa-3x text-danger"></i>
-                </div>
-                <h5 class="fw-bold text-dark">Xem phim</h5>
-                <p class="text-muted small">Netflix, Disney+, HBO</p>
-                <span class="badge bg-danger">850+ sản phẩm</span>
-              </div>
-            </a>
-          </div>
-          <div class="col-lg-2 col-md-4 col-6">
-            <a
-              href="<%= request.getContextPath() %>/products?category=3"
-              class="text-decoration-none"
-            >
-              <div
-                class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
-              >
-                <div class="category-icon mb-3">
-                  <i class="fas fa-laptop-code fa-3x text-success"></i>
-                </div>
-                <h5 class="fw-bold text-dark">Phần mềm</h5>
-                <p class="text-muted small">Adobe, Office, Antivirus</p>
-                <span class="badge bg-success">2,100+ sản phẩm</span>
-              </div>
-            </a>
-          </div>
-          <div class="col-lg-2 col-md-4 col-6">
-            <a
-              href="<%= request.getContextPath() %>/products?category=4"
-              class="text-decoration-none"
-            >
-              <div
-                class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
-              >
-                <div class="category-icon mb-3">
-                  <i class="fas fa-file-alt fa-3x text-warning"></i>
-                </div>
-                <h5 class="fw-bold text-dark">Tài liệu</h5>
-                <p class="text-muted small">Template, báo cáo, CV</p>
-                <span class="badge bg-warning">680+ sản phẩm</span>
-              </div>
-            </a>
-          </div>
-          <div class="col-lg-2 col-md-4 col-6">
-            <a
-              href="<%= request.getContextPath() %>/products?category=5"
-              class="text-decoration-none"
-            >
-              <div
-                class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
-              >
-                <div class="category-icon mb-3">
-                  <i class="fas fa-gift fa-3x text-primary"></i>
-                </div>
-                <h5 class="fw-bold text-dark">Thẻ cào</h5>
-                <p class="text-muted small">Viettel, Mobi, Vina</p>
-                <span class="badge bg-primary">1,500+ sản phẩm</span>
-              </div>
-            </a>
-          </div>
-          <div class="col-lg-2 col-md-4 col-6">
-            <a
-              href="<%= request.getContextPath() %>/products?category=6"
-              class="text-decoration-none"
-            >
-              <div
-                class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
-              >
-                <div class="category-icon mb-3">
-                  <i class="fas fa-gamepad fa-3x text-info"></i>
-                </div>
-                <h5 class="fw-bold text-dark">Tài khoản Game</h5>
-                <p class="text-muted small">LOL, PUBG, Valorant</p>
-                <span class="badge bg-info">2,300+ sản phẩm</span>
-              </div>
-            </a>
-          </div>
+            </c:if>
+          </c:forEach>
         </div>
+
+        <c:if test="${not empty extraCategories}">
+          <div class="row g-4 mt-3">
+            <c:forEach var="cat" items="${extraCategories}" varStatus="s">
+              <c:if test="${s.index < 6}">
+                <div class="col-lg-2 col-md-4 col-6">
+                  <a href="<%= request.getContextPath() %>/products?category=${cat.category_id}" class="text-decoration-none">
+                    <div class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100">
+                      <div class="category-icon mb-3">
+                        <c:choose>
+                          <c:when test="${(s.index % 6) == 0}"><i class="fas fa-folder-open fa-3x text-primary"></i></c:when>
+                          <c:when test="${(s.index % 6) == 1}"><i class="fas fa-tags fa-3x text-danger"></i></c:when>
+                          <c:when test="${(s.index % 6) == 2}"><i class="fas fa-layer-group fa-3x text-success"></i></c:when>
+                          <c:when test="${(s.index % 6) == 3}"><i class="fas fa-th-large fa-3x text-warning"></i></c:when>
+                          <c:when test="${(s.index % 6) == 4}"><i class="fas fa-star fa-3x text-info"></i></c:when>
+                          <c:otherwise><i class="fas fa-list fa-3x text-secondary"></i></c:otherwise>
+                        </c:choose>
+                      </div>
+                      <h5 class="fw-bold text-dark">${cat.name}</h5>
+                      <p class="text-muted small">${empty cat.description ? 'Danh mục sản phẩm' : cat.description}</p>
+                      <span class="badge bg-secondary">Mới</span>
+                    </div>
+                  </a>
+                </div>
+              </c:if>
+            </c:forEach>
+          </div>
+        </c:if>
       </div>
     </div>
 
