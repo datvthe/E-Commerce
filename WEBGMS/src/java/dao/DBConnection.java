@@ -8,9 +8,9 @@ import java.sql.ResultSet;
 
 public class DBConnection {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/gicungco?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&zeroDateTimeBehavior=CONVERT_TO_NULL";
+    private static final String URL = "jdbc:mysql://localhost:3306/gicungco?zeroDateTimeBehavior=CONVERT_TO_NULL";
     private static final String USER = "root";
-    private static final String PASSWORD = "Josee0368558694@";
+    private static final String PASSWORD = "Tunxinhso1";
 
     public static Connection getConnection() {
         Connection conn = null;

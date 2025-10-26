@@ -57,51 +57,103 @@
             }
 
             .product-card {
-                border: 1px solid #eee;
-                border-radius: 10px;
+                border: 2px solid #f0f0f0;
+                border-radius: 15px;
                 overflow: hidden;
                 transition: all 0.3s ease;
                 height: 100%;
                 background: white;
+                position: relative;
             }
 
             .product-card:hover {
-                box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-                transform: translateY(-5px);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+                transform: translateY(-8px);
+                border-color: #ff6600;
+            }
+
+            .product-image-container {
+                position: relative;
+                width: 100%;
+                height: 220px;
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                overflow: hidden;
             }
 
             .product-image {
                 width: 100%;
-                height: 200px;
+                height: 100%;
                 object-fit: cover;
-                background: #f8f9fa;
+                transition: transform 0.3s ease;
+            }
+
+            .product-card:hover .product-image {
+                transform: scale(1.05);
+            }
+
+            .product-badge {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: linear-gradient(135deg, #ff6600 0%, #ff8c3a 100%);
+                color: white;
+                padding: 5px 12px;
+                border-radius: 20px;
+                font-size: 11px;
+                font-weight: 600;
+                box-shadow: 0 2px 10px rgba(255,102,0,0.3);
             }
 
             .product-card-body {
-                padding: 15px;
+                padding: 18px;
+            }
+
+            .product-seller {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                margin-bottom: 10px;
+                font-size: 12px;
+                color: #666;
+            }
+
+            .product-seller i {
+                color: #ff6600;
             }
 
             .product-title {
                 font-size: 1rem;
                 font-weight: 600;
-                margin-bottom: 10px;
+                margin-bottom: 12px;
                 color: #333;
                 text-decoration: none;
                 display: -webkit-box;
                 -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
                 overflow: hidden;
+                line-height: 1.4;
+                min-height: 2.8em;
             }
 
             .product-title:hover {
-                color: #007bff;
+                color: #ff6600;
             }
 
             .product-price {
-                font-size: 1.1rem;
-                font-weight: 600;
-                color: #e74c3c;
-                margin-bottom: 10px;
+                font-size: 1.3rem;
+                font-weight: 700;
+                color: #ff6600;
+                margin-bottom: 12px;
+                display: flex;
+                align-items: baseline;
+                gap: 8px;
+            }
+
+            .product-price-old {
+                font-size: 0.9rem;
+                color: #999;
+                text-decoration: line-through;
+                font-weight: 400;
             }
 
             .product-rating {
@@ -290,15 +342,27 @@
                                             <c:set var="primaryImage" value='${pageContext.request.contextPath}/views/assets/user/img/product-1.png' />
                                         </c:if>
 
-
                                         <a href="<%= request.getContextPath() %>/product/${product.slug}">
-                                            <img src="${primaryImage}" alt="${product.name}" class="product-image">
+                                            <div class="product-image-container">
+                                                <img src="${primaryImage}" alt="${product.name}" class="product-image">
+                                                <c:if test="${product.total_reviews > 10}">
+                                                    <span class="product-badge">🔥 Bán chạy</span>
+                                                </c:if>
+                                            </div>
                                         </a>
 
                                         <div class="product-card-body">
+                                            <c:if test="${not empty product.seller_id}">
+                                                <div class="product-seller">
+                                                    <i class="bi bi-shop"></i>
+                                                    <span>${product.seller_id.full_name != null ? product.seller_id.full_name : 'Seller'}</span>
+                                                </div>
+                                            </c:if>
+                                            
                                             <a href="<%= request.getContextPath() %>/product/${product.slug}" class="product-title">
                                                 ${product.name}
                                             </a>
+                                            
                                             <div class="product-price">
                                                 <fmt:formatNumber value="${product.price}" type="number" groupingUsed="true" maxFractionDigits="0" />₫
                                             </div>
@@ -309,7 +373,10 @@
                                                         <i class="fas fa-star ${i <= product.average_rating ? '' : 'far'}"></i>
                                                     </c:forEach>
                                                 </div>
-                                                <span class="rating-text">(${product.total_reviews})</span>
+                                                <span class="rating-text">
+                                                    ${product.average_rating > 0 ? product.average_rating : 'Chưa có'}
+                                                    (${product.total_reviews})
+                                                </span>
                                             </div>
                                         </div>
                                     </div>

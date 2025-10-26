@@ -213,29 +213,34 @@ public class ProductDAO extends DBConnection {
         List<Products> products = new ArrayList<>();
         int offset = (page - 1) * pageSize;
 
-        StringBuilder sql = new StringBuilder("SELECT * FROM Products WHERE status = 'active' AND deleted_at IS NULL");
+        StringBuilder sql = new StringBuilder(
+            "SELECT p.*, u.user_id, u.full_name, u.email, u.avatar_url " +
+            "FROM Products p " +
+            "LEFT JOIN Users u ON p.seller_id = u.user_id " +
+            "WHERE p.status = 'active' AND p.deleted_at IS NULL"
+        );
 
         // Filter by category
         if (category != null && !category.isEmpty()) {
-            sql.append(" AND category_id = ?");
+            sql.append(" AND p.category_id = ?");
         }
 
         // Search by name
         if (search != null && !search.isEmpty()) {
-            sql.append(" AND name LIKE ?");
+            sql.append(" AND p.name LIKE ?");
         }
 
         // Sorting
         if ("priceAsc".equals(sort)) {
-            sql.append(" ORDER BY price ASC");
+            sql.append(" ORDER BY p.price ASC");
         } else if ("priceDesc".equals(sort)) {
-            sql.append(" ORDER BY price DESC");
+            sql.append(" ORDER BY p.price DESC");
         } else if ("rating".equals(sort)) {
-            sql.append(" ORDER BY average_rating DESC");
+            sql.append(" ORDER BY p.average_rating DESC");
         } else if ("newest".equals(sort)) {
-            sql.append(" ORDER BY created_at DESC");
+            sql.append(" ORDER BY p.created_at DESC");
         } else {
-            sql.append(" ORDER BY created_at DESC"); // Default
+            sql.append(" ORDER BY p.created_at DESC"); // Default
         }
 
         sql.append(" LIMIT ? OFFSET ?");
@@ -265,6 +270,16 @@ public class ProductDAO extends DBConnection {
                 product.setCurrency(rs.getString("currency"));
                 product.setAverage_rating(rs.getDouble("average_rating"));
                 product.setTotal_reviews(rs.getInt("total_reviews"));
+
+                // Set seller info
+                if (rs.getInt("user_id") > 0) {
+                    Users seller = new Users();
+                    seller.setUser_id(rs.getInt("user_id"));
+                    seller.setFull_name(rs.getString("full_name"));
+                    seller.setEmail(rs.getString("email"));
+                    seller.setAvatar_url(rs.getString("avatar_url"));
+                    product.setSeller_id(seller);
+                }
 
                 List<ProductImages> images = getProductImages(conn, product.getProduct_id());
                 product.setProductImages(images);

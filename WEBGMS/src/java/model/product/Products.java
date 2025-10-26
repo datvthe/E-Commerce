@@ -263,17 +263,7 @@ public class Products {
     public Timestamp getDeletedAt() { return deleted_at; }
     public void setDeletedAt(Timestamp deletedAt) { this.deleted_at = deletedAt; }
     
-    // Additional properties for wishlist display
-    private String category_name; // For displaying category name in wishlist
-    private String imageUrl; // For displaying product image
-    
-    public String getCategory_name() { return category_name; }
-    public void setCategory_name(String category_name) { this.category_name = category_name; }
-    
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
-
-    // Wishlist projection helpers
+    // Getters and setters for helper fields (wishlist projections)
     public String getCategory_name() { return category_name; }
     public void setCategory_name(String category_name) { this.category_name = category_name; }
 
