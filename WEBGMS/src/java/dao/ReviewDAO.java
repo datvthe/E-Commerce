@@ -34,28 +34,28 @@ public class ReviewDAO extends DBConnection {
             ps.setLong(1, productId);
             ps.setInt(2, pageSize);
             ps.setInt(3, offset);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                Reviews review = new Reviews();
-                review.setReviewId(rs.getInt("review_id"));
-                
-                Products product = new Products();
-                product.setProduct_id(productId);
-                review.setProductId(product);
-                
-                Users buyer = new Users();
-                buyer.setUser_id(rs.getInt("user_id"));
-                buyer.setFull_name(rs.getString("full_name"));
-                buyer.setAvatar_url(rs.getString("avatar_url"));
-                review.setBuyerId(buyer);
-                
-                review.setRating(rs.getInt("rating"));
-                review.setComment(rs.getString("comment"));
-                review.setImages(rs.getString("images"));
-                review.setStatus(rs.getString("status"));
-                review.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                reviews.add(review);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Reviews review = new Reviews();
+                    review.setReviewId(rs.getInt("review_id"));
+                    
+                    Products product = new Products();
+                    product.setProduct_id(productId);
+                    review.setProductId(product);
+                    
+                    Users buyer = new Users();
+                    buyer.setUser_id(rs.getInt("user_id"));
+                    buyer.setFull_name(rs.getString("full_name"));
+                    buyer.setAvatar_url(rs.getString("avatar_url"));
+                    review.setBuyerId(buyer);
+                    
+                    review.setRating(rs.getInt("rating"));
+                    review.setComment(rs.getString("comment"));
+                    review.setImages(rs.getString("images"));
+                    review.setStatus(rs.getString("status"));
+                    review.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    reviews.add(review);
+                }
             }
 
         } catch (Exception e) {
@@ -129,13 +129,13 @@ public class ReviewDAO extends DBConnection {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, productId);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                int rating = rs.getInt("rating");
-                int count = rs.getInt("count");
-                if (rating >= 1 && rating <= 5) {
-                    distribution[rating - 1] = count;
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int rating = rs.getInt("rating");
+                    int count = rs.getInt("count");
+                    if (rating >= 1 && rating <= 5) {
+                        distribution[rating - 1] = count;
+                    }
                 }
             }
 
@@ -155,29 +155,31 @@ public class ReviewDAO extends DBConnection {
             sql.append(" AND r.status = ?");
         }
         sql.append(" ORDER BY r.created_at DESC LIMIT ? OFFSET ?");
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             int i = 1;
             if (status != null && !status.isEmpty()) ps.setString(i++, status);
             ps.setInt(i++, pageSize);
             ps.setInt(i, offset);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Reviews review = new Reviews();
-                review.setReviewId(rs.getInt("review_id"));
-                Products product = new Products();
-                product.setProduct_id(rs.getLong("product_id"));
-                review.setProductId(product);
-                Users buyer = new Users();
-                buyer.setUser_id(rs.getInt("user_id"));
-                buyer.setFull_name(rs.getString("full_name"));
-                buyer.setAvatar_url(rs.getString("avatar_url"));
-                review.setBuyerId(buyer);
-                review.setRating(rs.getInt("rating"));
-                review.setComment(rs.getString("comment"));
-                review.setImages(rs.getString("images"));
-                review.setStatus(rs.getString("status"));
-                review.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                reviews.add(review);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Reviews review = new Reviews();
+                    review.setReviewId(rs.getInt("review_id"));
+                    Products product = new Products();
+                    product.setProduct_id(rs.getLong("product_id"));
+                    review.setProductId(product);
+                    Users buyer = new Users();
+                    buyer.setUser_id(rs.getInt("user_id"));
+                    buyer.setFull_name(rs.getString("full_name"));
+                    buyer.setAvatar_url(rs.getString("avatar_url"));
+                    review.setBuyerId(buyer);
+                    review.setRating(rs.getInt("rating"));
+                    review.setComment(rs.getString("comment"));
+                    review.setImages(rs.getString("images"));
+                    review.setStatus(rs.getString("status"));
+                    review.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    reviews.add(review);
+                }
             }
         } catch (Exception e) { e.printStackTrace(); }
         return reviews;

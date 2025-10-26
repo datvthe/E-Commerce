@@ -15,9 +15,9 @@ public class AITemplateDAO extends DBConnection {
         String sql = "SELECT * FROM ai_chat_templates WHERE is_active = TRUE ORDER BY priority DESC";
         
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
             
-            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 templates.add(mapTemplate(rs));
             }
@@ -55,10 +55,10 @@ public class AITemplateDAO extends DBConnection {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
             ps.setInt(1, templateId);
-            ResultSet rs = ps.executeQuery();
-            
-            if (rs.next()) {
-                return mapTemplate(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapTemplate(rs);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -83,9 +83,10 @@ public class AITemplateDAO extends DBConnection {
             
             int affected = ps.executeUpdate();
             if (affected > 0) {
-                ResultSet keys = ps.getGeneratedKeys();
-                if (keys.next()) {
-                    return getTemplateById(keys.getInt(1));
+                try (ResultSet keys = ps.getGeneratedKeys()) {
+                    if (keys.next()) {
+                        return getTemplateById(keys.getInt(1));
+                    }
                 }
             }
         } catch (Exception e) {
