@@ -29,9 +29,9 @@ public class Products {
     private Timestamp created_at;
     private Timestamp updated_at;
     private Timestamp deleted_at;
-    private int quantity; 
-
-    // Helper fields for joined data (wishlist projections)
+    private int quantity;
+    
+    // Helper fields for joined data (wishlist, search results)
     private String category_name;
     private String imageUrl;
 
@@ -243,20 +243,10 @@ public class Products {
     public Timestamp getDeletedAt() { return deleted_at; }
     public void setDeletedAt(Timestamp deletedAt) { this.deleted_at = deletedAt; }
     
-    // Additional properties for wishlist display
-    private String category_name; // For displaying category name in wishlist
-    private String imageUrl; // For displaying product image
-    
+    // Helper fields accessors
     public String getCategory_name() { return category_name; }
     public void setCategory_name(String category_name) { this.category_name = category_name; }
     
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
-
-    // Wishlist projection helpers
-    public String getCategory_name() { return category_name; }
-    public void setCategory_name(String category_name) { this.category_name = category_name; }
-
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
