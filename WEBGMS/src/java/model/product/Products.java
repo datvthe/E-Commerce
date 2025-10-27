@@ -242,8 +242,6 @@ public class Products {
 
     public Timestamp getDeletedAt() { return deleted_at; }
     public void setDeletedAt(Timestamp deletedAt) { this.deleted_at = deletedAt; }
-    
-    // Helper fields accessors
     public String getCategory_name() { return category_name; }
     public void setCategory_name(String category_name) { this.category_name = category_name; }
     
