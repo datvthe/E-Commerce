@@ -29,6 +29,72 @@
             .product-card .card-img-top { height: 220px; width: 100%; object-fit: contain; }
             .product-card .card-body { display: flex; flex-direction: column; }
             .product-card .btn { margin-top: auto; }
+            
+            /* Product Detail Layout Improvements */
+            .single-product {
+                background: #fff;
+                border-radius: 12px;
+                padding: 2rem;
+                box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            }
+            
+            .single-carousel {
+                border-radius: 8px;
+                overflow: hidden;
+                background: #f8f9fa;
+            }
+            
+            .single-carousel .single-inner {
+                padding: 1.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 400px;
+            }
+            
+            .single-carousel .single-inner img {
+                max-height: 400px;
+                object-fit: contain;
+            }
+            
+            .product-info {
+                padding-left: 1.5rem;
+            }
+            
+            @media (max-width: 768px) {
+                .product-info {
+                    padding-left: 0;
+                    margin-top: 1.5rem;
+                }
+                
+                .single-product {
+                    padding: 1rem;
+                }
+            }
+            
+            /* Product title styling */
+            .product-title {
+                font-size: 1.75rem;
+                font-weight: 700;
+                color: #2c3e50;
+                line-height: 1.3;
+            }
+            
+            /* Price section enhancement */
+            .price-section h2 {
+                font-size: 2rem;
+                font-weight: 700;
+            }
+            
+            /* Seller info box styling */
+            .seller-info {
+                transition: all 0.3s ease;
+            }
+            
+            .seller-info:hover {
+                box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+                transform: translateY(-2px);
+            }
         </style>
     </head>
     <body>
@@ -212,81 +278,12 @@
                         </div>
                     </c:when>
                     <c:otherwise>
-                <div class="row g-4">
-                    <div class="col-lg-5 col-xl-3 wow fadeInUp" data-wow-delay="0.1s">
-                        <div class="input-group w-100 mx-auto d-flex mb-4">
-                            <input type="search" class="form-control p-3" placeholder="Từ khóa" aria-describedby="search-icon-1">
-                            <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
-                        </div>
-                        <div class="product-categories mb-4">
-                            <h4>Danh mục sản phẩm</h4>
-                            <ul class="list-unstyled">
-                                <li>
-                                    <div class="categories-item">
-                                        <a href="#" class="text-dark"><i class="fas fa-apple-alt text-secondary me-2"></i>Phụ kiện</a>
-                                        <span>(3)</span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="categories-item">
-                                        <a href="#" class="text-dark"><i class="fas fa-apple-alt text-secondary me-2"></i>Điện tử & Máy tính</a>
-                                        <span>(5)</span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="categories-item">
-                                        <a href="#" class="text-dark"><i class="fas fa-apple-alt text-secondary me-2"></i>Laptop & Desktop</a>
-                                        <span>(2)</span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="categories-item">
-                                        <a href="#" class="text-dark"><i class="fas fa-apple-alt text-secondary me-2"></i>Điện thoại & Máy tính bảng</a>
-                                        <span>(8)</span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="categories-item">
-                                        <a href="#" class="text-dark"><i class="fas fa-apple-alt text-secondary me-2"></i>SmartPhone & Smart TV</a>
-                                        <span>(5)</span>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="featured-products mb-4">
-                            <h4 class="mb-3">Sản phẩm nổi bật</h4>
-                            <c:if test="${not empty similarProducts}">
-                                <c:forEach var="similarProduct" items="${similarProducts}" begin="0" end="5">
-                                    <div class="featured-product-item">
-                                        <div class="rounded me-4" style="width: 100px; height: 100px;">
-                                            <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-1.png" class="img-fluid rounded" alt="Image">
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-2">${similarProduct.name}</h6>
-                                            <div class="d-flex mb-2">
-                                                <c:forEach begin="1" end="5" var="i">
-                                                    <i class="fa fa-star text-secondary"></i>
-                                </c:forEach>
-                            </div>
-                                            <div class="d-flex mb-2">
-                                                <h5 class="fw-bold me-2">
-                                                    <c:choose>
-                                                        <c:when test="${similarProduct.price != null}">
-                                                            <fmt:formatNumber value="${similarProduct.price}" type="currency" currencyCode="VND" pattern="#,##0₫"/>
-                                                        </c:when>
-                                                        <c:otherwise>Liên hệ</c:otherwise>
-                                                    </c:choose>
-                                                </h5>
-                                            </div>
-                                        </div>
-                                            </div>
-                                        </c:forEach>
-                        </c:if>
-                    </div>
-                                </div>
-                    <div class="col-lg-7 col-xl-9 wow fadeInUp" data-wow-delay="0.1s">
+                <!-- Center container with max width for better readability -->
+                <div class="row justify-content-center">
+                    <div class="col-12 col-xxl-10">
                         <div class="row g-4 single-product">
-                            <div class="col-xl-6">
+                            <!-- Product Images - Left Side (40%) -->
+                            <div class="col-12 col-md-5 col-lg-5 wow fadeInUp" data-wow-delay="0.1s">
                                 <div class="single-carousel owl-carousel">
                                     <c:choose>
                                         <c:when test="${not empty images}">
@@ -308,8 +305,10 @@
                                     </c:choose>
                                 </div>
                             </div>
-                            <div class="col-xl-6">
-                        <div class="product-info">
+                            
+                            <!-- Product Information - Right Side (60%) -->
+                            <div class="col-12 col-md-7 col-lg-7 wow fadeInUp" data-wow-delay="0.2s">
+                                <div class="product-info">
                                     <h1 class="product-title mb-3">${empty product.name ? 'Sản phẩm' : product.name}</h1>
                                     
                                     <!-- Product Rating & Reviews -->
@@ -472,7 +471,7 @@
                                     </div>
                         
                                     <!-- Social Sharing -->
-                                    <div class="social-sharing mb-4">
+                                    <!-- <div class="social-sharing mb-4">
                                         <p class="mb-2"><strong>Chia sẻ sản phẩm:</strong></p>
                                         <div class="d-flex gap-2">
                                             <button class="btn btn-primary btn-sm" onclick="shareOnFacebook()">
@@ -485,10 +484,12 @@
                                                 <i class="fab fa-whatsapp me-1"></i>WhatsApp
                                             </button>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
-                            <div class="col-lg-12">
+                            
+                            <!-- Product Tabs - Full Width -->
+                            <div class="col-12">
                                 <nav>
                                     <div class="nav nav-tabs mb-3" id="productTabs">
                                         <button class="nav-link active" type="button" role="tab" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" aria-controls="description" aria-selected="true">
@@ -763,15 +764,15 @@
                                                     </ul>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
                     </c:otherwise>
                 </c:choose>
         <!-- Single Products End -->
