@@ -6,6 +6,8 @@ import model.user.Users;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -296,7 +298,7 @@ public class ProductDAO extends DBConnection {
     }
 
     public int countBySeller(int sellerId) {
-        String sql = "SELECT COUNT(*) FROM Products WHERE seller_id = ?";
+        String sql = "SELECT COUNT(*) FROM Products WHERE seller_id = ? AND deleted_at IS NULL";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, sellerId);
             ResultSet rs = ps.executeQuery();
@@ -307,6 +309,127 @@ public class ProductDAO extends DBConnection {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public int getProductCountBySeller(int sellerId) {
+        return countBySeller(sellerId);
+    }
+
+    public int getProductCountBySellerWithStatus(int sellerId, String status) {
+        String sql = "SELECT COUNT(*) FROM Products WHERE seller_id = ? AND status = ? AND deleted_at IS NULL";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, sellerId);
+            ps.setString(2, status);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<Products> searchProductsBySeller(int sellerId, String keyword, String status, int categoryId) {
+        List<Products> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT p.* FROM Products p WHERE p.deleted_at IS NULL AND p.seller_id = ? ");
+        List<Object> params = new ArrayList<>();
+        params.add(sellerId);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND (p.name LIKE ? OR p.description LIKE ?) ");
+            String k = "%" + keyword.trim() + "%";
+            params.add(k); params.add(k);
+        }
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append("AND p.status = ? ");
+            params.add(status);
+        }
+        if (categoryId > 0) {
+            sql.append("AND p.category_id = ? ");
+            params.add(categoryId);
+        }
+        sql.append("ORDER BY p.created_at DESC");
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int idx = 1;
+            for (Object p : params) {
+                if (p instanceof Integer) ps.setInt(idx++, (Integer) p);
+                else if (p instanceof String) ps.setString(idx++, (String) p);
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapProductLite(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Products> getProductsBySellerIdWithPagination(int sellerId, int page, int pageSize) {
+        List<Products> list = new ArrayList<>();
+        int offset = (page - 1) * pageSize;
+        String sql = "SELECT p.* FROM Products p WHERE p.seller_id = ? AND p.deleted_at IS NULL ORDER BY p.created_at DESC LIMIT ? OFFSET ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, sellerId);
+            ps.setInt(2, pageSize);
+            ps.setInt(3, offset);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) list.add(mapProductLite(rs));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public long insertProductReturningId(Products p) {
+        String sql = "INSERT INTO Products (seller_id, name, slug, description, price, currency, status, category_id, quantity, created_at) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, p.getSeller_id().getUser_id());
+            ps.setString(2, p.getName());
+            ps.setString(3, slugify(p.getName()));
+            ps.setString(4, p.getDescription());
+            ps.setBigDecimal(5, p.getPrice());
+            ps.setString(6, p.getCurrency() == null ? "VND" : p.getCurrency());
+            ps.setString(7, p.getStatus() == null ? "active" : p.getStatus());
+            ps.setLong(8, p.getCategory_id() == null ? 0 : p.getCategory_id().getCategory_id());
+            ps.setInt(9, p.getQuantity());
+            int affected = ps.executeUpdate();
+            if (affected > 0) {
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) return rs.getLong(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public boolean updateProduct(Products p) {
+        String sql = "UPDATE Products SET name=?, description=?, price=?, currency=?, status=?, category_id=?, quantity=?, updated_at=CURRENT_TIMESTAMP WHERE product_id=?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, p.getName());
+            ps.setString(2, p.getDescription());
+            ps.setBigDecimal(3, p.getPrice());
+            ps.setString(4, p.getCurrency() == null ? "VND" : p.getCurrency());
+            ps.setString(5, p.getStatus());
+            ps.setLong(6, p.getCategory_id() == null ? 0 : p.getCategory_id().getCategory_id());
+            ps.setInt(7, p.getQuantity());
+            ps.setLong(8, p.getProduct_id());
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean softDeleteProduct(long productId) {
+        String sql = "UPDATE Products SET status='inactive', deleted_at=CURRENT_TIMESTAMP WHERE product_id=?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, productId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -328,7 +451,27 @@ public class ProductDAO extends DBConnection {
         }
         return 0;
     }
+    private Products mapProductLite(ResultSet rs) throws Exception {
+        Products product = new Products();
+        product.setProduct_id(rs.getLong("product_id"));
+        product.setName(rs.getString("name"));
+        product.setPrice(rs.getBigDecimal("price"));
+        product.setCurrency(rs.getString("currency"));
+        product.setStatus(rs.getString("status"));
+        product.setCreated_at(rs.getTimestamp("created_at"));
+        product.setUpdated_at(rs.getTimestamp("updated_at"));
+        product.setQuantity(rs.getInt("quantity"));
+        return product;
+    }
 
+    private String slugify(String input) {
+        if (input == null) return null;
+        String s = input.trim().toLowerCase();
+        s = s.replaceAll("[^a-z0-9\s-]", "");
+        s = s.replaceAll("\s+", "-");
+        s = s.replaceAll("-+", "-");
+        return s;
+    }
     public int countFilteredProducts(String search, String category) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) AS total FROM Products WHERE status = 'active' AND deleted_at IS NULL");
 
@@ -406,5 +549,4 @@ public class ProductDAO extends DBConnection {
         }
         return images;
     }
-
 }

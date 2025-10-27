@@ -21,16 +21,17 @@ public class RoleDAO extends DBConnection {
         Roles role = null;
         String sql = "SELECT * FROM Roles WHERE role_id = ?";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, roleId);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                role = new Roles();
-                role.setRole_id(rs.getInt("role_id"));
-                role.setRole_name(rs.getString("role_name"));
-                role.setDescription(rs.getString("description"));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    role = new Roles();
+                    role.setRole_id(rs.getInt("role_id"));
+                    role.setRole_name(rs.getString("role_name"));
+                    role.setDescription(rs.getString("description"));
+                }
             }
 
         } catch (Exception e) {
@@ -44,16 +45,17 @@ public class RoleDAO extends DBConnection {
         Roles role = null;
         String sql = "SELECT * FROM Roles WHERE role_name = ?";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, roleName);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                role = new Roles();
-                role.setRole_id(rs.getInt("role_id"));
-                role.setRole_name(rs.getString("role_name"));
-                role.setDescription(rs.getString("description"));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    role = new Roles();
+                    role.setRole_id(rs.getInt("role_id"));
+                    role.setRole_name(rs.getString("role_name"));
+                    role.setDescription(rs.getString("description"));
+                }
             }
 
         } catch (Exception e) {
@@ -67,9 +69,9 @@ public class RoleDAO extends DBConnection {
         List<Roles> roles = new ArrayList<>();
         String sql = "SELECT * FROM Roles ORDER BY role_id";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ResultSet rs = ps.executeQuery();
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Roles role = new Roles();
@@ -131,27 +133,28 @@ public class RoleDAO extends DBConnection {
                     "JOIN Users u ON ur.user_id = u.user_id " +
                     "WHERE ur.role_id = ? ORDER BY ur.assigned_at DESC";
 
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, roleId);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                UserRoles userRole = new UserRoles();
-                userRole.setUser_role_id(rs.getInt("user_role_id"));
-                userRole.setAssigned_at(rs.getTimestamp("assigned_at"));
-                
-                // Set user info
-                Users user = new Users();
-                user.setUser_id(rs.getInt("user_id"));
-                user.setFull_name(rs.getString("full_name"));
-                user.setEmail(rs.getString("email"));
-                userRole.setUser_id(user);
-                
-                // Set role info
-                Roles role = getRoleById(roleId);
-                userRole.setRole_id(role);
-                
-                userRoles.add(userRole);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    UserRoles userRole = new UserRoles();
+                    userRole.setUser_role_id(rs.getInt("user_role_id"));
+                    userRole.setAssigned_at(rs.getTimestamp("assigned_at"));
+                    
+                    // Set user info
+                    Users user = new Users();
+                    user.setUser_id(rs.getInt("user_id"));
+                    user.setFull_name(rs.getString("full_name"));
+                    user.setEmail(rs.getString("email"));
+                    userRole.setUser_id(user);
+                    
+                    // Set role info
+                    Roles role = getRoleById(roleId);
+                    userRole.setRole_id(role);
+                    
+                    userRoles.add(userRole);
+                }
             }
 
         } catch (Exception e) {

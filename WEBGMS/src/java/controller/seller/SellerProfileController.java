@@ -1,6 +1,5 @@
 package controller.seller;
 
-import dao.SellerDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -11,7 +10,6 @@ import model.user.Users;
 @WebServlet(name = "SellerProfileController", urlPatterns = {"/seller/profile"})
 public class SellerProfileController extends HttpServlet {
 
-    private final SellerDAO sellerDAO = new SellerDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -27,7 +25,7 @@ public class SellerProfileController extends HttpServlet {
 
         try {
             // Lấy thông tin seller hiện tại
-            Seller seller = sellerDAO.getSellerByUserId(user.getUser_id());
+            Seller seller = new dao.SellerDAO().getSellerByUserId(user.getUser_id());
             if (seller == null) {
                 request.setAttribute("error", "❌ Không tìm thấy thông tin seller! Vui lòng đăng ký làm seller trước.");
                 request.getRequestDispatcher("/views/common/error.jsp").forward(request, response);
@@ -78,14 +76,14 @@ public class SellerProfileController extends HttpServlet {
                 shopName == null || shopName.trim().isEmpty()) {
                 
                 request.setAttribute("error", "❌ Vui lòng điền đầy đủ thông tin bắt buộc!");
-                Seller seller = sellerDAO.getSellerByUserId(user.getUser_id());
+                Seller seller = new dao.SellerDAO().getSellerByUserId(user.getUser_id());
                 request.setAttribute("seller", seller);
                 request.getRequestDispatcher("/views/seller/seller-profile.jsp").forward(request, response);
                 return;
             }
 
             // Tạo đối tượng Seller với dữ liệu mới
-            Seller seller = sellerDAO.getSellerByUserId(user.getUser_id());
+            Seller seller = new dao.SellerDAO().getSellerByUserId(user.getUser_id());
             if (seller == null) {
                 request.setAttribute("error", "❌ Không tìm thấy thông tin seller!");
                 request.getRequestDispatcher("/views/common/error.jsp").forward(request, response);
@@ -104,7 +102,7 @@ public class SellerProfileController extends HttpServlet {
             seller.setAccountOwner(accountOwner != null ? accountOwner.trim() : "");
 
             // Lưu vào database
-            boolean success = sellerDAO.updateSeller(seller);
+            boolean success = new dao.SellerDAO().updateSeller(seller);
             
             if (success) {
                 response.sendRedirect(request.getContextPath() + "/seller/profile?success=updated");
@@ -118,7 +116,7 @@ public class SellerProfileController extends HttpServlet {
             e.printStackTrace();
             request.setAttribute("error", "❌ Có lỗi xảy ra: " + e.getMessage());
             try {
-                Seller seller = sellerDAO.getSellerByUserId(user.getUser_id());
+                Seller seller = new dao.SellerDAO().getSellerByUserId(user.getUser_id());
                 request.setAttribute("seller", seller);
                 request.getRequestDispatcher("/views/seller/seller-profile.jsp").forward(request, response);
             } catch (Exception ex) {

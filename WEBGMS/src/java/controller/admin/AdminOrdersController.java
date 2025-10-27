@@ -1,0 +1,164 @@
+package controller.admin;
+
+import dao.OrderDAO;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.List;
+import model.order.OrderItems;
+import model.order.Orders;
+import model.user.Users;
+import service.RoleBasedAccessControl;
+
+@WebServlet(name = "AdminOrdersController", urlPatterns = {
+        "/admin/orders",
+        "/admin/orders/view",
+        "/admin/orders/create",
+        "/admin/orders/save",
+        "/admin/orders/update-status",
+        "/admin/orders/delete"
+})
+public class AdminOrdersController extends HttpServlet {
+
+    private final OrderDAO orderDAO = new OrderDAO();
+    private final RoleBasedAccessControl rbac = new RoleBasedAccessControl();
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if (!rbac.isAdmin(request)) {
+            response.sendRedirect(request.getContextPath() + "/home?error=access_denied");
+            return;
+        }
+
+        String path = request.getServletPath();
+
+        if ("/admin/orders".equals(path)) {
+            String status = request.getParameter("status");
+            int page = 1;
+            int pageSize = 10;
+            try {
+                String pageStr = request.getParameter("page");
+                if (pageStr != null && !pageStr.trim().isEmpty()) page = Integer.parseInt(pageStr);
+            } catch (NumberFormatException ignored) {}
+
+            List<Orders> orders = orderDAO.getAllOrders(status, page, pageSize);
+            int totalOrders = orderDAO.getOrderCount(status);
+            int totalPages = (int) Math.ceil((double) totalOrders / pageSize);
+
+            request.setAttribute("orders", orders);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("totalOrders", totalOrders);
+            request.setAttribute("status", status);
+
+            String success = request.getParameter("success");
+            String error = request.getParameter("error");
+            if (success != null) request.setAttribute("success", success);
+            if (error != null) request.setAttribute("error", error);
+
+            request.getRequestDispatcher("/views/admin/admin-orders.jsp").forward(request, response);
+            return;
+        }
+
+        if ("/admin/orders/view".equals(path)) {
+            try {
+                int orderId = Integer.parseInt(request.getParameter("id"));
+                Orders order = orderDAO.getOrderById(orderId);
+                if (order == null) {
+                    response.sendRedirect(request.getContextPath() + "/admin/orders?error=Đơn hàng không tồn tại");
+                    return;
+                }
+                List<OrderItems> items = orderDAO.getOrderItems(orderId);
+                request.setAttribute("order", order);
+                request.setAttribute("orderItems", items);
+                request.getRequestDispatcher("/views/admin/admin-order-detail.jsp").forward(request, response);
+            } catch (Exception e) {
+                response.sendRedirect(request.getContextPath() + "/admin/orders?error=ID đơn hàng không hợp lệ");
+            }
+            return;
+        }
+
+        if ("/admin/orders/create".equals(path)) {
+            request.getRequestDispatcher("/views/admin/admin-order-create.jsp").forward(request, response);
+            return;
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if (!rbac.isAdmin(request)) {
+            response.sendRedirect(request.getContextPath() + "/home?error=access_denied");
+            return;
+        }
+
+        String path = request.getServletPath();
+
+        if ("/admin/orders/update-status".equals(path)) {
+            try {
+                int orderId = Integer.parseInt(request.getParameter("order_id"));
+                String newStatus = request.getParameter("status");
+                boolean success = orderDAO.updateOrderStatus(orderId, newStatus);
+                if (success) {
+                    response.sendRedirect(request.getContextPath() + "/admin/orders?success=Cập nhật trạng thái thành công");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/admin/orders?error=Có lỗi khi cập nhật trạng thái");
+                }
+            } catch (Exception e) {
+                response.sendRedirect(request.getContextPath() + "/admin/orders?error=Dữ liệu không hợp lệ");
+            }
+            return;
+        }
+
+        if ("/admin/orders/delete".equals(path)) {
+            try {
+                int orderId = Integer.parseInt(request.getParameter("id"));
+                boolean success = orderDAO.deleteOrder(orderId);
+                if (success) {
+                    response.sendRedirect(request.getContextPath() + "/admin/orders?success=Đã xóa đơn hàng");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/admin/orders?error=Không thể xóa đơn hàng");
+                }
+            } catch (Exception e) {
+                response.sendRedirect(request.getContextPath() + "/admin/orders?error=Dữ liệu không hợp lệ");
+            }
+            return;
+        }
+
+        if ("/admin/orders/save".equals(path)) {
+            try {
+                int buyerId = Integer.parseInt(request.getParameter("buyer_id"));
+                int sellerId = Integer.parseInt(request.getParameter("seller_id"));
+                BigDecimal totalAmount = new BigDecimal(request.getParameter("total_amount"));
+                String currency = request.getParameter("currency");
+                String shippingAddress = request.getParameter("shipping_address");
+                String shippingMethod = request.getParameter("shipping_method");
+                String trackingNumber = request.getParameter("tracking_number");
+                String status = request.getParameter("status");
+
+                Orders order = new Orders();
+                Users buyer = new Users(); buyer.setUser_id(buyerId); order.setBuyer_id(buyer);
+                Users seller = new Users(); seller.setUser_id(sellerId); order.setSeller_id(seller);
+                order.setTotal_amount(totalAmount);
+                order.setCurrency(currency);
+                order.setShipping_address(shippingAddress);
+                order.setShipping_method(shippingMethod);
+                order.setTracking_number(trackingNumber);
+                order.setStatus(status);
+
+                int newId = orderDAO.createOrder(order);
+                if (newId > 0) {
+                    response.sendRedirect(request.getContextPath() + "/admin/orders/view?id=" + newId + "&success=Tạo đơn hàng thành công");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/admin/orders?error=Không thể tạo đơn hàng");
+                }
+            } catch (Exception e) {
+                response.sendRedirect(request.getContextPath() + "/admin/orders?error=Dữ liệu tạo đơn không hợp lệ");
+            }
+        }
+    }
+}

@@ -22,20 +22,20 @@ public class InventoryDAO extends DBConnection {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, productId);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                inventory = new Inventory();
-                inventory.setInventory_id(rs.getInt("inventory_id"));
-                
-                Products product = new Products();
-                product.setProduct_id(productId);
-                inventory.setProduct_id(product);
-                
-                inventory.setQuantity(rs.getInt("quantity"));
-                inventory.setReserved_quantity(rs.getInt("reserved_quantity"));
-                inventory.setMin_threshold(rs.getInt("min_threshold"));
-                inventory.setLast_restocked_at(rs.getTimestamp("last_restocked_at"));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    inventory = new Inventory();
+                    inventory.setInventory_id(rs.getInt("inventory_id"));
+                    
+                    Products product = new Products();
+                    product.setProduct_id(productId);
+                    inventory.setProduct_id(product);
+                    
+                    inventory.setQuantity(rs.getInt("quantity"));
+                    inventory.setReserved_quantity(rs.getInt("reserved_quantity"));
+                    inventory.setMin_threshold(rs.getInt("min_threshold"));
+                    inventory.setLast_restocked_at(rs.getTimestamp("last_restocked_at"));
+                }
             }
 
         } catch (Exception e) {
@@ -56,10 +56,10 @@ public class InventoryDAO extends DBConnection {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, productId);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                available = rs.getInt("available");
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    available = rs.getInt("available");
+                }
             }
 
         } catch (Exception e) {
@@ -93,4 +93,3 @@ public class InventoryDAO extends DBConnection {
         return false;
     }
 }
-
