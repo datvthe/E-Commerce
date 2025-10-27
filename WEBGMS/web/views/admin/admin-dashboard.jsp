@@ -5,6 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="vi">
   <head>
@@ -89,6 +90,7 @@
               <div class="card-style">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                   <h6 class="mb-0">Người dùng mới</h6>
+                  <a href="<%= request.getContextPath() %>/admin/users" class="text-sm" style="text-decoration:none;">Xem tất cả</a>
                 </div>
                 <div class="table-wrapper table-responsive">
                   <table class="table">
@@ -150,6 +152,50 @@
                         </tr>
                       </c:forEach>
                       <c:if test="${empty recentOrders}">
+                        <tr><td colspan="5" class="text-center">Không có dữ liệu</td></tr>
+                      </c:if>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Categories snapshot -->
+          <div class="row g-3 mt-2">
+            <div class="col-lg-12">
+              <div class="card-style">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h6 class="mb-0">Danh mục hiện có (${totalCategories})</h6>
+                  <div>
+                    <a href="<%= request.getContextPath() %>/admin/categories" class="main-btn primary-btn btn-hover">Quản lý danh mục</a>
+                    <a href="<%= request.getContextPath() %>/admin/categories?action=create" class="main-btn success-btn btn-hover">Thêm danh mục</a>
+                  </div>
+                </div>
+                <div class="table-wrapper table-responsive">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th><h6>ID</h6></th>
+                        <th><h6>Tên</h6></th>
+                        <th><h6>Slug</h6></th>
+                        <th><h6>Trạng thái</h6></th>
+                        <th><h6>Ngày tạo</h6></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <c:forEach var="c" items="${adminCategories}">
+                        <tr>
+                          <td><p>${c.category_id}</p></td>
+                          <td><p>${c.name}</p></td>
+                          <td><p>${c.slug}</p></td>
+                          <td>
+                            <span class="status-btn ${c.status == 'active' ? 'success-btn' : 'warning-btn'}">${c.status}</span>
+                          </td>
+                          <td><p>${c.created_at}</p></td>
+                        </tr>
+                      </c:forEach>
+                      <c:if test="${empty adminCategories}">
                         <tr><td colspan="5" class="text-center">Không có dữ liệu</td></tr>
                       </c:if>
                     </tbody>

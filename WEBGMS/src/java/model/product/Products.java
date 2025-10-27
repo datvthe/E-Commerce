@@ -24,6 +24,9 @@ public class Products {
     private ProductCategories category_id;
     private double average_rating;
     private int total_reviews;
+    private int quantity; // inventory qty
+    private String category_name; // for lightweight joins (e.g., wishlist)
+    private String imageUrl; // primary image url for listings
     private List<ProductImages> productImages;
     private Timestamp created_at;
     private Timestamp updated_at;
@@ -165,6 +168,16 @@ public class Products {
     public void setDeleted_at(Timestamp deleted_at) {
         this.deleted_at = deleted_at;
     }
+
+    // Quantity for inventory
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
+
+    // Lightweight props for wishlist/listing
+    public String getCategory_name() { return category_name; }
+    public void setCategory_name(String category_name) { this.category_name = category_name; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     // Additional camelCase accessors
     public long getProductId() { return product_id; }
