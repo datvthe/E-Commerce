@@ -320,16 +320,14 @@
                                             <i class="fa fa-star text-warning"></i>
                                             <i class="fa fa-star text-warning"></i>
                                         </div>
-                                        <span class="text-muted">(127 đánh giá)</span>
-                                        <span class="badge bg-success ms-3">4.8/5</span>
+                                        <span class="text-muted">(${product.total_reviews} đánh giá)</span>
+                                        <span class="badge bg-success ms-3"><fmt:formatNumber value="${product.average_rating}" maxFractionDigits="1"/>/5</span>
                                     </div>
                                     
                                     <!-- Price Section -->
                                     <div class="price-section mb-4">
                                         <div class="d-flex align-items-center">
-                                            <h2 class="text-primary mb-0 me-3">35,990,000₫</h2>
-                                            <span class="text-muted text-decoration-line-through me-2">39,990,000₫</span>
-                                            <span class="badge bg-danger">-10%</span>
+                                            <h2 class="text-primary mb-0 me-3"><fmt:formatNumber value="${product.price}" pattern="#,###"/>₫</h2>
                                         </div>
                                     </div>
                                     
@@ -346,7 +344,7 @@
                                                     <span class="text-success"><i class="fas fa-check-circle"></i> Còn hàng</span>
                                                 </p>
                                                 <p class="mb-2"><strong>Số lượng:</strong> <span class="text-primary">25 sản phẩm</span></p>
-                                                <p class="mb-2"><strong>Giao hàng:</strong> <span class="text-success"><i class="fas fa-truck"></i> 1-3 ngày</span></p>
+                                                <p class="mb-2"><strong>Giao hàng:</strong> <span class="text-success"><i class="fas fa-truck"></i> Tức thì</span></p>
                                             </div>
                                         </div>
                                     </div>
@@ -496,7 +494,7 @@
                                             <i class="fas fa-info-circle me-2"></i>Mô tả sản phẩm
                                         </button>
                                         <button class="nav-link" type="button" role="tab" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" aria-controls="reviews" aria-selected="false">
-                                            <i class="fas fa-star me-2"></i>Đánh giá (127)
+                                            <i class="fas fa-star me-2"></i>Đánh giá (${product.total_reviews})
                                         </button>
                                         <button class="nav-link" type="button" role="tab" id="policies-tab" data-bs-toggle="tab" data-bs-target="#policies" aria-controls="policies" aria-selected="false">
                                             <i class="fas fa-shield-alt me-2"></i>Chính sách
@@ -567,7 +565,7 @@
                                         <div class="row">
                                             <div class="col-lg-4">
                                                 <div class="rating-summary text-center p-4 bg-light rounded">
-                                                    <h2 class="text-primary mb-2">4.8</h2>
+                                                    <h2 class="text-primary mb-2"><fmt:formatNumber value="${product.average_rating}" maxFractionDigits="1"/></h2>
                                                     <div class="stars mb-3">
                                                         <i class="fa fa-star text-warning"></i>
                                                         <i class="fa fa-star text-warning"></i>
@@ -575,7 +573,7 @@
                                                         <i class="fa fa-star text-warning"></i>
                                                         <i class="fa fa-star text-warning"></i>
                                                     </div>
-                                                    <p class="text-muted">Dựa trên 127 đánh giá</p>
+                                                    <p class="text-muted">Dựa trên ${product.total_reviews} đánh giá</p>
                                                     
                                                     <!-- Rating Distribution -->
                                                     <div class="rating-breakdown mt-4">
