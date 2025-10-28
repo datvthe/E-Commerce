@@ -1,358 +1,292 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Wishlist - Gicungco</title>
+    <title>Danh sách yêu thích - Gicungco</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     
     <style>
-        .navbar {
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .navbar-brand {
-            font-size: 1.3rem;
-            font-weight: 700;
-        }
-        .nav-link.active {
-            font-weight: 600;
-            color: #f97316 !important;
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            background: #f8f9fa;
-            color: #333;
-            line-height: 1.6;
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-            color: white;
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-            text-align: center;
-            position: relative;
-        }
-        
-        .logo-container {
-            position: absolute;
-            top: 1rem;
-            left: 2rem;
-        }
-        
-        .logo-link {
-            display: inline-flex;
-            align-items: center;
-            text-decoration: none;
-            color: white;
-            font-size: 1.5rem;
-            font-weight: 700;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 0.5rem 1rem;
-            border-radius: 10px;
+        /* Navbar */
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 1rem 0;
         }
-        
-        .logo-link:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .navbar-custom .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .navbar-custom .nav-link {
+            color: #333;
+            font-weight: 600;
+            margin: 0 10px;
+            transition: all 0.3s;
+        }
+        .navbar-custom .nav-link:hover {
+            color: #ff6b35;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
         
-        .logo-icon {
-            font-size: 2rem;
-            margin-right: 0.5rem;
+        /* Header */
+        .wishlist-hero {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            backdrop-filter: blur(20px);
+            padding: 50px 0;
+            margin: 30px 0;
+            border-radius: 20px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
         }
-        
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
+        .wishlist-hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
-        
-        .stats {
+        .wishlist-hero .stats-badge {
             background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 15px 40px;
+            border-radius: 50px;
             display: inline-block;
-            padding: 1rem 2rem;
-            border-radius: 10px;
-            margin-top: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         
+        /* Wishlist Cards */
+        .wishlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
         .wishlist-item {
             background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .wishlist-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        }
+        .wishlist-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b35, #f7931e);
+        }
+        .product-image-wrapper {
+            position: relative;
+            overflow: hidden;
+            background: #f8f9fa;
+            height: 250px;
             display: flex;
             align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: transform 0.2s ease;
+            justify-content: center;
         }
-        
-        .wishlist-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        
-        .product-image {
-            width: 100px;
-            height: 100px;
+        .product-img {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            border-radius: 8px;
-            margin-right: 1.5rem;
-            border: 2px solid #f0f0f0;
+            transition: transform 0.3s;
         }
-        
-        .product-details {
-            flex: 1;
+        .wishlist-item:hover .product-img {
+            transform: scale(1.1);
         }
-        
-        .product-name {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 0.5rem;
+        .remove-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(220, 53, 69, 0.9);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        
-        .product-price {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #059669;
-            margin-bottom: 0.5rem;
+        .remove-btn:hover {
+            background: #dc3545;
+            transform: scale(1.1) rotate(90deg);
         }
-        
+        .product-info {
+            padding: 25px;
+        }
         .product-category {
             display: inline-block;
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
             color: white;
-            padding: 0.25rem 0.75rem;
+            padding: 5px 15px;
             border-radius: 20px;
             font-size: 0.8rem;
-            margin-bottom: 0.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
         }
-        
+        .product-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin: 10px 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .product-price {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 15px 0;
+        }
         .product-rating {
-            margin-bottom: 0.5rem;
+            color: #ffc107;
+            margin-bottom: 15px;
         }
-        
-        .star {
-            color: #fbbf24;
-            font-size: 1.1rem;
-        }
-        
-        .star-empty {
-            color: #d1d5db;
-            font-size: 1.1rem;
-        }
-        
         .added-date {
-            color: #6b7280;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
         }
-        
-        .product-description {
-            color: #6b7280;
-            font-size: 0.9rem;
-        }
-        
-        .actions {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            min-width: 140px;
-        }
-        
-        .btn {
-            padding: 0.75rem 1.5rem;
+        .btn-view {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
             border: none;
-            border-radius: 6px;
+            color: white;
             font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            text-align: center;
-            transition: all 0.2s ease;
-            font-size: 0.9rem;
+            border-radius: 10px;
+            transition: all 0.3s;
         }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        .btn-view:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
             color: white;
         }
         
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
-            transform: translateY(-1px);
+        /* Action Bar */
+        .action-bar {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        
-        .btn-danger {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-            padding: 0.5rem 1rem;
-        }
-        
-        .btn-danger:hover {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-            transform: translateY(-1px);
-        }
-        
-        .btn-outline {
-            background: transparent;
-            border: 2px solid #3b71ca;
-            color: #3b71ca;
-            padding: 0.5rem 1rem;
-        }
-        
-        .btn-outline:hover {
-            background: #3b71ca;
-            color: white;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .empty-state h2 {
-            font-size: 1.5rem;
-            color: #6b7280;
-            margin-bottom: 1rem;
-        }
-        
-        .empty-state p {
-            color: #9ca3af;
-            margin-bottom: 2rem;
-        }
-        
-        .btn-large {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-            color: white;
-            padding: 1rem 2rem;
+        .btn-clear-all {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
             border: none;
-            border-radius: 8px;
+            padding: 10px 25px;
+            border-radius: 25px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-clear-all:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 80px 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        }
+        .empty-icon {
+            font-size: 120px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .btn-explore {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            border: none;
+            padding: 15px 40px;
             font-size: 1.1rem;
             font-weight: 600;
+            border-radius: 50px;
+            color: white;
             text-decoration: none;
             display: inline-block;
-            transition: all 0.2s ease;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3);
         }
-        
-        .btn-large:hover {
-            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
-            transform: translateY(-1px);
+        .btn-explore:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.5);
             color: white;
         }
         
-        .summary {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .btn-clear {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-            padding: 0.5rem 1.5rem;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        
-        .btn-clear:hover {
-            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-        }
-        
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin: 2rem 0;
-            gap: 0.5rem;
-        }
-        
-        .page-link {
-            padding: 0.5rem 1rem;
-            border: 1px solid #e0e0e0;
-            color: #6b7280;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-        }
-        
-        .page-link:hover {
-            background: #fff7ed;
-            color: #f97316;
-        }
-        
-        .page-link.active {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-            color: white;
-            border-color: #f97316;
-        }
-        
-        .actions-footer {
+        /* Footer */
+        .footer-simple {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            margin-top: 60px;
             text-align: center;
-            margin-top: 2rem;
+            color: white;
         }
         
-        @media (max-width: 768px) {
-            .wishlist-item {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .product-image {
-                margin: 0 0 1rem 0;
-            }
-            
-            .actions {
-                flex-direction: row;
-                justify-content: center;
-                margin-top: 1rem;
-            }
-            
-            .summary {
-                flex-direction: column;
-                gap: 1rem;
-            }
+        /* Loading animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
-    <!-- Simple Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-        <div class="container-fluid px-4">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/home">
-                <span style="font-size: 1.5rem;">🎮</span>
-                <strong>Gicungco</strong>
+    <!-- Navbar -->
+    <nav class="navbar navbar-custom navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="<%= request.getContextPath() %>/home">
+                <i class="fas fa-shopping-bag me-2"></i>Gicungco
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -360,25 +294,25 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/home">🏠 Trang chủ</a>
+                        <a class="nav-link" href="<%= request.getContextPath() %>/home">
+                            <i class="fas fa-home me-1"></i>Trang chủ
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/products">🛒 Sản phẩm</a>
+                        <a class="nav-link" href="<%= request.getContextPath() %>/products">
+                            <i class="fas fa-store me-1"></i>Sản phẩm
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="<%= request.getContextPath() %>/wishlist">
+                            <i class="fas fa-heart me-1"></i>Yêu thích
+                        </a>
                     </li>
                     <c:if test="${not empty sessionScope.user}">
                         <li class="nav-item">
-                            <a class="nav-link active" href="${pageContext.request.contextPath}/wishlist">♥ Yêu thích</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="${pageContext.request.contextPath}/profile">👤 Hồ sơ</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-danger" href="${pageContext.request.contextPath}/logout">🚪 Đăng xuất</a>
-                        </li>
-                    </c:if>
-                    <c:if test="${empty sessionScope.user}">
-                        <li class="nav-item">
-                            <a class="nav-link" href="${pageContext.request.contextPath}/login">🔑 Đăng nhập</a>
+                            <a class="nav-link" href="<%= request.getContextPath() %>/profile">
+                                <i class="fas fa-user me-1"></i>${sessionScope.user.full_name}
+                            </a>
                         </li>
                     </c:if>
                 </ul>
@@ -386,220 +320,217 @@
         </div>
     </nav>
     
-    <!-- Header -->
-    <div class="header">
-        <!-- Logo -->
-        <div class="logo-container">
-            <a href="${pageContext.request.contextPath}/home" class="logo-link" title="Back to Homepage">
-                <span class="logo-icon">🎮</span>
-                <span>Gicungco</span>
-            </a>
-        </div>
-        
-        <div class="container">
-            <h1>♥ Danh Sách Yêu Thích</h1>
-            <p>Quản lý các sản phẩm số yêu thích của bạn</p>
-            <div class="stats">
-                <strong>${not empty wishlistItems ? wishlistItems.size() : 0}</strong> Sản phẩm trong danh sách
+    <!-- Main Content -->
+    <div class="container py-4">
+        <!-- Hero Header -->
+        <div class="wishlist-hero fade-in">
+            <h1>
+                <i class="fas fa-heart me-3"></i>Danh Sách Yêu Thích
+            </h1>
+            <div class="stats-badge mt-3">
+                <i class="fas fa-boxes me-2"></i>
+                <strong>${not empty wishlistItems ? wishlistItems.size() : 0}</strong> sản phẩm
             </div>
         </div>
-    </div>
-    
-    <!-- Main Content -->
-    <div class="container">
+        
         <c:choose>
             <c:when test="${not empty wishlistItems}">
-                <!-- Wishlist Summary -->
-                <div class="summary">
-                    <div>
-                        <h3>📋 Tổng Quan</h3>
-                        <p>Bạn có ${wishlistItems.size()} sản phẩm trong danh sách yêu thích</p>
+                <!-- Action Bar -->
+                <div class="action-bar fade-in">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">
+                                <i class="fas fa-list me-2"></i>
+                                ${wishlistItems.size()} sản phẩm đang chờ bạn
+                            </h5>
+                        </div>
+                        <button class="btn btn-clear-all" onclick="clearAll()">
+                            <i class="fas fa-trash-alt me-2"></i>Xóa tất cả
+                        </button>
                     </div>
-                    <button class="btn-clear" onclick="clearAll()">🗑 Xóa Tất Cả</button>
                 </div>
                 
-                <!-- Wishlist Items -->
-                <c:forEach var="item" items="${wishlistItems}" varStatus="status">
-                    <div class="wishlist-item" id="item-${item.productId.product_id}">
-                        <!-- Product Image -->
-                        <c:choose>
-                            <c:when test="${not empty item.productId.imageUrl}">
-                                <img src="${pageContext.request.contextPath}${item.productId.imageUrl}" alt="${item.productId.name}" class="product-image" loading="lazy">
-                            </c:when>
-                            <c:otherwise>
-                                <img src="${pageContext.request.contextPath}/views/assets/electro/img/product-${(status.index % 8) + 1}.png" alt="${item.productId.name}" class="product-image" loading="lazy">
-                            </c:otherwise>
-                        </c:choose>
-                        
-                        <!-- Product Details -->
-                        <div class="product-details">
-                            <c:if test="${not empty item.productId.category_name}">
-                                <div class="product-category">🏷 ${item.productId.category_name}</div>
-                            </c:if>
-                            <div class="product-name">${item.productId.name}</div>
-                            <div class="product-price">
-                                <fmt:formatNumber value="${item.productId.price}" type="currency" 
-                                                 currencySymbol="${item.productId.currency == 'VND' ? 'đ' : '$'}" 
-                                                 maxFractionDigits="0"/>
-                            </div>
-                            <div class="product-rating">
-                                <c:forEach begin="1" end="5" var="i">
-                                    <span class="${i <= item.productId.average_rating ? 'star' : 'star-empty'}">★</span>
-                                </c:forEach>
-                                <span style="color: #6b7280; margin-left: 0.5rem;">(${item.productId.total_reviews} reviews)</span>
-                            </div>
-                            <div class="added-date">
-                                📅 Added <fmt:formatDate value="${item.addedAt}" pattern="MMM dd, yyyy"/>
-                            </div>
-                            <c:if test="${not empty item.productId.description}">
-                                <div class="product-description">
-                                    <c:choose>
-                                        <c:when test="${item.productId.description.length() > 150}">
-                                            ${item.productId.description.substring(0, 150)}...
-                                        </c:when>
-                                        <c:otherwise>
-                                            ${item.productId.description}
-                                        </c:otherwise>
-                                    </c:choose>
-                                </div>
-                            </c:if>
-                        </div>
-                        
-                        <!-- Actions -->
-                        <div class="actions">
-                            <a href="${pageContext.request.contextPath}/product/${item.productId.slug}" class="btn btn-primary">
-                                👁 Xem Chi Tiết
-                            </a>
-                            
-                            <button class="btn btn-danger" onclick="removeItem(${item.productId.product_id})">
-                                🗑 Xóa
+                <!-- Wishlist Grid -->
+                <div class="wishlist-grid">
+                    <c:forEach var="item" items="${wishlistItems}" varStatus="status">
+                        <div class="wishlist-item fade-in" id="item-${item.productId.product_id}" 
+                             style="animation-delay: ${status.index * 0.1}s">
+                            <!-- Remove Button -->
+                            <button class="remove-btn" onclick="removeItem(${item.productId.product_id})" 
+                                    title="Xóa khỏi yêu thích">
+                                <i class="fas fa-times"></i>
                             </button>
+                            
+                            <!-- Product Image -->
+                            <div class="product-image-wrapper">
+                                <c:choose>
+                                    <c:when test="${not empty item.productId.imageUrl}">
+                                        <img src="${pageContext.request.contextPath}${item.productId.imageUrl}" 
+                                             alt="${item.productId.name}" class="product-img">
+                                    </c:when>
+                                    <c:otherwise>
+                                        <img src="${pageContext.request.contextPath}/views/assets/electro/img/product-1.png" 
+                                             alt="${item.productId.name}" class="product-img">
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                            
+                            <!-- Product Info -->
+                            <div class="product-info">
+                                <c:if test="${not empty item.productId.category_name}">
+                                    <span class="product-category">
+                                        <i class="fas fa-tag me-1"></i>${item.productId.category_name}
+                                    </span>
+                                </c:if>
+                                
+                                <h5 class="product-name">${item.productId.name}</h5>
+                                
+                                <div class="product-rating">
+                                    <c:forEach begin="1" end="5" var="i">
+                                        <i class="fas fa-star ${i <= item.productId.average_rating ? '' : 'text-muted'}"></i>
+                                    </c:forEach>
+                                    <span class="text-muted ms-2">(${item.productId.total_reviews})</span>
+                                </div>
+                                
+                                <div class="added-date">
+                                    <i class="far fa-calendar-alt me-1"></i>
+                                    Đã thêm: <fmt:formatDate value="${item.addedAt}" pattern="dd/MM/yyyy"/>
+                                </div>
+                                
+                                <div class="product-price">
+                                    <fmt:formatNumber value="${item.productId.price}" type="currency" 
+                                                     currencyCode="VND" pattern="#,##0₫"/>
+                                </div>
+                                
+                                <a href="${pageContext.request.contextPath}/product/${item.productId.slug}" 
+                                   class="btn btn-view">
+                                    <i class="fas fa-eye me-2"></i>Xem chi tiết
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                </c:forEach>
+                    </c:forEach>
+                </div>
                 
-                <!-- Pagination -->
-                <c:if test="${totalPages > 1}">
-                    <div class="pagination">
-                        <c:if test="${currentPage > 1}">
-                            <a href="?page=${currentPage - 1}&size=${pageSize}" class="page-link">← Prev</a>
-                        </c:if>
-                        
-                        <c:forEach begin="1" end="${totalPages}" var="p">
-                            <a href="?page=${p}&size=${pageSize}" 
-                               class="page-link ${p == currentPage ? 'active' : ''}">${p}</a>
-                        </c:forEach>
-                        
-                        <c:if test="${currentPage < totalPages}">
-                            <a href="?page=${currentPage + 1}&size=${pageSize}" class="page-link">Next →</a>
-                        </c:if>
-                    </div>
-                </c:if>
-                
-                <!-- Footer Actions -->
-                <div class="actions-footer">
-                    <a href="${pageContext.request.contextPath}/home" class="btn-large">← Tiếp Tục Mua Sắm</a>
-                    <a href="${pageContext.request.contextPath}/products" class="btn-large" style="margin-left: 1rem;">🛍 Duyệt Sản Phẩm</a>
+                <!-- Continue Shopping -->
+                <div class="text-center mt-5">
+                    <a href="${pageContext.request.contextPath}/products" class="btn btn-explore">
+                        <i class="fas fa-shopping-cart me-2"></i>Tiếp tục mua sắm
+                    </a>
                 </div>
                 
             </c:when>
             <c:otherwise>
-                <!-- Empty Wishlist -->
-                <div class="empty-state">
-                    <div style="font-size: 4rem; margin-bottom: 1rem;">💔</div>
-                    <h2>Danh sách yêu thích của bạn đang trống!</h2>
-                    <p>Khám phá các sản phẩm số tuyệt vời và thêm vào danh sách yêu thích để lưu lại.</p>
-                    <a href="${pageContext.request.contextPath}/home" class="btn-large">🛍️ Bắt Đầu Mua Sắm</a>
+                <!-- Empty State -->
+                <div class="empty-state fade-in">
+                    <div class="empty-icon">
+                        <i class="fas fa-heart-broken"></i>
+                    </div>
+                    <h2 class="mb-3">Danh sách yêu thích trống</h2>
+                    <p class="text-muted mb-4" style="font-size: 1.1rem;">
+                        Hãy khám phá và thêm những sản phẩm yêu thích của bạn!
+                    </p>
+                    <a href="${pageContext.request.contextPath}/products" class="btn btn-explore">
+                        <i class="fas fa-shopping-bag me-2"></i>Khám phá ngay
+                    </a>
                 </div>
             </c:otherwise>
         </c:choose>
     </div>
     
-    <script>
-        // Simple remove function
-        function removeItem(productId) {
-            if (confirm('Xóa sản phẩm này khỏi danh sách yêu thích?')) {
-                fetch('${pageContext.request.contextPath}/removeFromWishlist', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: 'productId=' + productId
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Reload page to update wishlist
-                        location.reload();
-                    } else {
-                        alert(data.message || 'Đã xảy ra lỗi khi xóa!');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra. Vui lòng thử lại.');
-                });
-            }
-        }
-        
-        // Clear all function
-        function clearAll() {
-            if (confirm('Xóa TẤT CẢ sản phẩm khỏi danh sách yêu thích? Thao tác này không thể hoàn tác.')) {
-                fetch('${pageContext.request.contextPath}/clearWishlist', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Reload page to show empty state
-                        location.reload();
-                    } else {
-                        alert(data.message || 'Đã xảy ra lỗi khi xóa!');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra. Vui lòng thử lại.');
-                });
-            }
-        }
-    </script>
-    
-    <!-- Simple Footer -->
-    <footer class="bg-dark text-white mt-5 py-4">
+    <!-- Footer -->
+    <footer class="footer-simple">
         <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h5>🎮 Gicungco Marketplace</h5>
-                    <p>Nền tảng thương mại điện tử đáng tin cậy</p>
-                </div>
-                <div class="col-md-4">
-                    <h5>Liên Kết Nhanh</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="${pageContext.request.contextPath}/home" class="text-white-50">Trang chủ</a></li>
-                        <li><a href="${pageContext.request.contextPath}/products" class="text-white-50">Sản phẩm</a></li>
-                        <li><a href="${pageContext.request.contextPath}/about" class="text-white-50">Giới thiệu</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h5>Liên Hệ</h5>
-                    <p class="text-white-50">
-                        <i class="fas fa-phone"></i> (+012) 1234 567890<br>
-                        <i class="fas fa-envelope"></i> info@gicungco.com
-                    </p>
-                </div>
-            </div>
-            <hr class="bg-white">
-            <div class="text-center">
-                <p class="mb-0">&copy; 2025 Gicungco Marketplace. Bảo lưu mọi quyền.</p>
-            </div>
+            <p class="mb-0">
+                <i class="fas fa-heart me-2"></i>
+                Made with love by Gicungco &copy; 2025
+            </p>
         </div>
     </footer>
     
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Remove item with animation
+        function removeItem(productId) {
+            if (confirm('Bạn có chắc muốn xóa sản phẩm này khỏi danh sách yêu thích?')) {
+                const itemElement = document.getElementById('item-' + productId);
+                
+                // Fade out animation
+                itemElement.style.transition = 'all 0.3s ease';
+                itemElement.style.opacity = '0';
+                itemElement.style.transform = 'scale(0.8)';
+                
+                setTimeout(() => {
+                    fetch('${pageContext.request.contextPath}/removeFromWishlist', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                        body: 'productId=' + productId
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert(data.message || 'Lỗi khi xóa!');
+                            itemElement.style.opacity = '1';
+                            itemElement.style.transform = 'scale(1)';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Có lỗi xảy ra!');
+                        itemElement.style.opacity = '1';
+                        itemElement.style.transform = 'scale(1)';
+                    });
+                }, 300);
+            }
+        }
+        
+        // Clear all with confirmation
+        function clearAll() {
+            if (confirm('⚠️ Bạn có chắc muốn XÓA TẤT CẢ sản phẩm khỏi danh sách yêu thích?\n\nThao tác này không thể hoàn tác!')) {
+                const items = document.querySelectorAll('.wishlist-item');
+                
+                // Animate all items
+                items.forEach((item, index) => {
+                    setTimeout(() => {
+                        item.style.transition = 'all 0.3s ease';
+                        item.style.opacity = '0';
+                        item.style.transform = 'scale(0.8)';
+                    }, index * 50);
+                });
+                
+                setTimeout(() => {
+                    fetch('${pageContext.request.contextPath}/clearWishlist', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert(data.message || 'Lỗi khi xóa!');
+                            location.reload();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Có lỗi xảy ra!');
+                        location.reload();
+                    });
+                }, items.length * 50 + 300);
+            }
+        }
+        
+        // Add entrance animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const items = document.querySelectorAll('.wishlist-item');
+            items.forEach((item, index) => {
+                item.style.animationDelay = (index * 0.1) + 's';
+            });
+        });
+    </script>
 </body>
 </html>

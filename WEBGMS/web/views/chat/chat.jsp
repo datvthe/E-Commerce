@@ -116,6 +116,7 @@
     </div>
     
     <script src="${pageContext.request.contextPath}/assets/js/chat.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/message-actions.js"></script>
     <script>
         // Initialize chat
         const userId = ${sessionScope.user.user_id};

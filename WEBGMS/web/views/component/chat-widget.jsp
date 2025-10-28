@@ -55,7 +55,48 @@
                     </div>
                     
                     <div class="chat-widget-input">
-                        <button class="btn-widget-attach" title="Đính kèm">
+                        <input type="file" id="aiBotFileInput" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.zip,.rar" 
+                               style="display: none;"
+                               onchange="(async function(e){
+                                   console.log('[AI Bot] File input changed!');
+                                   var file = e.target.files[0];
+                                   if (!file) return;
+                                   console.log('[AI Bot] File:', file.name, file.type, file.size);
+                                   
+                                   var maxSize = file.type.startsWith('image/') ? 5*1024*1024 : 10*1024*1024;
+                                   if (file.size > maxSize) {
+                                       alert('File quá lớn! Tối đa ' + (maxSize/1024/1024) + 'MB');
+                                       e.target.value = '';
+                                       return;
+                                   }
+                                   
+                                   // Show temporary preview
+                                   var preview = document.getElementById('aiBotFilePreview');
+                                   var img = document.getElementById('aiBotPreviewImg');
+                                   var info = document.getElementById('aiBotFileInfo');
+                                   var name = document.getElementById('aiBotFileName');
+                                   
+                                   if (file.type.startsWith('image/')) {
+                                       var reader = new FileReader();
+                                       reader.onload = function(evt) {
+                                           img.src = evt.target.result;
+                                           img.style.display = 'block';
+                                           info.style.display = 'none';
+                                       };
+                                       reader.readAsDataURL(file);
+                                   } else {
+                                       name.textContent = file.name;
+                                       info.style.display = 'block';
+                                       img.style.display = 'none';
+                                   }
+                                   preview.style.display = 'block';
+                                   
+                                   // Store file, but DON'T auto-send
+                                   // Let user click send button manually
+                                   console.log('[AI Bot] File selected, waiting for user to click send');
+                                   window.aiBotSelectedFile = file;
+                               })(event)">
+                        <button class="btn-widget-attach" title="Đính kèm file" onclick="console.log('[AI Bot] Attach button clicked'); document.getElementById('aiBotFileInput').click();">
                             <i class="fas fa-paperclip"></i>
                         </button>
                         <textarea id="aiBotMessageInput" 
@@ -64,6 +105,20 @@
                         <button class="btn-widget-send" onclick="sendToAIBot()">
                             <i class="fas fa-paper-plane"></i>
                         </button>
+                    </div>
+                    
+                    <!-- File Preview -->
+                    <div class="chat-widget-image-preview" id="aiBotFilePreview" style="display: none;">
+                        <div class="image-preview-container">
+                            <img id="aiBotPreviewImg" src="" alt="Preview" style="display: none;">
+                            <div id="aiBotFileInfo" class="file-info-preview" style="display: none;">
+                                <i class="fas fa-file"></i>
+                                <span id="aiBotFileName"></span>
+                            </div>
+                            <button class="btn-remove-image" onclick="aiBotSelectedFile=null; document.getElementById('aiBotFileInput').value=''; document.getElementById('aiBotFilePreview').style.display='none';">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
@@ -105,7 +160,51 @@
                     </div>
                     
                     <div class="chat-widget-input">
-                        <button class="btn-widget-attach" title="Đính kèm">
+                        <input type="file" id="widgetFileInput" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.zip,.rar" 
+                               style="display: none;"
+                               onchange="(async function(e){
+                                   console.log('[Widget] File input changed!');
+                                   var file = e.target.files[0];
+                                   if (!file) return;
+                                   console.log('[Widget] File:', file.name, file.type, file.size);
+                                   
+                                   var maxSize = file.type.startsWith('image/') ? 5*1024*1024 : 10*1024*1024;
+                                   if (file.size > maxSize) {
+                                       alert('File quá lớn! Tối đa ' + (maxSize/1024/1024) + 'MB');
+                                       e.target.value = '';
+                                       return;
+                                   }
+                                   
+                                   // Show temporary preview
+                                   var preview = document.getElementById('widgetFilePreview');
+                                   var img = document.getElementById('widgetPreviewImg');
+                                   var info = document.getElementById('widgetFileInfo');
+                                   var name = document.getElementById('widgetFileName');
+                                   
+                                   if (file.type.startsWith('image/')) {
+                                       var reader = new FileReader();
+                                       reader.onload = function(evt) {
+                                           img.src = evt.target.result;
+                                           img.style.display = 'block';
+                                           info.style.display = 'none';
+                                       };
+                                       reader.readAsDataURL(file);
+                                   } else {
+                                       name.textContent = file.name;
+                                       info.style.display = 'block';
+                                       img.style.display = 'none';
+                                   }
+                                   preview.style.display = 'block';
+                                   
+                                   // Auto-send file immediately
+                                   console.log('[Widget] Auto-sending file...');
+                                   widgetSelectedFile = file;
+                                   await widgetSendMessage();
+                                   
+                                   // Clear file input
+                                   e.target.value = '';
+                               })(event)">
+                        <button class="btn-widget-attach" title="Đính kèm file" onclick="console.log('[Widget] Attach button clicked'); document.getElementById('widgetFileInput').click();">
                             <i class="fas fa-paperclip"></i>
                         </button>
                         <textarea id="widgetMessageInput" 
@@ -114,6 +213,20 @@
                         <button class="btn-widget-send" onclick="widgetSendMessage()">
                             <i class="fas fa-paper-plane"></i>
                         </button>
+                    </div>
+                    
+                    <!-- File Preview -->
+                    <div class="chat-widget-image-preview" id="widgetFilePreview" style="display: none;">
+                        <div class="image-preview-container">
+                            <img id="widgetPreviewImg" src="" alt="Preview" style="display: none;">
+                            <div id="widgetFileInfo" class="file-info-preview" style="display: none;">
+                                <i class="fas fa-file"></i>
+                                <span id="widgetFileName"></span>
+                            </div>
+                            <button class="btn-remove-image" onclick="widgetSelectedFile=null; document.getElementById('widgetFileInput').value=''; document.getElementById('widgetFilePreview').style.display='none';">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </c:when>

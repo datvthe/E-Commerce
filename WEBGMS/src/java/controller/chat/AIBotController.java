@@ -272,5 +272,5 @@ public class AIBotController extends HttpServlet {
         error.addProperty("success", false);
         error.addProperty("error", message);
         sendJsonResponse(response, error);
-    }
+   }
 }
