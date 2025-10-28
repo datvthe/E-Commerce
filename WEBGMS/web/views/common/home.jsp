@@ -1245,10 +1245,11 @@
         </script>
         
         <!-- Chat Widget -->
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/chat-widget.css" />
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/chat-widget.css?v=<%= System.currentTimeMillis() %>" />
         <jsp:include page="../component/chat-widget.jsp" />
-        <script src="<%= request.getContextPath() %>/assets/js/chat-widget.js"></script>
-        <script src="<%= request.getContextPath() %>/assets/js/aibot-widget.js"></script>
+        <script src="<%= request.getContextPath() %>/assets/js/chat-widget.js?v=<%= System.currentTimeMillis() %>"></script>
+        <script src="<%= request.getContextPath() %>/assets/js/aibot-widget.js?v=<%= System.currentTimeMillis() %>"></script>
+        <script src="<%= request.getContextPath() %>/assets/js/message-actions.js?v=<%= System.currentTimeMillis() %>"></script>
         <script>
             // Initialize chat widget after DOM is ready
             document.addEventListener('DOMContentLoaded', function() {

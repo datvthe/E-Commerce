@@ -83,10 +83,11 @@
 <script src="<%= request.getContextPath() %>/views/assets/electro/js/main.js" defer></script>
 
 <!-- Chat Widget for All Pages -->
-<link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/chat-widget.css" />
+<link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/chat-widget.css?v=<%= System.currentTimeMillis() %>" />
 <jsp:include page="chat-widget.jsp" />
-<script src="<%= request.getContextPath() %>/assets/js/chat-widget.js"></script>
-<script src="<%= request.getContextPath() %>/assets/js/aibot-widget.js"></script>
+<script src="<%= request.getContextPath() %>/assets/js/chat-widget.js?v=<%= System.currentTimeMillis() %>"></script>
+<script src="<%= request.getContextPath() %>/assets/js/aibot-widget.js?v=<%= System.currentTimeMillis() %>"></script>
+<script src="<%= request.getContextPath() %>/assets/js/message-actions.js?v=<%= System.currentTimeMillis() %>"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         try {

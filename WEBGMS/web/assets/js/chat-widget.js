@@ -271,6 +271,7 @@ function appendWidgetMessage(message) {
     const messageContent = message.content || message.messageContent;
     const messageType = message.messageType || 'text';
     const attachmentUrl = message.attachmentUrl || message.attachment_url;
+    const messageId = message.messageId || message.message_id || '';
     
     // Skip if no content and no image
     if (!messageContent && !attachmentUrl) {
@@ -278,24 +279,37 @@ function appendWidgetMessage(message) {
         return;
     }
     
-    console.log('[Widget] Appending message:', {
-        senderId: message.senderId,
-        content: messageContent ? messageContent.substring(0, 30) : '(image)',
-        type: messageType,
-        isOwn: message.senderId === widgetUserId
-    });
+    // Parse IDs to numbers for proper comparison
+    const senderId = parseInt(message.senderId || message.sender_id);
+    const userId = parseInt(widgetUserId);
+    const isOwn = senderId === userId;
+    const isAI = message.isAiResponse || message.senderRole === 'ai';
+    
+    console.log('[Widget] Appending message:');
+    console.log('  - messageId:', messageId);
+    console.log('  - senderId (parsed):', senderId, '(original:', message.senderId, ')');
+    console.log('  - widgetUserId (parsed):', userId, '(original:', widgetUserId, ')');
+    console.log('  - isOwn:', isOwn);
+    console.log('  - isAI:', isAI);
+    console.log('  - content:', messageContent ? messageContent.substring(0, 30) : '(image)');
     
     const messageDiv = document.createElement('div');
     
-    const isOwn = message.senderId === widgetUserId;
-    const isAI = message.isAiResponse || message.senderRole === 'ai';
-    
     messageDiv.className = `widget-message ${isOwn ? 'widget-message-own' : 'widget-message-other'} ${isAI ? 'widget-message-ai' : ''}`;
+    messageDiv.dataset.messageId = messageId;
+    
+    // DEBUG LOG
+    if (isOwn) {
+        console.log('✅ TIN NHAN CUA BAN - CLASS: widget-message-own');
+    }
     
     // Build message content HTML
     let messageHTML = '';
     if (messageContent && messageContent.trim()) {
-        messageHTML += `<div class="widget-message-bubble">${escapeWidgetHtml(messageContent)}</div>`;
+        messageHTML += `<div class="widget-message-bubble" id="bubble-${messageId}">
+            <p id="text-${messageId}">${escapeWidgetHtml(messageContent)}</p>
+            ${message.isEdited ? '<span style="font-size: 0.8em; opacity: 0.7;">(đã chỉnh sửa)</span>' : ''}
+        </div>`;
     }
     if (messageType === 'image' && attachmentUrl) {
         messageHTML += `<img src="${widgetContextPath}${attachmentUrl}" alt="Image" class="widget-message-image" onclick="window.open('${widgetContextPath}${attachmentUrl}', '_blank')">`;
@@ -308,12 +322,34 @@ function appendWidgetMessage(message) {
         </div>`;
     }
     
+    // Add action buttons for own messages (not AI)
+    let actionsHtml = '';
+    if (isOwn && !isAI && messageId) {
+        actionsHtml = `
+            <div class="message-actions">
+                <button class="btn-message-action btn-message-edit" 
+                        onclick="event.stopPropagation(); editMessage('${messageId}');" 
+                        title="Sửa">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-message-action btn-message-delete" 
+                        onclick="event.stopPropagation(); deleteMessage('${messageId}');" 
+                        title="Xóa">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+    }
+    
     messageDiv.innerHTML = `
         ${!isOwn ? `<img src="${message.senderAvatar || widgetContextPath + '/assets/images/default-avatar.png'}" 
                          alt="Avatar" class="widget-message-avatar">` : ''}
         <div class="widget-message-content">
             ${messageHTML}
-            <div class="widget-message-time">${formatWidgetMessageTime(message.createdAt)}</div>
+            <div class="widget-message-footer">
+                <div class="widget-message-time">${formatWidgetMessageTime(message.createdAt)}</div>
+                ${isOwn ? actionsHtml : ''}
+            </div>
         </div>
     `;
     

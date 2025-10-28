@@ -91,13 +91,10 @@
                                    }
                                    preview.style.display = 'block';
                                    
-                                   // Auto-send file immediately
-                                   console.log('[AI Bot] Auto-sending file...');
-                                   aiBotSelectedFile = file;
-                                   await sendToAIBot();
-                                   
-                                   // Clear file input
-                                   e.target.value = '';
+                                   // Store file, but DON'T auto-send
+                                   // Let user click send button manually
+                                   console.log('[AI Bot] File selected, waiting for user to click send');
+                                   window.aiBotSelectedFile = file;
                                })(event)">
                         <button class="btn-widget-attach" title="Đính kèm file" onclick="console.log('[AI Bot] Attach button clicked'); document.getElementById('aiBotFileInput').click();">
                             <i class="fas fa-paperclip"></i>
