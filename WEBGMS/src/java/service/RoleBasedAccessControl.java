@@ -1,12 +1,12 @@
 package service;
 
-import model.user.Users;
-import model.user.UserRoles;
-import model.user.Roles;
-import dao.UsersDAO;
 import dao.RoleDAO;
+import dao.UsersDAO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import model.user.Roles;
+import model.user.UserRoles;
+import model.user.Users;
 
 /**
  * Role-Based Access Control Service

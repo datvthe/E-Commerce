@@ -22,6 +22,8 @@ public class DBConnection {
             System.out.println("Không tìm thấy Driver MySQL: " + e.getMessage());
         } catch (SQLException e) {
             System.out.println("Lỗi kết nối MySQL: " + e.getMessage());
+            // Gợi ý thường gặp
+            System.out.println("Gợi ý: kiểm tra allowPublicKeyRetrieval, useSSL, serverTimezone, user/password, và DB name (gicungco)");
         }
         return conn;
     }

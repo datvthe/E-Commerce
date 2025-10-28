@@ -81,12 +81,12 @@ public class CategoryDAO extends DBConnection {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setLong(1, parentId);
-            ResultSet rs = ps.executeQuery();
-            
-            while (rs.next()) {
-                Category category = extractCategoryFromResultSet(rs);
-                category.setProductCount(rs.getInt("product_count"));
-                categories.add(category);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Category category = extractCategoryFromResultSet(rs);
+                    category.setProductCount(rs.getInt("product_count"));
+                    categories.add(category);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -109,13 +109,13 @@ public class CategoryDAO extends DBConnection {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setLong(1, categoryId);
-            ResultSet rs = ps.executeQuery();
-            
-            if (rs.next()) {
-                Category category = extractCategoryFromResultSet(rs);
-                category.setProductCount(rs.getInt("product_count"));
-                category.setParentName(rs.getString("parent_name"));
-                return category;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Category category = extractCategoryFromResultSet(rs);
+                    category.setProductCount(rs.getInt("product_count"));
+                    category.setParentName(rs.getString("parent_name"));
+                    return category;
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -138,13 +138,13 @@ public class CategoryDAO extends DBConnection {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setString(1, slug);
-            ResultSet rs = ps.executeQuery();
-            
-            if (rs.next()) {
-                Category category = extractCategoryFromResultSet(rs);
-                category.setProductCount(rs.getInt("product_count"));
-                category.setParentName(rs.getString("parent_name"));
-                return category;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Category category = extractCategoryFromResultSet(rs);
+                    category.setProductCount(rs.getInt("product_count"));
+                    category.setParentName(rs.getString("parent_name"));
+                    return category;
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -168,5 +168,4 @@ public class CategoryDAO extends DBConnection {
         category.setUpdatedAt(rs.getTimestamp("updated_at"));
         return category;
     }
-
 }

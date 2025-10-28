@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -31,7 +31,7 @@
                                     <nav aria-label="breadcrumb">
                                         <ol class="breadcrumb">
                                             <li class="breadcrumb-item">
-                                                <a href="<%= request.getContextPath() %>/admin/dashboard">Dashboard</a>
+<a href="<%= request.getContextPath() %>/admin/dashboard">Bảng điều khiển</a>
                                             </li>
                                             <li class="breadcrumb-item">
                                                 <a href="<%= request.getContextPath() %>/admin/users">Người dùng</a>
