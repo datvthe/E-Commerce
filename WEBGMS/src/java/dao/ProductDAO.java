@@ -532,6 +532,40 @@ public class ProductDAO extends DBConnection {
         return categories;
     }
 
+    // ===== Admin filter without forcing status = 'active' =====
+    public List<Products> adminFilterProducts(int page, int pageSize, String search, String category, String status) {
+        List<Products> products = new ArrayList<>();
+        int offset = (page - 1) * pageSize;
+        StringBuilder sql = new StringBuilder("SELECT * FROM Products WHERE deleted_at IS NULL");
+        List<Object> params = new ArrayList<>();
+        if (category != null && !category.isEmpty()) { sql.append(" AND category_id = ?"); params.add(category); }
+        if (search != null && !search.isEmpty()) { sql.append(" AND name LIKE ?"); params.add("%" + search + "%"); }
+        if (status != null && !status.isEmpty() && !"all".equalsIgnoreCase(status)) { sql.append(" AND status = ?"); params.add(status); }
+        sql.append(" ORDER BY created_at DESC LIMIT ? OFFSET ?");
+        params.add(pageSize); params.add(offset);
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int idx = 1; for (Object p : params) { if (p instanceof String) ps.setString(idx++, (String)p); else if (p instanceof Integer) ps.setInt(idx++, (Integer)p);}            
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Products product = mapProductLite(rs);
+                products.add(product);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return products;
+    }
+    public int adminCountFilteredProducts(String search, String category, String status) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) AS total FROM Products WHERE deleted_at IS NULL");
+        List<Object> params = new ArrayList<>();
+        if (category != null && !category.isEmpty()) { sql.append(" AND category_id = ?"); params.add(category); }
+        if (search != null && !search.isEmpty()) { sql.append(" AND name LIKE ?"); params.add("%" + search + "%"); }
+        if (status != null && !status.isEmpty() && !"all".equalsIgnoreCase(status)) { sql.append(" AND status = ?"); params.add(status); }
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int idx = 1; for (Object p : params) { if (p instanceof String) ps.setString(idx++, (String)p); }
+            ResultSet rs = ps.executeQuery(); if (rs.next()) return rs.getInt("total");
+        } catch (Exception e) { e.printStackTrace(); }
+        return 0;
+    }
+
     private List<ProductImages> getProductImages(Connection conn, long productId) throws SQLException {
         List<ProductImages> images = new ArrayList<>();
         String sql = "SELECT * FROM product_images WHERE product_id = ?";

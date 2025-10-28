@@ -83,6 +83,9 @@
                                 <a href="<%= request.getContextPath() %>/admin/categories" class="active"> Quản lý danh mục </a>
                             </li>
                             <li>
+                                <a href="<%= request.getContextPath() %>/admin/products"> Quản lý sản phẩm </a>
+                            </li>
+                            <li>
                                 <a href="<%= request.getContextPath() %>/admin/users"> Quản lý người dùng </a>
                             </li>
                             <li>
