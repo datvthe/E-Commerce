@@ -1,6 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%> <%@ taglib prefix="c"
-uri="jakarta.tags.core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+uri="jakarta.tags.core" %> <%@ taglib prefix="fn"
+uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -150,6 +150,44 @@ uri="jakarta.tags.core" %>
         </div>
         <div class="col-lg-4 text-center text-lg-end">
           <div class="d-inline-flex align-items-center" style="height: 45px">
+            <!-- Notification Button -->
+            <c:choose>
+              <c:when test="${not empty sessionScope.user}">
+                <!-- User đã đăng nhập - cho phép truy cập -->
+                <a
+                  href="<%= request.getContextPath() %>/notifications"
+                  class="text-muted me-3 position-relative"
+                  title="Thông báo"
+                  style="text-decoration: none"
+                >
+                  <i class="bi bi-bell" style="font-size: 1.2rem"></i>
+                  <c:if
+                    test="${not empty unreadNotificationCount && unreadNotificationCount > 0}"
+                  >
+                    <span
+                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                      style="font-size: 0.65rem"
+                    >
+                      ${unreadNotificationCount > 99 ? '99+' :
+                      unreadNotificationCount}
+                      <span class="visually-hidden">thông báo mới</span>
+                    </span>
+                  </c:if>
+                </a>
+              </c:when>
+              <c:otherwise>
+                <!-- Guest user - yêu cầu đăng nhập -->
+                <a
+                  href="#"
+                  class="text-muted me-3 position-relative"
+                  title="Thông báo"
+                  style="text-decoration: none"
+                  onclick="showLoginPrompt(); return false;"
+                >
+                  <i class="bi bi-bell" style="font-size: 1.2rem"></i>
+                </a>
+              </c:otherwise>
+            </c:choose>
             <div class="dropdown">
               <a
                 href="#"
@@ -294,17 +332,23 @@ uri="jakarta.tags.core" %>
                   <c:forEach var="cat" items="${pinnedCategories}">
                     <li>
                       <div class="categories-bars-item">
-                        <a href="<%= request.getContextPath() %>/products?category=${cat.categoryId}">
+                        <a
+                          href="<%= request.getContextPath() %>/products?category=${cat.categoryId}"
+                        >
                           <i class="fas fa-folder-open me-2"></i>${cat.name}
                         </a>
-                        <c:if test="${cat.productCount > 0}"><span>(${cat.productCount})</span></c:if>
+                        <c:if test="${cat.productCount > 0}"
+                          ><span>(${cat.productCount})</span></c:if
+                        >
                       </div>
                     </li>
                   </c:forEach>
                   <c:forEach var="cat" items="${extraCategories}">
                     <li>
                       <div class="categories-bars-item">
-                        <a href="<%= request.getContextPath() %>/products?category=${cat.category_id}">
+                        <a
+                          href="<%= request.getContextPath() %>/products?category=${cat.category_id}"
+                        >
                           <i class="fas fa-folder-open me-2"></i>${cat.name}
                         </a>
                       </div>
@@ -354,20 +398,28 @@ uri="jakarta.tags.core" %>
                   >
                   <div class="dropdown-menu m-0">
                     <c:forEach var="cat" items="${pinnedCategories}">
-                      <a href="<%= request.getContextPath() %>/products?category=${cat.categoryId}"
-                         class="dropdown-item">
+                      <a
+                        href="<%= request.getContextPath() %>/products?category=${cat.categoryId}"
+                        class="dropdown-item"
+                      >
                         <i class="fas fa-folder-open me-2"></i>${cat.name}
                       </a>
                     </c:forEach>
                     <c:forEach var="cat" items="${extraCategories}">
-                      <a href="<%= request.getContextPath() %>/products?category=${cat.category_id}"
-                         class="dropdown-item">
+                      <a
+                        href="<%= request.getContextPath() %>/products?category=${cat.category_id}"
+                        class="dropdown-item"
+                      >
                         <i class="fas fa-folder-open me-2"></i>${cat.name}
                       </a>
                     </c:forEach>
                   </div>
                 </div>
-                <a href="<%= request.getContextPath() %>/blog" class="nav-item nav-link">Tin tức</a>
+                <a
+                  href="<%= request.getContextPath() %>/blog"
+                  class="nav-item nav-link"
+                  >Tin tức</a
+                >
                 <a href="#" class="nav-item nav-link">Chia sẻ</a>
                 <a
                   href="<%= request.getContextPath() %>/contact"
@@ -507,20 +559,42 @@ uri="jakarta.tags.core" %>
           <c:forEach var="cat" items="${pinnedCategories}" varStatus="s">
             <c:if test="${s.index < 6}">
               <div class="col-lg-2 col-md-4 col-6">
-                <a href="<%= request.getContextPath() %>/products?category=${cat.categoryId}" class="text-decoration-none">
-                  <div class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100">
+                <a
+                  href="<%= request.getContextPath() %>/products?category=${cat.categoryId}"
+                  class="text-decoration-none"
+                >
+                  <div
+                    class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
+                  >
                     <div class="category-icon mb-3">
                       <c:choose>
-                        <c:when test="${(s.index % 6) == 0}"><i class="fas fa-graduation-cap fa-3x text-primary"></i></c:when>
-                        <c:when test="${(s.index % 6) == 1}"><i class="fas fa-play-circle fa-3x text-danger"></i></c:when>
-                        <c:when test="${(s.index % 6) == 2}"><i class="fas fa-laptop-code fa-3x text-success"></i></c:when>
-                        <c:when test="${(s.index % 6) == 3}"><i class="fas fa-file-alt fa-3x text-warning"></i></c:when>
-                        <c:when test="${(s.index % 6) == 4}"><i class="fas fa-gift fa-3x text-primary"></i></c:when>
-                        <c:otherwise><i class="fas fa-gamepad fa-3x text-info"></i></c:otherwise>
+                        <c:when test="${(s.index % 6) == 0}"
+                          ><i
+                            class="fas fa-graduation-cap fa-3x text-primary"
+                          ></i
+                        ></c:when>
+                        <c:when test="${(s.index % 6) == 1}"
+                          ><i class="fas fa-play-circle fa-3x text-danger"></i
+                        ></c:when>
+                        <c:when test="${(s.index % 6) == 2}"
+                          ><i class="fas fa-laptop-code fa-3x text-success"></i
+                        ></c:when>
+                        <c:when test="${(s.index % 6) == 3}"
+                          ><i class="fas fa-file-alt fa-3x text-warning"></i
+                        ></c:when>
+                        <c:when test="${(s.index % 6) == 4}"
+                          ><i class="fas fa-gift fa-3x text-primary"></i
+                        ></c:when>
+                        <c:otherwise
+                          ><i class="fas fa-gamepad fa-3x text-info"></i
+                        ></c:otherwise>
                       </c:choose>
                     </div>
                     <h5 class="fw-bold text-dark">${cat.name}</h5>
-                    <p class="text-muted small">${empty cat.description ? 'Danh mục sản phẩm' : cat.description}</p>
+                    <p class="text-muted small">
+                      ${empty cat.description ? 'Danh mục sản phẩm' :
+                      cat.description}
+                    </p>
                     <span class="badge bg-primary">Mới</span>
                   </div>
                 </a>
@@ -534,20 +608,44 @@ uri="jakarta.tags.core" %>
             <c:forEach var="cat" items="${extraCategories}" varStatus="s">
               <c:if test="${s.index < 6}">
                 <div class="col-lg-2 col-md-4 col-6">
-                  <a href="<%= request.getContextPath() %>/products?category=${cat.category_id}" class="text-decoration-none">
-                    <div class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100">
+                  <a
+                    href="<%= request.getContextPath() %>/products?category=${cat.category_id}"
+                    class="text-decoration-none"
+                  >
+                    <div
+                      class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
+                    >
                       <div class="category-icon mb-3">
                         <c:choose>
-                          <c:when test="${(s.index % 6) == 0}"><i class="fas fa-folder-open fa-3x text-primary"></i></c:when>
-                          <c:when test="${(s.index % 6) == 1}"><i class="fas fa-tags fa-3x text-danger"></i></c:when>
-                          <c:when test="${(s.index % 6) == 2}"><i class="fas fa-layer-group fa-3x text-success"></i></c:when>
-                          <c:when test="${(s.index % 6) == 3}"><i class="fas fa-th-large fa-3x text-warning"></i></c:when>
-                          <c:when test="${(s.index % 6) == 4}"><i class="fas fa-star fa-3x text-info"></i></c:when>
-                          <c:otherwise><i class="fas fa-list fa-3x text-secondary"></i></c:otherwise>
+                          <c:when test="${(s.index % 6) == 0}"
+                            ><i
+                              class="fas fa-folder-open fa-3x text-primary"
+                            ></i
+                          ></c:when>
+                          <c:when test="${(s.index % 6) == 1}"
+                            ><i class="fas fa-tags fa-3x text-danger"></i
+                          ></c:when>
+                          <c:when test="${(s.index % 6) == 2}"
+                            ><i
+                              class="fas fa-layer-group fa-3x text-success"
+                            ></i
+                          ></c:when>
+                          <c:when test="${(s.index % 6) == 3}"
+                            ><i class="fas fa-th-large fa-3x text-warning"></i
+                          ></c:when>
+                          <c:when test="${(s.index % 6) == 4}"
+                            ><i class="fas fa-star fa-3x text-info"></i
+                          ></c:when>
+                          <c:otherwise
+                            ><i class="fas fa-list fa-3x text-secondary"></i
+                          ></c:otherwise>
                         </c:choose>
                       </div>
                       <h5 class="fw-bold text-dark">${cat.name}</h5>
-                      <p class="text-muted small">${empty cat.description ? 'Danh mục sản phẩm' : cat.description}</p>
+                      <p class="text-muted small">
+                        ${empty cat.description ? 'Danh mục sản phẩm' :
+                        cat.description}
+                      </p>
                       <span class="badge bg-secondary">Mới</span>
                     </div>
                   </a>
@@ -934,6 +1032,19 @@ uri="jakarta.tags.core" %>
         if (confirm("Bạn có chắc chắn muốn đăng xuất?")) {
           // Direct redirect to logout endpoint
           window.location.href = "<%= request.getContextPath() %>/logout";
+        }
+      }
+
+      // Show login prompt when guest user clicks notification button
+      function showLoginPrompt() {
+        // Create a custom styled alert/confirm dialog
+        const result = confirm(
+          "Vui lòng đăng nhập để xem thông báo.\n\nBạn có muốn đăng nhập ngay không?"
+        );
+
+        if (result) {
+          // Redirect to login page
+          window.location.href = "<%= request.getContextPath() %>/login";
         }
       }
 

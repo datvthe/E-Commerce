@@ -12,10 +12,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import dao.ProductCategoriesDAO;
 import dao.CategoryDAO;
 import model.product.ProductCategories;
 import model.Category;
+import model.user.Users;
+import service.NotificationService;
 
 @WebServlet(name = "HomeController", urlPatterns = {"/home"})
 public class CommonHomeController extends HttpServlet {
@@ -88,6 +91,15 @@ public class CommonHomeController extends HttpServlet {
             request.setAttribute("categories", combined);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        
+        // Get unread notification count if user is logged in
+        HttpSession session = request.getSession();
+        Users currentUser = (Users) session.getAttribute("user");
+        if (currentUser != null) {
+            NotificationService notificationService = new NotificationService();
+            int unreadCount = notificationService.getUnreadCount(currentUser.getUser_id());
+            request.setAttribute("unreadNotificationCount", unreadCount);
         }
         
         request.getRequestDispatcher("views/common/home.jsp").forward(request, response);
