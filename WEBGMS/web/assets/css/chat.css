@@ -232,7 +232,7 @@ body {
 
 .chat-messages {
     flex: 1;
-    padding: 20px;
+    padding: 10px 6px;
     overflow-y: auto;
     background: #f5f7fa;
     scroll-behavior: smooth;
@@ -243,8 +243,10 @@ body {
 
 .message {
     display: flex;
-    margin-bottom: 16px;
+    margin-bottom: 4px;
     animation: fadeIn 0.3s;
+    align-items: flex-end;
+    width: 100%;
 }
 
 @keyframes fadeIn {
@@ -252,25 +254,36 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
+.message-other {
+    justify-content: flex-start;
+    flex-direction: row;
+}
+
 .message-own {
+    justify-content: flex-end;
     flex-direction: row-reverse;
 }
 
 .message-avatar {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    margin: 0 8px;
+    flex-shrink: 0;
+    margin: 0 4px;
 }
 
 .message-content {
-    max-width: 60%;
+    max-width: 75%;
+    display: flex;
+    flex-direction: column;
 }
 
 .message-own .message-content {
-    display: flex;
-    flex-direction: column;
     align-items: flex-end;
+}
+
+.message-other .message-content {
+    align-items: flex-start;
 }
 
 .message-sender {
@@ -284,22 +297,26 @@ body {
     border-radius: 18px;
     word-wrap: break-word;
     display: inline-block;
+    font-size: 14px;
 }
 
 .message-other .message-bubble {
     background: #e4e6eb;
     color: #050505;
+    border-radius: 18px 18px 18px 4px;
 }
 
 .message-own .message-bubble {
-    background: #0084ff;
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
     color: white;
+    border-radius: 18px 18px 4px 18px;
 }
 
 .message-ai .message-bubble {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: 2px solid #667eea;
+    border-radius: 18px 18px 18px 4px;
 }
 
 .message-time {
@@ -312,6 +329,132 @@ body {
     font-size: 10px;
     opacity: 0.7;
     margin-left: 5px;
+}
+
+/* Deleted message style */
+.message-deleted {
+    opacity: 0.5;
+}
+
+.message-deleted .message-bubble {
+    background: #f0f0f0 !important;
+    color: #999 !important;
+    border: 1px dashed #ccc !important;
+    font-style: italic;
+}
+
+/* Image styles in messages - prevent rotation */
+.message-bubble img {
+    max-width: 180px !important;
+    max-height: 180px !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+    display: block !important;
+    margin-top: 8px !important;
+    border-radius: 12px;
+}
+
+.message-bubble img:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
+/* Message actions for chat page */
+.message-actions {
+    display: flex !important;
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
+    margin: 0 4px;
+    opacity: 1 !important;
+    transition: opacity 0.3s ease;
+    flex-shrink: 0;
+}
+
+.message:hover .message-actions {
+    opacity: 1 !important;
+}
+
+.btn-message-action {
+    background: rgba(0, 0, 0, 0.6);
+    border: none;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-message-action:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: translateY(-2px);
+}
+
+.btn-message-delete {
+    background: rgba(220, 53, 69, 0.8);
+}
+
+.btn-message-delete:hover {
+    background: #dc3545;
+}
+
+.btn-message-edit {
+    background: rgba(255, 107, 53, 0.8);
+}
+
+.btn-message-edit:hover {
+    background: #ff6b35;
+}
+
+/* Edit message input */
+.message-edit-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.message-edit-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 2px solid #ff6b35;
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+}
+
+.btn-save-edit,
+.btn-cancel-edit {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-save-edit {
+    background: #ff6b35;
+    color: white;
+}
+
+.btn-save-edit:hover {
+    background: #e55a2b;
+}
+
+.btn-cancel-edit {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.btn-cancel-edit:hover {
+    background: #d0d0d0;
 }
 
 .typing-indicator {

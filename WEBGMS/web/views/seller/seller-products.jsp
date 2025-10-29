@@ -8,6 +8,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Quản lý sản phẩm - Giicungco Seller</title>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
     <style>
         body {
@@ -33,17 +35,74 @@
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
         }
 
         h1 {
             color: #333;
-            font-size: 24px;
+            font-size: 28px;
             margin-bottom: 10px;
+            font-weight: 700;
         }
 
         .subtitle {
             color: #777;
             margin-bottom: 25px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card.orange {
+            background: linear-gradient(135deg, #ff6600 0%, #ff8c3a 100%);
+        }
+
+        .stat-card.green {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .stat-card.blue {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-card.red {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            opacity: 0.9;
+            font-weight: 500;
         }
 
         .add-btn {
@@ -66,23 +125,42 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
+            overflow: hidden;
+            border-radius: 10px;
         }
 
         th, td {
-            padding: 12px 14px;
+            padding: 14px 16px;
             border-bottom: 1px solid #f0f0f0;
             text-align: left;
             font-size: 14px;
         }
 
         th {
-            background-color: #fff3e6;
-            color: #ff6600;
+            background: linear-gradient(135deg, #ff6600 0%, #ff7b00 100%);
+            color: white;
             font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
         }
 
-        tr:hover {
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
             background-color: #fff9f3;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transform: scale(1.01);
+        }
+
+        td:first-child {
+            border-left: 3px solid transparent;
+        }
+
+        tbody tr:hover td:first-child {
+            border-left-color: #ff6600;
         }
 
         .status {
@@ -110,12 +188,18 @@
             font-size: 15px;
         }
 
+        .actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
         .actions button {
             border: none;
             background: none;
             cursor: pointer;
-            margin: 0 5px;
             font-size: 16px;
+            padding: 0;
         }
 
         .actions button.edit { color: #007bff; }
@@ -123,20 +207,35 @@
 
         /* Explicit action buttons */
         .actions .btn-action {
-            display: inline-block;
-            padding: 6px 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
             border: 1px solid #e6e6e6;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 13px;
             text-decoration: none;
-            color: #333;
-            background: #fff;
-            transition: background .15s, border-color .15s;
+            color: #fff;
+            background: #6c757d;
+            transition: all 0.2s ease;
+            font-weight: 500;
         }
-        .actions .btn-action:hover { background: #fafafa; border-color: #dcdcdc; }
-        .actions .btn-edit { color: #0d6efd; }
-        .actions .btn-view { color: #198754; }
-        .actions .btn-delete { color: #dc3545; }
+        .actions .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .actions .btn-edit {
+            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            border-color: #0d6efd;
+        }
+        .actions .btn-view {
+            background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+            border-color: #198754;
+        }
+        .actions .btn-delete {
+            background: linear-gradient(135deg, #dc3545 0%, #bb2d3b 100%);
+            border-color: #dc3545;
+        }
 
         .header-bar {
             display: flex;
@@ -156,10 +255,60 @@
 <!-- Main -->
 <div class="main">
     <div class="header-bar">
-        <h1>📦 Danh sách sản phẩm</h1>
-        <a href="${pageContext.request.contextPath}/seller/products/add" class="add-btn">➕ Thêm sản phẩm mới</a>
+        <h1><i class="bi bi-box-seam"></i> Quản lý sản phẩm</h1>
+        <a href="${pageContext.request.contextPath}/seller/products/add" class="add-btn">
+            <i class="bi bi-plus-circle"></i> Thêm sản phẩm mới
+        </a>
     </div>
-    <p class="subtitle">Xem và quản lý các sản phẩm bạn đã đăng bán.</p>
+    <p class="subtitle">Xem và quản lý các sản phẩm bạn đã đăng bán trên nền tảng Giicungco</p>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card orange">
+            <div class="stat-icon"><i class="bi bi-boxes"></i></div>
+            <div class="stat-value">${totalProducts}</div>
+            <div class="stat-label">Tổng sản phẩm</div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+            <div class="stat-value">
+                <c:set var="activeCount" value="0"/>
+                <c:forEach var="p" items="${products}">
+                    <c:if test="${p.status == 'active'}">
+                        <c:set var="activeCount" value="${activeCount + 1}"/>
+                    </c:if>
+                </c:forEach>
+                ${activeCount}
+            </div>
+            <div class="stat-label">Đang hoạt động</div>
+        </div>
+        <div class="stat-card blue">
+            <div class="stat-icon"><i class="bi bi-eye"></i></div>
+            <div class="stat-value">
+                <c:set var="inactiveCount" value="0"/>
+                <c:forEach var="p" items="${products}">
+                    <c:if test="${p.status == 'inactive'}">
+                        <c:set var="inactiveCount" value="${inactiveCount + 1}"/>
+                    </c:if>
+                </c:forEach>
+                ${inactiveCount}
+            </div>
+            <div class="stat-label">Tạm dừng</div>
+        </div>
+        <div class="stat-card red">
+            <div class="stat-icon"><i class="bi bi-file-earmark-text"></i></div>
+            <div class="stat-value">
+                <c:set var="draftCount" value="0"/>
+                <c:forEach var="p" items="${products}">
+                    <c:if test="${p.status == 'draft'}">
+                        <c:set var="draftCount" value="${draftCount + 1}"/>
+                    </c:if>
+                </c:forEach>
+                ${draftCount}
+            </div>
+            <div class="stat-label">Nháp</div>
+        </div>
+    </div>
 
     <div class="card">
         <!-- Thanh thông báo -->
@@ -175,24 +324,33 @@
         </c:if>
 
         <!-- Bộ lọc & tìm kiếm -->
-        <form method="get" action="${pageContext.request.contextPath}/seller/products" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;align-items:flex-end;">
+        <form method="get" action="${pageContext.request.contextPath}/seller/products" 
+              style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:flex-end;background:#f8f9fa;padding:20px;border-radius:10px;">
             <div style="flex:1;min-width:220px;">
-                <label>Từ khóa</label>
-                <input type="text" name="keyword" value="${keyword}" placeholder="Tên hoặc mô tả..."/>
+                <label style="display:block;margin-bottom:8px;font-weight:600;color:#333;font-size:13px;">
+                    <i class="bi bi-search"></i> Từ khóa
+                </label>
+                <input type="text" name="keyword" value="${keyword}" 
+                       placeholder="Tìm kiếm sản phẩm..."
+                       style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;"/>
             </div>
             <div style="width:180px;">
-                <label>Trạng thái</label>
-                <select name="status">
+                <label style="display:block;margin-bottom:8px;font-weight:600;color:#333;font-size:13px;">
+                    <i class="bi bi-toggle-on"></i> Trạng thái
+                </label>
+                <select name="status" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
                     <option value="">-- Tất cả --</option>
-                    <option value="active" <c:if test='${status == "active"}'>selected</c:if>>Active</option>
-                    <option value="inactive" <c:if test='${status == "inactive"}'>selected</c:if>>Inactive</option>
-                    <option value="draft" <c:if test='${status == "draft"}'>selected</c:if>>Draft</option>
-                    <option value="pending" <c:if test='${status == "pending"}'>selected</c:if>>Pending</option>
+                    <option value="active" <c:if test='${status == "active"}'>selected</c:if>>Đang bán</option>
+                    <option value="inactive" <c:if test='${status == "inactive"}'>selected</c:if>>Tạm dừng</option>
+                    <option value="draft" <c:if test='${status == "draft"}'>selected</c:if>>Nháp</option>
+                    <option value="pending" <c:if test='${status == "pending"}'>selected</c:if>>Chờ duyệt</option>
                 </select>
             </div>
             <div style="width:220px;">
-                <label>Danh mục</label>
-                <select name="category_id">
+                <label style="display:block;margin-bottom:8px;font-weight:600;color:#333;font-size:13px;">
+                    <i class="bi bi-tag"></i> Danh mục
+                </label>
+                <select name="category_id" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
                     <option value="0">-- Tất cả --</option>
                     <c:forEach var="c" items="${categories}">
                         <option value="${c.category_id}" <c:if test='${categoryId == c.category_id}'>selected</c:if>>${c.name}</option>
@@ -200,7 +358,9 @@
                 </select>
             </div>
             <div>
-                <button type="submit" class="add-btn" style="float:none;">🔎 Lọc</button>
+                <button type="submit" class="add-btn" style="float:none;display:flex;align-items:center;gap:6px;">
+                    <i class="bi bi-funnel"></i> Lọc
+                </button>
             </div>
         </form>
 
@@ -283,11 +443,21 @@
                             </td>
                             <td><fmt:formatDate value="${p.created_at}" pattern="dd/MM/yyyy"/></td>
                             <td class="actions">
-                                <a href="${pageContext.request.contextPath}/seller/products/view?id=${p.product_id}" class="btn-action btn-view" title="Xem">Xem</a>
-                                <a href="${pageContext.request.contextPath}/seller/products/edit?id=${p.product_id}" class="btn-action btn-edit" title="Chỉnh sửa">Sửa</a>
-                                <form action="${pageContext.request.contextPath}/seller/products/delete" method="post" style="display:inline;" onsubmit="return confirm('Bạn chắc chắn muốn xóa?');">
+                                <a href="${pageContext.request.contextPath}/seller/products/view?id=${p.product_id}" 
+                                   class="btn-action btn-view" title="Xem chi tiết">
+                                    <i class="bi bi-eye"></i> Xem
+                                </a>
+                                <a href="${pageContext.request.contextPath}/seller/products/edit?id=${p.product_id}" 
+                                   class="btn-action btn-edit" title="Chỉnh sửa">
+                                    <i class="bi bi-pencil"></i> Sửa
+                                </a>
+                                <form action="${pageContext.request.contextPath}/seller/products/delete" 
+                                      method="post" style="display:inline;margin:0;" 
+                                      onsubmit="return confirm('Bạn chắc chắn muốn xóa sản phẩm này?');">
                                     <input type="hidden" name="id" value="${p.product_id}">
-                                    <button type="submit" class="btn-action btn-delete" title="Xóa">Xóa</button>
+                                    <button type="submit" class="btn-action btn-delete" title="Xóa">
+                                        <i class="bi bi-trash"></i> Xóa
+                                    </button>
                                 </form>
                             </td>
                         </tr>

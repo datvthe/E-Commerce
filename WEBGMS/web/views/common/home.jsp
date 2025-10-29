@@ -1276,37 +1276,175 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
                         </div>
             </div>
                 `;
-      }
-
-      function viewMode(mode) {
-        const productGrid = document.getElementById("productGrid");
-        if (mode === "list") {
-          productGrid.className = "row g-4 list-view";
-        } else {
-          productGrid.className = "row g-4";
-        }
-      }
-
-      function viewProduct(productId) {
-        window.location.href =
-          "<%= request.getContextPath() %>/product/" + productId;
-      }
-
-      function loadMoreProducts() {
-        const loadMoreBtn = event.target;
-        loadMoreBtn.innerHTML =
-          '<i class="fas fa-spinner fa-spin me-2"></i> Đang tải...';
-
-        setTimeout(() => {
-          loadMoreBtn.innerHTML =
-            '<i class="fas fa-plus me-2"></i> Xem thêm sản phẩm';
-        }, 2000);
-      }
-
-      // Initialize page
-      document.addEventListener("DOMContentLoaded", function () {
-        console.log("Gicungco Marketplace - Buyer Homepage Loaded");
-      });
-    </script>
-  </body>
+            }
+            
+            function viewMode(mode) {
+                const productGrid = document.getElementById('productGrid');
+                if (mode === 'list') {
+                    productGrid.className = 'row g-4 list-view';
+                } else {
+                    productGrid.className = 'row g-4';
+                }
+            }
+            
+            function viewProduct(productId) {
+                window.location.href = '<%= request.getContextPath() %>/product/' + productId;
+            }
+            
+            function loadMoreProducts() {
+                const loadMoreBtn = event.target;
+                loadMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Đang tải...';
+                
+                setTimeout(() => {
+                    loadMoreBtn.innerHTML = '<i class="fas fa-plus me-2"></i> Xem thêm sản phẩm';
+                }, 2000);
+            }
+            
+            // Initialize wishlist functionality
+            function loadWishlistCount() {
+                <c:if test="${not empty sessionScope.user}">
+                    $.ajax({
+                        url: '<%= request.getContextPath() %>/api/wishlist/count',
+                        method: 'GET',
+                        success: function(response) {
+                            if (response.success) {
+                                const wishlistCountElement = document.getElementById('wishlistCount');
+                                if (wishlistCountElement) {
+                                    wishlistCountElement.textContent = response.count;
+                                    if (response.count > 0) {
+                                        wishlistCountElement.style.display = 'inline-block';
+                                    } else {
+                                        wishlistCountElement.style.display = 'none';
+                                    }
+                                }
+                            }
+                        },
+                        error: function() {
+                            console.log('Could not load wishlist count');
+                        }
+                    });
+                </c:if>
+            }
+            
+            // Add to wishlist function for product cards
+            function toggleWishlist(productId, element) {
+                <c:choose>
+                    <c:when test="${not empty sessionScope.user}">
+                        $.ajax({
+                            url: '<%= request.getContextPath() %>/wishlist',
+                            method: 'POST',
+                            data: {
+                                action: 'toggle',
+                                productId: productId
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    // Update heart icon
+                                    const heartIcon = element.querySelector('i');
+                                    if (response.message.includes('added')) {
+                                        heartIcon.className = 'fas fa-heart text-danger';
+                                        element.setAttribute('title', 'Remove from wishlist');
+                                        showToast('Added to wishlist!', 'success');
+                                    } else {
+                                        heartIcon.className = 'fas fa-heart';
+                                        element.setAttribute('title', 'Add to wishlist');
+                                        showToast('Removed from wishlist!', 'success');
+                                    }
+                                    // Update wishlist count
+                                    loadWishlistCount();
+                                } else {
+                                    showToast('Error: ' + response.message, 'error');
+                                }
+                            },
+                            error: function() {
+                                showToast('Failed to update wishlist. Please try again.', 'error');
+                            }
+                        });
+                    </c:when>
+                    <c:otherwise>
+                        showWarningModal('Login Required', 'Please login to use wishlist feature.');
+                        // Update modal button to redirect to login
+                        setTimeout(function() {
+                            const modal = document.getElementById('notificationModal');
+                            const footerButton = modal.querySelector('.modal-footer .btn');
+                            footerButton.onclick = function() {
+                                window.location.href = '<%= request.getContextPath() %>/login';
+                            };
+                            footerButton.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Login Now';
+                        }, 100);
+                    </c:otherwise>
+                </c:choose>
+            }
+            
+            // Initialize page
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('Gicungco Marketplace - Buyer Homepage Loaded');
+                
+                // Initialize tooltips
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+                
+                // Load wishlist count for logged-in users
+                loadWishlistCount();
+                
+                // Handle server-side messages - with duplicate prevention
+                const notificationShown = sessionStorage.getItem('notificationShown');
+                
+                <c:if test="${not empty sessionScope.message}">
+                    if (!notificationShown || notificationShown !== 'message_${sessionScope.message}') {
+                        showSuccessModal('Notice!', '${sessionScope.message}');
+                        sessionStorage.setItem('notificationShown', 'message_${sessionScope.message}');
+                    }
+                    <c:remove var="message" scope="session" />
+                </c:if>
+                
+                <c:if test="${not empty sessionScope.success}">
+                    if (!notificationShown || notificationShown !== 'success_${sessionScope.success}') {
+                        showSuccessModal('Success!', '${sessionScope.success}');
+                        sessionStorage.setItem('notificationShown', 'success_${sessionScope.success}');
+                    }
+                    <c:remove var="success" scope="session" />
+                </c:if>
+                
+                <c:if test="${not empty sessionScope.error}">
+                    if (!notificationShown || notificationShown !== 'error_${sessionScope.error}') {
+                        showErrorModal('Error!', '${sessionScope.error}');
+                        sessionStorage.setItem('notificationShown', 'error_${sessionScope.error}');
+                    }
+                    <c:remove var="error" scope="session" />
+                </c:if>
+                
+                // Clear the notification flag after modal is shown
+                setTimeout(() => {
+                    sessionStorage.removeItem('notificationShown');
+                }, 5000);
+                
+                // Chat widget initialized below
+            });
+        </script>
+        
+        <!-- Chat Widget -->
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/chat-widget.css?v=<%= System.currentTimeMillis() %>" />
+        <jsp:include page="../component/chat-widget.jsp" />
+        <script src="<%= request.getContextPath() %>/assets/js/chat-widget.js?v=<%= System.currentTimeMillis() %>"></script>
+        <script src="<%= request.getContextPath() %>/assets/js/aibot-widget.js?v=<%= System.currentTimeMillis() %>"></script>
+        <script src="<%= request.getContextPath() %>/assets/js/message-actions.js?v=<%= System.currentTimeMillis() %>"></script>
+        <script>
+            // Initialize chat widget after DOM is ready
+            document.addEventListener('DOMContentLoaded', function() {
+                try {
+                    const userId = ${sessionScope.user != null ? sessionScope.user.user_id : -1};
+                    const userRole = '${sessionScope.user != null ? sessionScope.user.default_role : "guest"}';
+                    if (typeof initChatWidget === 'function') {
+                        initChatWidget('<%= request.getContextPath() %>', userId, userRole);
+                        console.log('[Chat Widget] Initialized for home.jsp');
+                    }
+                } catch(e) {
+                    console.error('[Chat Widget] Init error:', e);
+                }
+            });
+        </script>
+    </body>
 </html>
