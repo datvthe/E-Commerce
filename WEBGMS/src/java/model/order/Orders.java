@@ -1,89 +1,131 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model.order;
 
 import model.user.Users;
+import model.product.Products;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+/**
+ * Orders Model - Digital Goods Orders
+ */
 public class Orders {
-
-    public enum OrderStatus { PENDING, PAID, SHIPPED, DELIVERED, CANCELLED, REFUNDED }
-
-    private int order_id;
-    private Users buyer_id;
-    private Users seller_id;
-    private String status;           // kept for compatibility; use getStatusEnum/setStatusEnum
-    private BigDecimal total_amount;
+    
+    // Order statuses
+    public enum OrderStatus { PENDING, PROCESSING, COMPLETED, FAILED, CANCELED }
+    public enum PaymentStatus { PENDING, PAID, FAILED, REFUNDED }
+    public enum QueueStatus { WAITING, PROCESSING, COMPLETED, FAILED }
+    
+    private Long orderId;
+    private String orderNumber;
+    private Long buyerId;           // user_id của người mua
+    private Long sellerId;          // user_id của người bán
+    private Long productId;
+    private Integer quantity;
+    private BigDecimal unitPrice;
+    private BigDecimal totalAmount;
     private String currency;
-    private String shipping_address;
-    private String shipping_method;
-    private String tracking_number;
-    private Timestamp created_at;
-    private Timestamp updated_at;
+    private String paymentMethod;
+    private String paymentStatus;
+    private String orderStatus;
+    private String deliveryStatus;
+    private String transactionId;
+    private String queueStatus;
+    private Timestamp processedAt;
+    private String shippingAddress;
+    private String shippingMethod;
+    private String trackingNumber;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
+    
+    // Joined data
+    private Users buyer;
+    private Users seller;
+    private Products product;
 
+    // Constructors
     public Orders() {
     }
 
-    public Orders(int order_id, Users buyer_id, Users seller_id, String status, BigDecimal total_amount, String currency, String shipping_address, String shipping_method, String tracking_number, Timestamp created_at, Timestamp updated_at) {
-        this.order_id = order_id;
-        this.buyer_id = buyer_id;
-        this.seller_id = seller_id;
-        this.status = status;
-        this.total_amount = total_amount;
-        this.currency = currency;
-        this.shipping_address = shipping_address;
-        this.shipping_method = shipping_method;
-        this.tracking_number = tracking_number;
-        this.created_at = created_at;
-        this.updated_at = updated_at;
+    public Orders(Long orderId, String orderNumber, Long buyerId, Long sellerId, 
+                  Long productId, Integer quantity, BigDecimal unitPrice, 
+                  BigDecimal totalAmount, String paymentMethod, String paymentStatus,
+                  String orderStatus) {
+        this.orderId = orderId;
+        this.orderNumber = orderNumber;
+        this.buyerId = buyerId;
+        this.sellerId = sellerId;
+        this.productId = productId;
+        this.quantity = quantity;
+        this.unitPrice = unitPrice;
+        this.totalAmount = totalAmount;
+        this.paymentMethod = paymentMethod;
+        this.paymentStatus = paymentStatus;
+        this.orderStatus = orderStatus;
     }
 
-    public int getOrder_id() {
-        return order_id;
+    // Getters and Setters
+    public Long getOrderId() {
+        return orderId;
     }
 
-    public void setOrder_id(int order_id) {
-        this.order_id = order_id;
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
     }
 
-    public Users getBuyer_id() {
-        return buyer_id;
+    public String getOrderNumber() {
+        return orderNumber;
     }
 
-    public void setBuyer_id(Users buyer_id) {
-        this.buyer_id = buyer_id;
+    public void setOrderNumber(String orderNumber) {
+        this.orderNumber = orderNumber;
     }
 
-    public Users getSeller_id() {
-        return seller_id;
+    public Long getBuyerId() {
+        return buyerId;
     }
 
-    public void setSeller_id(Users seller_id) {
-        this.seller_id = seller_id;
+    public void setBuyerId(Long buyerId) {
+        this.buyerId = buyerId;
     }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-
-    // Type-safe helpers
-    public OrderStatus getStatusEnum() {
-        if (status == null) return null;
-        return OrderStatus.valueOf(status.trim().toUpperCase());
+    public Long getSellerId() {
+        return sellerId;
     }
 
-    public void setStatusEnum(OrderStatus statusEnum) {
-        this.status = statusEnum == null ? null : statusEnum.name().toLowerCase();
+    public void setSellerId(Long sellerId) {
+        this.sellerId = sellerId;
     }
 
-    public BigDecimal getTotal_amount() {
-        return total_amount;
+    public Long getProductId() {
+        return productId;
     }
 
-    public void setTotal_amount(BigDecimal total_amount) {
-        this.total_amount = total_amount;
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public BigDecimal getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
     }
 
     public String getCurrency() {
@@ -94,92 +136,140 @@ public class Orders {
         this.currency = currency;
     }
 
-    public String getShipping_address() {
-        return shipping_address;
+    public String getPaymentMethod() {
+        return paymentMethod;
     }
 
-    public void setShipping_address(String shipping_address) {
-        this.shipping_address = shipping_address;
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
-    public String getShipping_method() {
-        return shipping_method;
+    public String getPaymentStatus() {
+        return paymentStatus;
     }
 
-    public void setShipping_method(String shipping_method) {
-        this.shipping_method = shipping_method;
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 
-    public String getTracking_number() {
-        return tracking_number;
+    public String getOrderStatus() {
+        return orderStatus;
     }
 
-    public void setTracking_number(String tracking_number) {
-        this.tracking_number = tracking_number;
+    public void setOrderStatus(String orderStatus) {
+        this.orderStatus = orderStatus;
     }
 
-    public Timestamp getCreated_at() {
-        return created_at;
+    public String getDeliveryStatus() {
+        return deliveryStatus;
     }
 
-    public void setCreated_at(Timestamp created_at) {
-        this.created_at = created_at;
+    public void setDeliveryStatus(String deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
     }
 
-    public Timestamp getUpdated_at() {
-        return updated_at;
+    public String getTransactionId() {
+        return transactionId;
     }
 
-    public void setUpdated_at(Timestamp updated_at) {
-        this.updated_at = updated_at;
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
     }
 
-    // Additional camelCase accessors
-    public int getOrderId() { return order_id; }
-    public void setOrderId(int orderId) { this.order_id = orderId; }
-    public Users getBuyer() { return buyer_id; }
-    public void setBuyer(Users buyer) { this.buyer_id = buyer; }
-    public Users getSeller() { return seller_id; }
-    public void setSeller(Users seller) { this.seller_id = seller; }
-    public BigDecimal getTotalAmount() { return total_amount; }
-    public void setTotalAmount(BigDecimal totalAmount) { this.total_amount = totalAmount; }
-    public String getShippingAddress() { return shipping_address; }
-    public void setShippingAddress(String shippingAddress) { this.shipping_address = shippingAddress; }
-    public String getShippingMethod() { return shipping_method; }
-    public void setShippingMethod(String shippingMethod) { this.shipping_method = shippingMethod; }
-    public String getTrackingNumber() { return tracking_number; }
-    public void setTrackingNumber(String trackingNumber) { this.tracking_number = trackingNumber; }
-    public Timestamp getCreatedAt() { return created_at; }
-    public void setCreatedAt(Timestamp createdAt) { this.created_at = createdAt; }
-    public Timestamp getUpdatedAt() { return updated_at; }
-    public void setUpdatedAt(Timestamp updatedAt) { this.updated_at = updatedAt; }
+    public String getQueueStatus() {
+        return queueStatus;
+    }
 
-    @Override
-    public int hashCode() { return Integer.hashCode(order_id); }
+    public void setQueueStatus(String queueStatus) {
+        this.queueStatus = queueStatus;
+    }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Orders other = (Orders) obj;
-        return this.order_id == other.order_id;
+    public Timestamp getProcessedAt() {
+        return processedAt;
+    }
+
+    public void setProcessedAt(Timestamp processedAt) {
+        this.processedAt = processedAt;
+    }
+
+    public String getShippingAddress() {
+        return shippingAddress;
+    }
+
+    public void setShippingAddress(String shippingAddress) {
+        this.shippingAddress = shippingAddress;
+    }
+
+    public String getShippingMethod() {
+        return shippingMethod;
+    }
+
+    public void setShippingMethod(String shippingMethod) {
+        this.shippingMethod = shippingMethod;
+    }
+
+    public String getTrackingNumber() {
+        return trackingNumber;
+    }
+
+    public void setTrackingNumber(String trackingNumber) {
+        this.trackingNumber = trackingNumber;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    // Joined objects
+    public Users getBuyer() {
+        return buyer;
+    }
+
+    public void setBuyer(Users buyer) {
+        this.buyer = buyer;
+    }
+
+    public Users getSeller() {
+        return seller;
+    }
+
+    public void setSeller(Users seller) {
+        this.seller = seller;
+    }
+
+    public Products getProduct() {
+        return product;
+    }
+
+    public void setProduct(Products product) {
+        this.product = product;
     }
 
     @Override
     public String toString() {
-        return "Orders{"
-                + "order_id=" + order_id
-                + ", buyer_id=" + (buyer_id == null ? null : buyer_id.getUser_id())
-                + ", seller_id=" + (seller_id == null ? null : seller_id.getUser_id())
-                + ", status=" + status
-                + ", total_amount=" + total_amount
-                + ", currency=" + currency
-                + ", shipping_address_length=" + (shipping_address == null ? 0 : shipping_address.length())
-                + ", shipping_method=" + shipping_method
-                + ", tracking_number=" + tracking_number
-                + ", created_at=" + created_at
-                + ", updated_at=" + updated_at
-                + '}';
+        return "Orders{" +
+                "orderId=" + orderId +
+                ", orderNumber='" + orderNumber + '\'' +
+                ", buyerId=" + buyerId +
+                ", sellerId=" + sellerId +
+                ", productId=" + productId +
+                ", quantity=" + quantity +
+                ", totalAmount=" + totalAmount +
+                ", paymentStatus='" + paymentStatus + '\'' +
+                ", orderStatus='" + orderStatus + '\'' +
+                ", queueStatus='" + queueStatus + '\'' +
+                '}';
     }
-
 }

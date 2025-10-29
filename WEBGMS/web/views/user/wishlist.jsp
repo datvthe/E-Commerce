@@ -354,6 +354,7 @@
                 <div class="wishlist-grid">
                     <c:forEach var="item" items="${wishlistItems}" varStatus="status">
                         <div class="wishlist-item fade-in" id="item-${item.productId.product_id}" 
+                             data-product-id="${item.productId.product_id}"
                              style="animation-delay: ${status.index * 0.1}s">
                             <!-- Remove Button -->
                             <button class="remove-btn" onclick="removeItem(${item.productId.product_id})" 
@@ -532,5 +533,15 @@
             });
         });
     </script>
+    
+    <!-- Wishlist Management JavaScript -->
+    <script>
+        // Set context path and user ID for wishlist.js
+        const contextPath = '<%= request.getContextPath() %>';
+        <c:if test="${not empty sessionScope.user}">
+        const currentUserId = ${sessionScope.user.user_id};
+        </c:if>
+    </script>
+    <script src="<%= request.getContextPath() %>/assets/js/wishlist.js?v=<%= System.currentTimeMillis() %>"></script>
 </body>
 </html>
