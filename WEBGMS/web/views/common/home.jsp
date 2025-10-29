@@ -371,9 +371,20 @@ uri="jakarta.tags.core" %>
                 <a href="#" class="nav-item nav-link">Chia sẻ</a>
                 <a
                   href="<%= request.getContextPath() %>/contact"
-                  class="nav-item nav-link me-2"
+                  class="nav-item nav-link"
                   >Hỗ trợ</a
                 >
+                <c:if test="${not empty sessionScope.user}">
+                <a
+                  href="<%= request.getContextPath() %>/wishlist"
+                  class="nav-item nav-link me-2 position-relative"
+                  title="Danh sách yêu thích"
+                  >
+                  <i class="fas fa-heart me-1"></i>Yêu thích
+                  <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" 
+                        id="wishlistCount" style="display: none; font-size: 0.7rem;">0</span>
+                </a>
+                </c:if>
                 <div class="nav-item dropdown d-block d-lg-none mb-3">
                   <a
                     href="#"
@@ -1313,6 +1324,18 @@ uri="jakarta.tags.core" %>
                 // Chat widget initialized below
             });
         </script>
+        
+        <!-- Wishlist JavaScript -->
+        <script>
+            // Set context path and user ID for wishlist.js
+            const contextPath = '<%= request.getContextPath() %>';
+            <c:if test="${not empty sessionScope.user}">
+            const currentUserId = ${sessionScope.user.user_id};
+            // Store in sessionStorage for wishlist.js
+            sessionStorage.setItem('userId', ${sessionScope.user.user_id});
+            </c:if>
+        </script>
+        <script src="<%= request.getContextPath() %>/assets/js/wishlist.js?v=<%= System.currentTimeMillis() %>"></script>
         
         <!-- Chat Widget -->
         <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/chat-widget.css?v=<%= System.currentTimeMillis() %>" />

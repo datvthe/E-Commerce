@@ -451,18 +451,23 @@
                                     <div class="action-buttons mb-4">
                                         <!-- Physical Goods Buttons -->
                                         <div class="row g-2">
-                                            <div class="col-md-12">
+                                            <div class="col-md-9">
                                                 <button class="btn btn-primary w-100 py-3" onclick="buyNow()">
                                                     <i class="fas fa-bolt me-2"></i>Mua ngay
                                                 </button>
                                             </div>
+                                            <div class="col-md-3">
+                                                <c:if test="${not empty sessionScope.user}">
+                                                    <button class="btn btn-outline-danger w-100 py-3 wishlist-btn" 
+                                                            data-product-id="${product.product_id}"
+                                                            onclick="toggleWishlist(${product.product_id}, this)"
+                                                            title="Thêm vào yêu thích">
+                                                        <i class="far fa-heart fa-lg"></i>
+                                                    </button>
+                                                </c:if>
+                                            </div>
                                         </div>
                                         <div class="row g-2 mt-2">
-                                            <div class="col-md-6">
-                                                <button class="btn btn-outline-danger w-100 py-2" onclick="toggleWishlist()" id="wishlistBtn">
-                                                    <i class="fas fa-heart me-2"></i><span id="wishlistText">Thêm vào yêu thích</span>
-                                                </button>
-                                            </div>
                                             <div class="col-md-6">
                                                 <button class="btn btn-outline-info w-100 py-2" onclick="shareProduct()">
                                                     <i class="fas fa-share-alt me-2"></i>Chia sẻ
@@ -1063,16 +1068,21 @@
                 if (value > maxQuantity) this.value = maxQuantity;
             });
 
-            // Buy Now function
+            // Buy Now function - Instant checkout for digital goods
             function buyNow() {
-                const quantity = document.getElementById('quantity').value;
+                const quantity = document.getElementById('quantity').value || 1;
                 if (quantity > maxQuantity) {
                     alert('Số lượng vượt quá tồn kho!');
                     return;
                 }
                 
-                // Redirect to checkout with product and quantity
-                window.location.href = '<%= request.getContextPath() %>/checkout?product=' + productId + '&quantity=' + quantity;
+                if (quantity <= 0) {
+                    alert('Vui lòng chọn số lượng!');
+                    return;
+                }
+                
+                // Redirect to instant checkout (digital goods)
+                window.location.href = '<%= request.getContextPath() %>/checkout/instant?productId=' + productId + '&quantity=' + quantity;
             }
 
             // Buy Digital Goods function
@@ -1308,5 +1318,17 @@
                 isInWishlist = false;
             });
         </script>
+        
+        <!-- Wishlist JavaScript -->
+        <script>
+            // Set context path and user ID for wishlist.js
+            const contextPath = '<%= request.getContextPath() %>';
+            <c:if test="${not empty sessionScope.user}">
+            const currentUserId = ${sessionScope.user.user_id};
+            // Store in sessionStorage for wishlist.js
+            sessionStorage.setItem('userId', ${sessionScope.user.user_id});
+            </c:if>
+        </script>
+        <script src="<%= request.getContextPath() %>/assets/js/wishlist.js?v=<%= System.currentTimeMillis() %>"></script>
     </body>
 </html>
