@@ -344,6 +344,23 @@
                                                 <c:if test="${product.total_reviews > 10}">
                                                     <span class="product-badge">🔥 Bán chạy</span>
                                                 </c:if>
+                                                
+                                                <!-- Wishlist Button -->
+                                                <c:if test="${not empty sessionScope.user}">
+                                                    <button class="wishlist-btn" 
+                                                            data-product-id="${product.product_id}"
+                                                            onclick="event.preventDefault(); toggleWishlist(${product.product_id}, this)"
+                                                            title="Thêm vào yêu thích"
+                                                            style="position: absolute; top: 10px; left: 10px; 
+                                                                   background: white; border: none; 
+                                                                   width: 40px; height: 40px; 
+                                                                   border-radius: 50%; 
+                                                                   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                                                                   cursor: pointer; font-size: 18px;
+                                                                   transition: all 0.3s ease;">
+                                                        <i class="far fa-heart"></i>
+                                                    </button>
+                                                </c:if>
                                             </div>
                                         </a>
 
@@ -423,6 +440,18 @@
             </div>
         </div>
 
+        <!-- Wishlist JavaScript -->
+        <script>
+            // Set context path and user ID for wishlist.js
+            const contextPath = '<%= request.getContextPath() %>';
+            <c:if test="${not empty sessionScope.user}">
+            const currentUserId = ${sessionScope.user.user_id};
+            // Store in sessionStorage for wishlist.js
+            sessionStorage.setItem('userId', ${sessionScope.user.user_id});
+            </c:if>
+        </script>
+        <script src="<%= request.getContextPath() %>/assets/js/wishlist.js?v=<%= System.currentTimeMillis() %>"></script>
+        
         <script>
             function clearFilters() {
                 window.location.href = '<%= request.getContextPath() %>/products';
