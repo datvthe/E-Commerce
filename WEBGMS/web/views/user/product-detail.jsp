@@ -335,9 +335,9 @@
                                     <div class="product-details mb-4">
                                         <div class="row">
                                             <div class="col-6">
-                                                <p class="mb-2"><strong>Danh mục:</strong> Điện thoại & Máy tính bảng</p>
+                                                <p class="mb-2"><strong>Danh mục:</strong> ${not empty product.category_id ? product.category_id.name : 'Chưa phân loại'}</p>
                                                 <p class="mb-2"><strong>Mã sản phẩm:</strong> IP15PM256</p>
-                                                <p class="mb-2"><strong>Loại:</strong> <span class="badge bg-info">Hàng vật lý</span></p>
+                                                <p class="mb-2"><strong>Loại:</strong> <span class="badge bg-info">Sản phẩm số</span></p>
                                             </div>
                                             <div class="col-6">
                                                 <p class="mb-2"><strong>Tình trạng:</strong> 
@@ -507,43 +507,15 @@
                                         <div class="row">
                                             <div class="col-lg-8">
                                                 <h5 class="mb-3">Mô tả chi tiết</h5>
-                                <div class="product-description">
-                                                    <p class="lead">iPhone 15 Pro Max 256GB với chip A17 Pro mạnh mẽ, camera 48MP và thiết kế titan cao cấp. Sản phẩm mới nhất từ Apple với nhiều tính năng đột phá.</p>
-                                                    
-                                                    <!-- Product Specifications -->
-                                                    <div class="specifications mt-4">
-                                                        <h6 class="mb-3">Thông tin chi tiết</h6>
-                                                        <div class="table-responsive">
-                                                            <table class="table table-striped">
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td><strong>Thương hiệu</strong></td>
-                                                                        <td>Apple</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Model</strong></td>
-                                                                        <td>iPhone 15 Pro Max</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Màu sắc</strong></td>
-                                                                        <td>Titanium Natural</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Kích thước</strong></td>
-                                                                        <td>159.9 x 76.7 x 8.25 mm</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Trọng lượng</strong></td>
-                                                                        <td>221g</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Bảo hành</strong></td>
-                                                                        <td>12 tháng</td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
+                                                <div class="product-description">
+                                                    <c:choose>
+                                                        <c:when test="${not empty product.description}">
+                                                            <p class="lead">${product.description}</p>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <p class="text-muted">Chưa có mô tả cho sản phẩm này.</p>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </div>
                                             </div>
                                             <div class="col-lg-4">
@@ -788,38 +760,39 @@
                                 Xem tất cả <i class="fas fa-arrow-right ms-1"></i>
                             </a>
                                             </div>
-                        <p class="text-muted mb-4">Dựa trên sở thích và lịch sử mua hàng của bạn, chúng tôi gợi ý những sản phẩm phù hợp</p>
+                        <p class="text-muted mb-4">Khám phá các sản phẩm số chất lượng cao với giá cả hợp lý</p>
                         
                         <div class="row g-4">
-                            <!-- Similar Product 1 -->
+                            <!-- Digital Product 1 -->
                             <div class="col-md-6 col-lg-3">
                                 <div class="product-card h-100">
                                     <div class="position-relative">
-                                        <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-2.png" class="card-img-top" alt="MacBook Pro">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/ChatGPT_logo.svg/512px-ChatGPT_logo.svg.png" 
+                                             class="card-img-top" alt="ChatGPT Plus" style="object-fit: contain; padding: 2rem; background: #fff;">
                                         <div class="position-absolute top-0 end-0 p-2">
                                             <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(2)">
                                                 <i class="fas fa-heart"></i>
                                             </button>
                                         </div>
                                         <div class="position-absolute top-0 start-0 p-2">
-                                            <span class="badge bg-success">Mới</span>
+                                            <span class="badge bg-success">Hot</span>
                                     </div>
                                 </div>
                                     <div class="card-body d-flex flex-column">
-                                        <h6 class="card-title">MacBook Pro M3 14 inch</h6>
+                                        <h6 class="card-title">Tài khoản ChatGPT Plus 1 tháng</h6>
                                         <div class="d-flex align-items-center mb-2">
                                             <div class="text-warning me-2">
                                                 <i class="fas fa-star"></i>
                                                 <i class="fas fa-star"></i>
                                                 <i class="fas fa-star"></i>
                                                 <i class="fas fa-star"></i>
-                                                <i class="far fa-star"></i>
+                                                <i class="fas fa-star"></i>
                         </div>
-                                            <small class="text-muted">(89)</small>
+                                            <small class="text-muted">(523)</small>
                     </div>
                                         <div class="d-flex align-items-center justify-content-between mb-3">
                                             <div>
-                                                <span class="h5 text-primary mb-0">45,000,000₫</span>
+                                                <span class="h5 text-primary mb-0">450,000₫</span>
                                             </div>
                                         </div>
                                         <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(2)">
@@ -829,22 +802,23 @@
                                 </div>
                             </div>
                             
-                            <!-- Similar Product 2 -->
+                            <!-- Digital Product 2 -->
                             <div class="col-md-6 col-lg-3">
                                 <div class="product-card h-100">
                                     <div class="position-relative">
-                                        <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-3.png" class="card-img-top" alt="Samsung Galaxy">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/512px-Netflix_2015_logo.svg.png" 
+                                             class="card-img-top" alt="Netflix Premium" style="object-fit: contain; padding: 2rem; background: #000;">
                                         <div class="position-absolute top-0 end-0 p-2">
                                             <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(3)">
                                                 <i class="fas fa-heart"></i>
                                             </button>
                                         </div>
                                         <div class="position-absolute top-0 start-0 p-2">
-                                            <span class="badge bg-danger">-20%</span>
+                                            <span class="badge bg-danger">Giảm giá</span>
                                         </div>
                                     </div>
                                     <div class="card-body d-flex flex-column">
-                                        <h6 class="card-title">Samsung Galaxy S24 Ultra</h6>
+                                        <h6 class="card-title">Tài khoản Netflix Premium 1 tháng</h6>
                                         <div class="d-flex align-items-center mb-2">
                                             <div class="text-warning me-2">
                                                 <i class="fas fa-star"></i>
@@ -853,12 +827,12 @@
                                                 <i class="fas fa-star"></i>
                                                 <i class="fas fa-star"></i>
                                             </div>
-                                            <small class="text-muted">(156)</small>
+                                            <small class="text-muted">(892)</small>
                                         </div>
                                         <div class="d-flex align-items-center justify-content-between mb-3">
                                             <div>
-                                                <span class="h5 text-primary mb-0">32,000,000₫</span>
-                                                <small class="text-muted d-block"><del>40,000,000₫</del></small>
+                                                <span class="h5 text-primary mb-0">180,000₫</span>
+                                                <small class="text-muted d-block"><del>260,000₫</del></small>
                                             </div>
                                         </div>
                                         <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(3)">
@@ -868,32 +842,36 @@
                                 </div>
                             </div>
                             
-                            <!-- Similar Product 3 -->
+                            <!-- Digital Product 3 -->
                             <div class="col-md-6 col-lg-3">
                                 <div class="product-card h-100">
                                     <div class="position-relative">
-                                        <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-4.png" class="card-img-top" alt="AirPods Pro">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/512px-Spotify_logo_without_text.svg.png" 
+                                             class="card-img-top" alt="Spotify Premium" style="object-fit: contain; padding: 2rem; background: #1DB954;">
                                         <div class="position-absolute top-0 end-0 p-2">
                                             <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(4)">
                                                 <i class="fas fa-heart"></i>
                                             </button>
                                         </div>
+                                        <div class="position-absolute top-0 start-0 p-2">
+                                            <span class="badge bg-success">Bán chạy</span>
+                                        </div>
                                     </div>
                                     <div class="card-body d-flex flex-column">
-                                        <h6 class="card-title">AirPods Pro 2nd Gen</h6>
+                                        <h6 class="card-title">Tài khoản Spotify Premium 1 tháng</h6>
                                         <div class="d-flex align-items-center mb-2">
                                             <div class="text-warning me-2">
                                                 <i class="fas fa-star"></i>
                                                 <i class="fas fa-star"></i>
                                                 <i class="fas fa-star"></i>
                                                 <i class="fas fa-star"></i>
-                                                <i class="far fa-star"></i>
+                                                <i class="fas fa-star"></i>
                                             </div>
-                                            <small class="text-muted">(203)</small>
+                                            <small class="text-muted">(1,245)</small>
                                         </div>
                                         <div class="d-flex align-items-center justify-content-between mb-3">
                                             <div>
-                                                <span class="h5 text-primary mb-0">6,500,000₫</span>
+                                                <span class="h5 text-primary mb-0">120,000₫</span>
                                             </div>
                                         </div>
                                         <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(4)">
@@ -903,22 +881,24 @@
                                 </div>
                             </div>
                             
-                            <!-- Similar Product 4 -->
+                            <!-- Digital Product 4 -->
                             <div class="col-md-6 col-lg-3">
                                 <div class="product-card h-100">
                                     <div class="position-relative">
-                                        <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-5.png" class="card-img-top" alt="iPad Air">
+                                        <img src="https://www.quancongnghe.com.vn/wp-content/uploads/2023/07/tai-canva-0.jpg" 
+                                             class="card-img-top" alt="Canva Pro" style="object-fit: contain; padding: 2rem; background: linear-gradient(135deg, #00C4CC 0%, #7C5CFF 100%);"
+                                             onerror="this.src='<%= request.getContextPath() %>/views/assets/electro/img/product-10.png'; this.onerror=null;">
                                         <div class="position-absolute top-0 end-0 p-2">
                                             <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(5)">
                                                 <i class="fas fa-heart"></i>
                                             </button>
                                         </div>
                                         <div class="position-absolute top-0 start-0 p-2">
-                                            <span class="badge bg-info">Hot</span>
+                                            <span class="badge bg-info">Mới</span>
                                         </div>
                                     </div>
                                     <div class="card-body d-flex flex-column">
-                                        <h6 class="card-title">iPad Air 5th Gen</h6>
+                                        <h6 class="card-title">Tài khoản Canva Pro 1 tháng</h6>
                                         <div class="d-flex align-items-center mb-2">
                                             <div class="text-warning me-2">
                                                 <i class="fas fa-star"></i>
@@ -927,11 +907,11 @@
                                                 <i class="fas fa-star"></i>
                                                 <i class="fas fa-star"></i>
                                             </div>
-                                            <small class="text-muted">(127)</small>
+                                            <small class="text-muted">(687)</small>
                                         </div>
                                         <div class="d-flex align-items-center justify-content-between mb-3">
                                             <div>
-                                                <span class="h5 text-primary mb-0">18,500,000₫</span>
+                                                <span class="h5 text-primary mb-0">280,000₫</span>
                                             </div>
                                         </div>
                                         <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(5)">

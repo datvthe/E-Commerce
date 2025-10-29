@@ -325,18 +325,7 @@
                             <c:forEach var="product" items="${products}">
                                 <div class="col-sm-6 col-md-4 col-lg-3">
                                     <div class="product-card">
-
-                                        <a href="<%= request.getContextPath() %>/product/${product.slug}">
-                                            <c:choose>
-                                                <c:when test="${not empty product.productImages}">
-                                                    <img src="${product.productImages[0].url}" alt="${product.name}" class="product-image">
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <img src="${pageContext.request.contextPath}/views/assets/user/img/product-1.png" alt="${product.name}" class="product-image">
-                                                </c:otherwise>
-                                            </c:choose>
-
-                                        <!-- ✅ Find the primary image or fallback -->
+                                        <!-- Find the primary image or fallback -->
                                         <c:set var="primaryImage" value="" />
                                         <c:forEach var="img" items="${product.productImages}">
                                             <c:if test="${img.is_primary}">
@@ -344,7 +333,7 @@
                                             </c:if>
                                         </c:forEach>
 
-                                        <!-- ✅ If no primary found, use default -->
+                                        <!-- If no primary found, use default -->
                                         <c:if test="${empty primaryImage}">
                                             <c:set var="primaryImage" value='${pageContext.request.contextPath}/views/assets/user/img/product-1.png' />
                                         </c:if>
@@ -356,7 +345,6 @@
                                                     <span class="product-badge">🔥 Bán chạy</span>
                                                 </c:if>
                                             </div>
-
                                         </a>
 
                                         <div class="product-card-body">
