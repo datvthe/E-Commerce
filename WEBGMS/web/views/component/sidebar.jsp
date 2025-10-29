@@ -1,4 +1,6 @@
 
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -31,6 +33,15 @@
                 </a>
             </div>
             <nav class="sidebar-nav">
+                <c:set var="ctx" value="${pageContext.request.contextPath}" />
+                <c:set var="uri" value="${pageContext.request.requestURI}" />
+                <c:set var="catPath" value="${ctx}/admin/categories" />
+                <c:set var="prodPath" value="${ctx}/admin/products" />
+                <c:set var="userPath" value="${ctx}/admin/users" />
+                <c:set var="orderPath" value="${ctx}/admin/orders" />
+                <c:set var="cmsPagePath" value="${ctx}/admin/cms/pages" />
+                <c:set var="cmsPostPath" value="${ctx}/admin/cms/posts" />
+                <c:set var="cmsReviewPath" value="${ctx}/admin/cms/reviews" />
                 <ul>
                     <li class="nav-item nav-item-has-children">
                         <a
@@ -80,25 +91,25 @@
                         </a>
                         <ul id="ddmenu_2" class="collapse show dropdown-nav">
                             <li>
-                                <a href="<%= request.getContextPath() %>/admin/categories" class="active"> Quản lý danh mục </a>
+                                <a href="${catPath}" class="${fn:startsWith(uri, catPath) ? 'active' : ''}"> Quản lý danh mục </a>
                             </li>
                             <li>
-                                <a href="<%= request.getContextPath() %>/admin/products"> Quản lý sản phẩm </a>
+                                <a href="${prodPath}" class="${fn:startsWith(uri, prodPath) ? 'active' : ''}"> Quản lý sản phẩm </a>
                             </li>
                             <li>
-                                <a href="<%= request.getContextPath() %>/admin/users"> Quản lý người dùng </a>
+                                <a href="${userPath}" class="${fn:startsWith(uri, userPath) ? 'active' : ''}"> Quản lý người dùng </a>
                             </li>
                             <li>
-                                <a href="<%= request.getContextPath() %>/admin/orders"> Quản lý đơn hàng </a>
+                                <a href="${orderPath}" class="${fn:startsWith(uri, orderPath) ? 'active' : ''}"> Quản lý đơn hàng </a>
                             </li>
                             <li>
-                                <a href="<%= request.getContextPath() %>/admin/cms/pages"> Quản lý trang tĩnh </a>
+                                <a href="${cmsPagePath}" class="${fn:startsWith(uri, cmsPagePath) ? 'active' : ''}"> Quản lý trang tĩnh </a>
                             </li>
                             <li>
-                                <a href="<%= request.getContextPath() %>/admin/cms/posts"> Quản lý bài viết </a>
+                                <a href="${cmsPostPath}" class="${fn:startsWith(uri, cmsPostPath) ? 'active' : ''}"> Quản lý bài viết </a>
                             </li>
                             <li>
-                                <a href="<%= request.getContextPath() %>/admin/cms/reviews"> Duyệt đánh giá </a>
+                                <a href="${cmsReviewPath}" class="${fn:startsWith(uri, cmsReviewPath) ? 'active' : ''}"> Duyệt đánh giá </a>
                             </li>
                         </ul>
                     </li>

@@ -29,6 +29,10 @@
         </div>
 
         <div class="card-style mb-30">
+          <div class="d-flex justify-content-between align-items-center mb-20">
+            <h6 class="mb-0">Danh sách sản phẩm (${totalProducts})</h6>
+            <a href="<%= request.getContextPath() %>/admin/products/create" class="main-btn primary-btn btn-hover"><i class="lni lni-plus"></i> Thêm sản phẩm</a>
+          </div>
           <form method="get" action="<%= request.getContextPath() %>/admin/products" class="mb-20">
             <div class="row g-3">
               <div class="col-md-4"><input type="text" name="keyword" value="${keyword}" class="form-control" placeholder="Tìm theo tên..."/></div>

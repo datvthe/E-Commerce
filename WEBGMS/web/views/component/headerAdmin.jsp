@@ -5,6 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -19,13 +20,24 @@
                         <div class="col-lg-5 col-md-5 col-6">
                             <div class="header-left d-flex align-items-center">
                                 <div class="menu-toggle-btn mr-15">
-                                    <button id="menu-toggle" class="main-btn primary-btn btn-hover">
-<i class="lni lni-chevron-left me-2"></i> Danh mục
-                                    </button>
+                                    <c:set var="backUrl" value="${param.headerBackUrl}" />
+                                    <c:set var="backLabel" value="${empty param.headerBackLabel ? 'Quay lại' : param.headerBackLabel}" />
+                                    <c:choose>
+                                        <c:when test="${not empty backUrl}">
+                                            <a href="${backUrl}" class="main-btn primary-btn btn-hover">
+                                                <i class="lni lni-chevron-left me-2"></i> ${backLabel}
+                                            </a>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <button id="menu-toggle" class="main-btn primary-btn btn-hover">
+                                                <i class="lni lni-chevron-left me-2"></i> Menu
+                                            </button>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                                 <div class="header-search d-none d-md-flex">
                                     <form action="#">
-<input type="text" placeholder="Tìm kiếm..." />
+                                        <input type="text" placeholder="Tìm kiếm..." />
                                         <button><i class="lni lni-search-alt"></i></button>
                                     </form>
                                 </div>
@@ -176,24 +188,24 @@
                                         </li>
                                         <li class="divider"></li>
                                         <li>
-                                            <a href="#0">
-<i class="lni lni-user"></i> Xem hồ sơ
+                                            <a href="<%= request.getContextPath() %>/profile">
+                                                <i class="lni lni-user"></i> Xem hồ sơ
                                             </a>
                                         </li>
                                         <li>
                                             <a href="#0">
-<i class="lni lni-alarm"></i> Thông báo
+                                                <i class="lni lni-alarm"></i> Thông báo
                                             </a>
                                         </li>
                                         <li>
-<a href="#0"> <i class="lni lni-inbox"></i> Tin nhắn </a>
+                                            <a href="#0"> <i class="lni lni-inbox"></i> Tin nhắn </a>
                                         </li>
                                         <li>
-<a href="#0"> <i class="lni lni-cog"></i> Cài đặt </a>
+                                            <a href="#0"> <i class="lni lni-cog"></i> Cài đặt </a>
                                         </li>
                                         <li class="divider"></li>
                                         <li>
-<a href="#0"> <i class="lni lni-exit"></i> Đăng xuất </a>
+                                            <a href="<%= request.getContextPath() %>/logout" onclick="return confirm('Bạn chắc chắn muốn đăng xuất?')"> <i class="lni lni-exit"></i> Đăng xuất </a>
                                         </li>
                                     </ul>
                                 </div>

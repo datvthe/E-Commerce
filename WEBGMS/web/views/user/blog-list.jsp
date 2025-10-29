@@ -3,9 +3,8 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
+  <%@ include file="/views/component/head.jspf" %>
   <title>Tin tức & Blog</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
   <jsp:include page="/views/component/header.jsp" />
@@ -42,5 +41,15 @@
       </c:if>
     </div>
   </div>
+
+  <!-- Scripts (match homepage so header components work) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="<%= request.getContextPath() %>/views/assets/electro/lib/wow/wow.min.js"></script>
+  <script src="<%= request.getContextPath() %>/views/assets/electro/lib/easing/easing.min.js"></script>
+  <script src="<%= request.getContextPath() %>/views/assets/electro/lib/waypoints/waypoints.min.js"></script>
+  <script src="<%= request.getContextPath() %>/views/assets/electro/lib/counterup/counterup.min.js"></script>
+  <script src="<%= request.getContextPath() %>/views/assets/electro/lib/owlcarousel/owl.carousel.min.js"></script>
+  <script src="<%= request.getContextPath() %>/views/assets/electro/js/main.js"></script>
 </body>
 </html>

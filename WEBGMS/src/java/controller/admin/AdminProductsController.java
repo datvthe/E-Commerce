@@ -17,7 +17,7 @@ import model.product.ProductImages;
 import model.product.Products;
 import model.user.Users;
 
-@WebServlet(name = "AdminProductsController", urlPatterns = {"/admin/products", "/admin/products/edit", "/admin/products/update", "/admin/products/delete", "/admin/products/change-status"})
+@WebServlet(name = "AdminProductsController", urlPatterns = {"/admin/products", "/admin/products/create", "/admin/products/edit", "/admin/products/update", "/admin/products/delete", "/admin/products/change-status"})
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 1, maxFileSize = 1024 * 1024 * 10, maxRequestSize = 1024 * 1024 * 15)
 public class AdminProductsController extends HttpServlet {
 
@@ -46,6 +46,13 @@ public class AdminProductsController extends HttpServlet {
             request.setAttribute("status", status);
             request.setAttribute("categoryId", category);
             request.getRequestDispatcher("/views/admin/admin-products.jsp").forward(request, response);
+            return;
+        }
+        if ("/admin/products/create".equals(path)) {
+            ProductCategoriesDAO cateDAO = new ProductCategoriesDAO();
+            List<ProductCategories> categories = cateDAO.getAllCategories();
+            request.setAttribute("categories", categories);
+            request.getRequestDispatcher("/views/admin/admin-product-create.jsp").forward(request, response);
             return;
         }
         if ("/admin/products/edit".equals(path)) {
@@ -100,6 +107,61 @@ public class AdminProductsController extends HttpServlet {
                 }
                 boolean ok = productDAO.updateProduct(existing);
                 response.sendRedirect(request.getContextPath()+"/admin/products"+(ok?"?success=update":"?error=1"));
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.sendRedirect(request.getContextPath()+"/admin/products?error=1");
+                return;
+            }
+        }
+        if ("/admin/products/create".equals(path)) {
+            try {
+                String name = request.getParameter("name");
+                String description = request.getParameter("description");
+                BigDecimal price = new BigDecimal(request.getParameter("price"));
+                int quantity = Integer.parseInt(request.getParameter("quantity"));
+                int categoryId = Integer.parseInt(request.getParameter("category_id"));
+                String status = request.getParameter("status");
+                Part imagePart = request.getPart("image");
+
+                Users current = (Users) request.getSession().getAttribute("user");
+                if (current == null) { response.sendRedirect(request.getContextPath()+"/login"); return; }
+
+                Products p = new Products();
+                p.setSeller_id(current);
+                p.setName(name);
+                p.setDescription(description);
+                p.setPrice(price);
+                p.setQuantity(quantity);
+                p.setStatus(status);
+                ProductCategories cate = new ProductCategories(); cate.setCategory_id(categoryId); p.setCategory_id(cate);
+
+                long newId = productDAO.insertProductReturningId(p);
+                if (newId <= 0) {
+                    request.setAttribute("error", "Tạo sản phẩm thất bại");
+                    ProductCategoriesDAO cateDAO = new ProductCategoriesDAO();
+                    request.setAttribute("categories", cateDAO.getAllCategories());
+                    request.getRequestDispatcher("/views/admin/admin-product-create.jsp").forward(request, response);
+                    return;
+                }
+
+                if (imagePart != null && imagePart.getSize() > 0) {
+                    String lower = imagePart.getSubmittedFileName()==null?"":imagePart.getSubmittedFileName().toLowerCase();
+                    if (!(lower.endsWith(".jpg")||lower.endsWith(".jpeg")||lower.endsWith(".png")||lower.endsWith(".webp"))) {
+                        request.setAttribute("error","Định dạng ảnh không hợp lệ");
+                        ProductCategoriesDAO cateDAO = new ProductCategoriesDAO();
+                        request.setAttribute("categories", cateDAO.getAllCategories());
+                        request.getRequestDispatcher("/views/admin/admin-product-create.jsp").forward(request, response);
+                        return;
+                    }
+                    String uploadPath = request.getServletContext().getRealPath("")+File.separator+"uploads"+File.separator+"products";
+                    new File(uploadPath).mkdirs();
+                    String fileName = System.currentTimeMillis()+"_"+imagePart.getSubmittedFileName();
+                    imagePart.write(uploadPath+File.separator+fileName);
+                    String imageUrl = request.getContextPath()+"/uploads/products/"+fileName;
+                    new ProductImageDAO().updatePrimaryImage(newId, imageUrl, "Ảnh sản phẩm "+name);
+                }
+                response.sendRedirect(request.getContextPath()+"/admin/products?success=create");
                 return;
             } catch (Exception e) {
                 e.printStackTrace();
