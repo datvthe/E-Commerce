@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -366,8 +367,17 @@
                             <div class="product-image-wrapper">
                                 <c:choose>
                                     <c:when test="${not empty item.productId.imageUrl}">
-                                        <img src="${pageContext.request.contextPath}${item.productId.imageUrl}" 
-                                             alt="${item.productId.name}" class="product-img">
+                                        <%-- Kiểm tra nếu là absolute URL (http/https) --%>
+                                        <c:choose>
+                                            <c:when test="${fn:startsWith(item.productId.imageUrl, 'http://') || fn:startsWith(item.productId.imageUrl, 'https://')}">
+                                                <img src="${item.productId.imageUrl}" 
+                                                     alt="${item.productId.name}" class="product-img">
+                                            </c:when>
+                                            <c:otherwise>
+                                                <img src="${pageContext.request.contextPath}${item.productId.imageUrl}" 
+                                                     alt="${item.productId.name}" class="product-img">
+                                            </c:otherwise>
+                                        </c:choose>
                                     </c:when>
                                     <c:otherwise>
                                         <img src="${pageContext.request.contextPath}/views/assets/electro/img/product-1.png" 
