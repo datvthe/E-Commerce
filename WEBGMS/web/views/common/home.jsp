@@ -188,32 +188,6 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
                 </a>
               </c:otherwise>
             </c:choose>
-            <div class="dropdown">
-              <a
-                href="#"
-                class="dropdown-toggle text-muted me-2"
-                data-bs-toggle="dropdown"
-                ><small> VND</small></a
-              >
-              <div class="dropdown-menu rounded">
-                <a href="#" class="dropdown-item"> USD</a>
-                <a href="#" class="dropdown-item"> Euro</a>
-              </div>
-            </div>
-            <div class="dropdown">
-              <a
-                href="#"
-                class="dropdown-toggle text-muted mx-2"
-                data-bs-toggle="dropdown"
-                ><small> English</small></a
-              >
-              <div class="dropdown-menu rounded">
-                <a href="#" class="dropdown-item"> English</a>
-                <a href="#" class="dropdown-item"> Turkish</a>
-                <a href="#" class="dropdown-item"> Spanol</a>
-                <a href="#" class="dropdown-item"> Italiano</a>
-              </div>
-            </div>
             <c:choose>
               <c:when test="${not empty sessionScope.user}">
                 <a
@@ -911,6 +885,28 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
       </div>
     </div>
 
+    <!-- Latest Blog Section -->
+    <div class="container-fluid py-5 bg-light">
+      <div class="container">
+        <div class="text-center mb-5">
+          <h2 class="display-5 fw-bold text-dark">📝 BLOG MỚI NHẤT</h2>
+          <p class="lead text-muted">
+            Khám phá những bài viết hữu ích về công nghệ và gaming
+          </p>
+        </div>
+
+        <div class="row g-4" id="blogGrid">
+          <!-- Blog posts will be loaded here -->
+        </div>
+
+        <div class="text-center mt-5">
+          <a href="<%= request.getContextPath() %>/blogs" class="btn btn-outline-primary px-5 py-3">
+            <i class="fas fa-newspaper me-2"></i> Xem tất cả Blog
+          </a>
+        </div>
+      </div>
+    </div>
+
     <!-- Enhanced Footer -->
     <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
       <div class="container py-5">
@@ -1447,6 +1443,61 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
             </c:if>
         </script>
         <script src="<%= request.getContextPath() %>/assets/js/wishlist.js?v=<%= System.currentTimeMillis() %>"></script>
+        
+        <!-- Blog Loading Script -->
+        <script>
+            // Load latest blogs
+            async function loadLatestBlogs() {
+                try {
+                    const response = await fetch('<%= request.getContextPath() %>/api/blogs/latest?limit=3');
+                    const blogs = await response.json();
+                    
+                    const blogGrid = document.getElementById('blogGrid');
+                    if (!blogs || blogs.length === 0) {
+                        blogGrid.innerHTML = '<div class="col-12 text-center text-muted">Chưa có blog nào</div>';
+                        return;
+                    }
+                    
+                    const contextPath = '<%= request.getContextPath() %>';
+                    
+                    blogGrid.innerHTML = blogs.map(blog => {
+                        const imageHtml = blog.featuredImage ? 
+                            '<img src="' + contextPath + blog.featuredImage + '" class="card-img-top" style="height: 200px; object-fit: cover;" alt="' + blog.title + '">' :
+                            '<div class="card-img-top bg-gradient" style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">' +
+                            '<i class="fas fa-newspaper fa-4x text-white"></i></div>';
+                        
+                        const dateStr = new Date(blog.publishedAt || blog.createdAt).toLocaleDateString('vi-VN');
+                        
+                        return '<div class="col-lg-4 col-md-6">' +
+                            '<div class="card h-100 shadow-sm border-0 blog-card-home">' +
+                            imageHtml +
+                            '<div class="card-body d-flex flex-column">' +
+                            '<h5 class="card-title fw-bold">' + blog.title + '</h5>' +
+                            '<p class="card-text text-muted flex-grow-1">' + (blog.summary || '') + '</p>' +
+                            '<div class="d-flex justify-content-between text-muted small mb-3">' +
+                            '<span><i class="far fa-user me-1"></i>' + blog.authorName + '</span>' +
+                            '<span><i class="far fa-calendar me-1"></i>' + dateStr + '</span>' +
+                            '</div>' +
+                            '<div class="d-flex justify-content-between text-muted small mb-3">' +
+                            '<span><i class="far fa-eye me-1"></i>' + blog.viewCount + ' views</span>' +
+                            '<span><i class="far fa-heart me-1"></i>' + blog.likeCount + ' likes</span>' +
+                            '<span><i class="far fa-comment me-1"></i>' + blog.commentCount + ' comments</span>' +
+                            '</div>' +
+                            '<a href="' + contextPath + '/blog/' + blog.slug + '" class="btn btn-outline-primary w-100">' +
+                            '<i class="fas fa-book-reader me-2"></i>Đọc tiếp' +
+                            '</a>' +
+                            '</div></div></div>';
+                    }).join('');
+                } catch (error) {
+                    console.error('Error loading blogs:', error);
+                    document.getElementById('blogGrid').innerHTML = 
+                        '<div class="col-12 text-center text-muted">Không thể tải blog</div>';
+                }
+            }
+            
+            // Load blogs on page load
+            document.addEventListener('DOMContentLoaded', loadLatestBlogs);
+        </script>
         
         <!-- Chat Widget -->
         <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/chat-widget.css?v=<%= System.currentTimeMillis() %>" />
