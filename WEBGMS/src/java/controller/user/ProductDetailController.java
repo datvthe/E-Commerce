@@ -3,6 +3,7 @@ package controller.user;
 import dao.ProductDAO;
 import dao.ProductImageDAO;
 import dao.InventoryDAO;
+import dao.DigitalProductDAO;
 import dao.ReviewDAO;
 import dao.WishlistDAO;
 import model.product.Products;
@@ -29,6 +30,7 @@ public class ProductDetailController extends HttpServlet {
     private ProductDAO productDAO = new ProductDAO();
     private ProductImageDAO imageDAO = new ProductImageDAO();
     private InventoryDAO inventoryDAO = new InventoryDAO();
+    private DigitalProductDAO digitalDAO = new DigitalProductDAO();
     private ReviewDAO reviewDAO = new ReviewDAO();
     private WishlistDAO wishlistDAO = new WishlistDAO();
 
@@ -64,9 +66,26 @@ public class ProductDetailController extends HttpServlet {
         // Get product images
         List<ProductImages> images = imageDAO.getImagesByProductId(product.getProduct_id());
         
-        // Get inventory
-        Inventory inventory = inventoryDAO.getInventoryByProductId(product.getProduct_id());
-        int availableStock = inventoryDAO.getAvailableQuantity(product.getProduct_id());
+        // Get stock (digital products use digital_products; otherwise Inventory)
+        Inventory inventory = null;
+        int availableStock;
+        boolean isDigitalGoods;
+        try {
+            long categoryId = (product.getCategory_id() != null) ? product.getCategory_id().getCategory_id() : 0;
+            // Heuristic stays the same as before
+            isDigitalGoods = product.getCategory_id() != null && 
+                (product.getCategory_id().getName().toLowerCase().contains("thẻ cào") ||
+                 product.getCategory_id().getName().toLowerCase().contains("tài khoản") ||
+                 product.getCategory_id().getName().toLowerCase().contains("phần mềm") ||
+                 product.getCategory_id().getName().toLowerCase().contains("digital") ||
+                 product.getCategory_id().getName().toLowerCase().contains("số"));
+        } catch (Exception e) { isDigitalGoods = false; }
+        if (isDigitalGoods) {
+            availableStock = digitalDAO.getAvailableStock(product.getProduct_id());
+        } else {
+            inventory = inventoryDAO.getInventoryByProductId(product.getProduct_id());
+            availableStock = inventoryDAO.getAvailableQuantity(product.getProduct_id());
+        }
         
         // Get reviews (first page, 10 per page)
         int reviewPage = 1;
@@ -97,13 +116,7 @@ public class ProductDetailController extends HttpServlet {
             isInWishlist = wishlistDAO.isInWishlist(currentUser.getUser_id(), product.getProduct_id());
         }
 
-        // Check if product is digital goods
-        boolean isDigitalGoods = product.getCategory_id() != null && 
-            (product.getCategory_id().getName().toLowerCase().contains("thẻ cào") ||
-             product.getCategory_id().getName().toLowerCase().contains("tài khoản") ||
-             product.getCategory_id().getName().toLowerCase().contains("phần mềm") ||
-             product.getCategory_id().getName().toLowerCase().contains("digital") ||
-             product.getCategory_id().getName().toLowerCase().contains("số"));
+        // Check if product is digital goods (already computed above)
 
         // Set attributes
         request.setAttribute("product", product);

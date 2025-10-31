@@ -9,10 +9,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import model.order.OrderItems;
 import model.order.Orders;
 import model.user.Users;
+import model.order.DigitalProduct;
+import dao.DigitalProductDAO;
 import service.RoleBasedAccessControl;
 
 @WebServlet(name = "AdminOrdersController", urlPatterns = {
@@ -26,6 +30,7 @@ import service.RoleBasedAccessControl;
 public class AdminOrdersController extends HttpServlet {
 
     private final OrderDAO orderDAO = new OrderDAO();
+    private final DigitalProductDAO digitalProductDAO = new DigitalProductDAO();
     private final RoleBasedAccessControl rbac = new RoleBasedAccessControl();
 
     @Override
@@ -56,6 +61,15 @@ public class AdminOrdersController extends HttpServlet {
             request.setAttribute("totalOrders", totalOrders);
             request.setAttribute("status", status);
 
+            // Flash messages from session (POST-redirect)
+            HttpSession sess = request.getSession(false);
+            if (sess != null) {
+                Object fs = sess.getAttribute("flash_success");
+                Object fe = sess.getAttribute("flash_error");
+                if (fs != null) { request.setAttribute("success", fs); sess.removeAttribute("flash_success"); }
+                if (fe != null) { request.setAttribute("error", fe); sess.removeAttribute("flash_error"); }
+            }
+            // Also accept query-string messages
             String success = request.getParameter("success");
             String error = request.getParameter("error");
             if (success != null) request.setAttribute("success", success);
@@ -74,8 +88,10 @@ public class AdminOrdersController extends HttpServlet {
                     return;
                 }
                 List<OrderItems> items = orderDAO.getOrderItems(orderId);
+                List<DigitalProduct> digitalItems = digitalProductDAO.getDigitalProductsByOrderId((long) orderId);
                 request.setAttribute("order", order);
                 request.setAttribute("orderItems", items);
+                request.setAttribute("digitalItems", digitalItems);
                 request.getRequestDispatcher("/views/admin/admin-order-detail.jsp").forward(request, response);
             } catch (Exception e) {
                 response.sendRedirect(request.getContextPath() + "/admin/orders?error=ID đơn hàng không hợp lệ");
@@ -85,6 +101,13 @@ public class AdminOrdersController extends HttpServlet {
 
         if ("/admin/orders/create".equals(path)) {
             request.getRequestDispatcher("/views/admin/admin-order-create.jsp").forward(request, response);
+            return;
+        }
+
+        // Safeguard: if someone hits update-status with GET, redirect back
+        if ("/admin/orders/update-status".equals(path)) {
+            String msg = URLEncoder.encode("Use POST via buttons", StandardCharsets.UTF_8.name());
+            response.sendRedirect(request.getContextPath() + "/admin/orders?error=" + msg);
             return;
         }
     }
@@ -102,14 +125,27 @@ public class AdminOrdersController extends HttpServlet {
             try {
                 int orderId = Integer.parseInt(request.getParameter("order_id"));
                 String newStatus = request.getParameter("status");
-                boolean success = orderDAO.updateOrderStatus(orderId, newStatus);
-                if (success) {
-                    response.sendRedirect(request.getContextPath() + "/admin/orders?success=Cập nhật trạng thái thành công");
+                boolean ok = orderDAO.updateOrderStatus(orderId, newStatus);
+                if (ok) {
+                    // Notify buyer when approved
+                    try {
+                        Orders order = orderDAO.getOrderById(orderId);
+                        if (order != null && order.getBuyerId() != null) {
+                            String title = "Đơn hàng đã được duyệt";
+                            String msg = String.format("Đơn #%d đã được duyệt. Trạng thái: %s.", orderId, newStatus);
+                            new service.NotificationService().sendNotificationToUser(order.getBuyerId().intValue(), title, msg, "order");
+                        }
+                    } catch (Exception ignore) {}
+                    // Redirect admin to product management with success message
+                    request.getSession().setAttribute("flash_success", "Duyệt/Cập nhật đơn #" + orderId + " thành công");
+                    response.sendRedirect(request.getContextPath() + "/admin/orders");
                 } else {
-                    response.sendRedirect(request.getContextPath() + "/admin/orders?error=Có lỗi khi cập nhật trạng thái");
+                    request.getSession().setAttribute("flash_error", "Có lỗi khi cập nhật trạng thái");
+                    response.sendRedirect(request.getContextPath() + "/admin/orders");
                 }
             } catch (Exception e) {
-                response.sendRedirect(request.getContextPath() + "/admin/orders?error=Dữ liệu không hợp lệ");
+                request.getSession().setAttribute("flash_error", "Dữ liệu không hợp lệ");
+                response.sendRedirect(request.getContextPath() + "/admin/orders");
             }
             return;
         }

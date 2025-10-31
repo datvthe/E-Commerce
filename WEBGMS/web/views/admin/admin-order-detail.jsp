@@ -41,7 +41,8 @@
                 </form>
             </div>
         </div>
-        <p>Trạng thái: <span class="status ${order.status}">${order.status}</span></p>
+        <p>Trạng thái đơn: <span class="status ${order.status}">${order.status}</span></p>
+        <p>Trạng thái thanh toán: <span class="status ${order.payment_status}">${order.payment_status}</span></p>
         <p>Tổng tiền: <strong><fmt:formatNumber value="${order.total_amount}" type="number" groupingUsed="true"/> ${order.currency}</strong></p>
         <p>Ngày tạo: <fmt:formatDate value="${order.created_at}" pattern="dd/MM/yyyy HH:mm"/></p>
         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:16px;">
@@ -56,10 +57,18 @@
                 <p>${order.seller_id.email}</p>
             </div>
             <div class="card">
-                <h3>Vận chuyển</h3>
-                <p>Địa chỉ: ${order.shipping_address}</p>
-                <p>Phương thức: ${order.shipping_method}</p>
-                <p>Mã vận đơn: ${order.tracking_number}</p>
+                <h3>Giao hàng</h3>
+                <c:choose>
+                    <c:when test="${not empty order.shipping_method}">
+                        <p>Địa chỉ: ${order.shipping_address}</p>
+                        <p>Phương thức: ${order.shipping_method}</p>
+                        <p>Mã vận đơn: ${order.tracking_number}</p>
+                    </c:when>
+                    <c:otherwise>
+                        <p>Hình thức: <strong>Giao tức thì (Digital)</strong></p>
+                        <p>Không có vận chuyển vật lý.</p>
+                    </c:otherwise>
+                </c:choose>
             </div>
         </div>
     </div>
@@ -87,11 +96,41 @@
                     </tr>
                 </c:forEach>
                 <c:if test="${empty orderItems}">
-                    <tr><td colspan="5" style="text-align:center; color:#888;">Không có sản phẩm</td></tr>
+                    <tr><td colspan="5" style="text-align:center; color:#888;">Không có sản phẩm vật lý</td></tr>
                 </c:if>
             </tbody>
         </table>
     </div>
+
+    <c:if test="${not empty digitalItems}">
+    <div class="card">
+        <h3>Sản phẩm số (Digital)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Mã/Code</th>
+                    <th>Serial</th>
+                    <th>Mật khẩu</th>
+                    <th>Hết hạn</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="di" items="${digitalItems}" varStatus="s">
+                    <tr>
+                        <td>${s.index+1}</td>
+                        <td>${di.productName}</td>
+                        <td>${di.code}</td>
+                        <td>${empty di.serial ? '-' : di.serial}</td>
+                        <td>${empty di.password ? '-' : di.password}</td>
+                        <td><c:out value="${di.expiresAt}"/></td>
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
+    </div>
+    </c:if>
 </div>
 
 <!-- Modal cập nhật trạng thái -->

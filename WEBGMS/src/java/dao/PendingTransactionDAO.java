@@ -58,17 +58,47 @@ public class PendingTransactionDAO extends DBConnection {
     public List<PendingTransaction> getPendingTransactionsToProcess() {
         List<PendingTransaction> list = new ArrayList<>();
         
-        String sql = "SELECT * FROM pending_transactions_to_process";
+        String viewSql = "SELECT * FROM pending_transactions_to_process";
         
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
+             PreparedStatement ps = conn.prepareStatement(viewSql);
              ResultSet rs = ps.executeQuery()) {
             
             while (rs.next()) {
                 list.add(extractPendingTransaction(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            // Fallback when the VIEW doesn't exist: query base table with joins
+            boolean isMissing = false;
+            try {
+                String state = e.getSQLState();
+                int code = e.getErrorCode();
+                isMissing = ("42S02".equals(state) || code == 1146 || e.getMessage().toLowerCase().contains("doesn't exist"));
+            } catch (Exception ignore) {}
+            if (!isMissing) {
+                e.printStackTrace();
+                return list;
+            }
+            
+            String fallbackSql = "SELECT pt.*, b.email as buyer_email, b.full_name as buyer_name, " +
+                                 "s.email as seller_email, s.full_name as seller_name, " +
+                                 "o.order_number, o.product_id " +
+                                 "FROM pending_transactions pt " +
+                                 "LEFT JOIN users b ON pt.buyer_id = b.user_id " +
+                                 "LEFT JOIN users s ON pt.seller_id = s.user_id " +
+                                 "LEFT JOIN orders o ON pt.order_id = o.order_id " +
+                                 "WHERE pt.status = 'PENDING' AND pt.hold_until <= NOW() " +
+                                 "ORDER BY pt.hold_until ASC";
+            
+            try (Connection conn = getConnection();
+                 PreparedStatement ps = conn.prepareStatement(fallbackSql);
+                 ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(extractPendingTransaction(rs));
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
         
         return list;

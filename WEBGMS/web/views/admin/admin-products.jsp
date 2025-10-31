@@ -28,6 +28,9 @@
           </div>
         </div>
 
+        <c:if test="${not empty param.success}">
+          <div class="alert alert-success" role="alert" style="margin-bottom:16px;">${param.success}</div>
+        </c:if>
         <div class="card-style mb-30">
           <div class="d-flex justify-content-between align-items-center mb-20">
             <h6 class="mb-0">Danh sách sản phẩm (${totalProducts})</h6>

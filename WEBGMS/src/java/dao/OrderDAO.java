@@ -31,24 +31,35 @@ public class OrderDAO extends DBConnection {
                     "order_status, delivery_status, transaction_id, queue_status, created_at) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, 'VND', 'WALLET', 'PAID', 'PENDING', 'INSTANT', ?, 'WAITING', NOW())";
         
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            
-            ps.setString(1, orderNumber);
-            ps.setLong(2, buyerId);
-            ps.setLong(3, sellerId);
-            ps.setLong(4, productId);
-            ps.setInt(5, quantity);
-            ps.setBigDecimal(6, unitPrice);
-            ps.setBigDecimal(7, totalAmount);
-            ps.setString(8, transactionId);
-            
-            int affected = ps.executeUpdate();
-            
-            if (affected > 0) {
-                try (ResultSet rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        return rs.getLong(1);
+        try (Connection conn = DBConnection.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setString(1, orderNumber);
+                ps.setLong(2, buyerId);
+                ps.setLong(3, sellerId);
+                ps.setLong(4, productId);
+                ps.setInt(5, quantity);
+                ps.setBigDecimal(6, unitPrice);
+                ps.setBigDecimal(7, totalAmount);
+                ps.setString(8, transactionId);
+                int affected = ps.executeUpdate();
+                if (affected > 0) {
+                    try (ResultSet rs = ps.getGeneratedKeys()) {
+                        if (rs.next()) return rs.getLong(1);
+                    }
+                }
+            } catch (SQLException e) {
+                // Fallback for legacy schema without order_number/product_id/quantity, etc.
+                String legacy = "INSERT INTO orders (buyer_id, seller_id, total_amount, currency, status, created_at) " +
+                                "VALUES (?, ?, ?, 'VND', 'paid', NOW())";
+                try (PreparedStatement ps2 = conn.prepareStatement(legacy, Statement.RETURN_GENERATED_KEYS)) {
+                    ps2.setLong(1, buyerId);
+                    ps2.setLong(2, sellerId);
+                    ps2.setBigDecimal(3, totalAmount);
+                    int affected2 = ps2.executeUpdate();
+                    if (affected2 > 0) {
+                        try (ResultSet rs = ps2.getGeneratedKeys()) {
+                            if (rs.next()) return rs.getLong(1);
+                        }
                     }
                 }
             }
@@ -84,16 +95,29 @@ public class OrderDAO extends DBConnection {
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            
             ps.setLong(1, orderId);
-            
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return extractOrderFromResultSet(rs);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            // Fallback when legacy schema doesn't have product_id or joined columns
+            try (Connection conn = DBConnection.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(
+                    "SELECT o.*, b.email as buyer_email, b.full_name as buyer_name, " +
+                    "s.email as seller_email, s.full_name as seller_name " +
+                    "FROM orders o " +
+                    "LEFT JOIN users b ON o.buyer_id = b.user_id " +
+                    "LEFT JOIN users s ON o.seller_id = s.user_id " +
+                    "WHERE o.order_id = ?")) {
+                ps.setLong(1, orderId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) return extractOrderFromResultSet(rs);
+                }
+            } catch (SQLException ignored) {
+                ignored.printStackTrace();
+            }
         }
         
         return null;
@@ -161,24 +185,50 @@ public class OrderDAO extends DBConnection {
      * Cập nhật trạng thái order
      */
     public boolean updateOrderStatus(Long orderId, String orderStatus, String queueStatus) {
-        String sql = "UPDATE orders SET order_status = ?, queue_status = ?, " +
-                    "processed_at = IF(? = 'COMPLETED', NOW(), processed_at) " +
-                    "WHERE order_id = ?";
-        
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setString(1, orderStatus);
-            ps.setString(2, queueStatus);
-            ps.setString(3, queueStatus);
-            ps.setLong(4, orderId);
-            
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
+        String sql = "UPDATE orders SET order_status = ?, queue_status = ?, processed_at = IF(? = 'COMPLETED', NOW(), processed_at) WHERE order_id = ?";
+        try (Connection conn = DBConnection.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, orderStatus);
+                ps.setString(2, queueStatus);
+                ps.setString(3, queueStatus);
+                ps.setLong(4, orderId);
+                return ps.executeUpdate() > 0;
+            } catch (SQLException e) {
+                // Fallback for legacy schema that only has 'status' (often ENUM with values like 'pending','paid','delivered','cancelled','refunded')
+                String legacyStatus = mapLegacyStatus(orderStatus);
+                try (PreparedStatement ps2 = conn.prepareStatement("UPDATE orders SET status = ? WHERE order_id = ?")) {
+                    ps2.setString(1, legacyStatus);
+                    ps2.setLong(2, orderId);
+                    return ps2.executeUpdate() > 0;
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
-        
         return false;
+    }
+
+    // Map new statuses to legacy 'status' column values
+    private String mapLegacyStatus(String orderStatus) {
+        if (orderStatus == null) return "pending";
+        String s = orderStatus.trim().toUpperCase();
+        switch (s) {
+            case "COMPLETED":
+                return "delivered"; // legacy delivered = completed
+            case "PROCESSING":
+                return "pending"; // legacy has no processing
+            case "FAILED":
+                return "cancelled";
+            case "CANCELED":
+            case "CANCELLED":
+                return "cancelled";
+            case "REFUNDED":
+                return "refunded";
+            case "PAID":
+                return "paid";
+            default:
+                return s.toLowerCase();
+        }
     }
     
     /**
@@ -188,50 +238,51 @@ public class OrderDAO extends DBConnection {
         Orders order = new Orders();
         
         order.setOrderId(rs.getLong("order_id"));
-        order.setOrderNumber(rs.getString("order_number"));
+        try { order.setOrderNumber(rs.getString("order_number")); } catch (SQLException ignore) {}
         order.setBuyerId(rs.getLong("buyer_id"));
         order.setSellerId(rs.getLong("seller_id"));
-        order.setProductId(rs.getLong("product_id"));
-        order.setQuantity(rs.getInt("quantity"));
-        order.setUnitPrice(rs.getBigDecimal("unit_price"));
-        order.setTotalAmount(rs.getBigDecimal("total_amount"));
-        order.setCurrency(rs.getString("currency"));
-        order.setPaymentMethod(rs.getString("payment_method"));
-        order.setPaymentStatus(rs.getString("payment_status"));
-        order.setOrderStatus(rs.getString("order_status"));
-        order.setDeliveryStatus(rs.getString("delivery_status"));
-        order.setTransactionId(rs.getString("transaction_id"));
-        order.setQueueStatus(rs.getString("queue_status"));
-        order.setProcessedAt(rs.getTimestamp("processed_at"));
+        try { order.setProductId(rs.getLong("product_id")); } catch (SQLException ignore) {}
+        try { order.setQuantity(rs.getInt("quantity")); } catch (SQLException ignore) {}
+        try { order.setUnitPrice(rs.getBigDecimal("unit_price")); } catch (SQLException ignore) {}
+        try { order.setTotalAmount(rs.getBigDecimal("total_amount")); } catch (SQLException ignore) {}
+        try { order.setCurrency(rs.getString("currency")); } catch (SQLException ignore) {}
+        try { order.setPaymentMethod(rs.getString("payment_method")); } catch (SQLException ignore) {}
+        try { order.setPaymentStatus(rs.getString("payment_status")); } catch (SQLException ignore) {}
+        try { order.setOrderStatus(rs.getString("order_status")); } catch (SQLException ignore) {}
+        try { if (order.getOrderStatus() == null) order.setOrderStatus(rs.getString("status")); } catch (SQLException ignore) {}
+        try { order.setDeliveryStatus(rs.getString("delivery_status")); } catch (SQLException ignore) {}
+        try { order.setTransactionId(rs.getString("transaction_id")); } catch (SQLException ignore) {}
+        try { order.setQueueStatus(rs.getString("queue_status")); } catch (SQLException ignore) {}
+        try { order.setProcessedAt(rs.getTimestamp("processed_at")); } catch (SQLException ignore) {}
         order.setCreatedAt(rs.getTimestamp("created_at"));
-        order.setUpdatedAt(rs.getTimestamp("updated_at"));
+        try { order.setUpdatedAt(rs.getTimestamp("updated_at")); } catch (SQLException ignore) {}
         
         // Joined data (if available)
+        // Buyer
         try {
-            // Buyer
-            try {
-                String buyerEmail = rs.getString("buyer_email");
-                if (buyerEmail != null) {
-                    Users buyer = new Users();
-                    buyer.setUser_id((int) rs.getLong("buyer_id"));
-                    buyer.setEmail(buyerEmail);
-                    buyer.setFull_name(rs.getString("buyer_name"));
-                    order.setBuyer(buyer);
-                }
-            } catch (SQLException ignored) {}
-            
-            // Seller
-            try {
-                String sellerName = rs.getString("seller_name");
-                if (sellerName != null) {
-                    Users seller = new Users();
-                    seller.setUser_id((int) rs.getLong("seller_id"));
-                    seller.setFull_name(sellerName);
-                    order.setSeller(seller);
-                }
-            } catch (SQLException ignored) {}
-            
-            // Product
+            String buyerEmail = rs.getString("buyer_email");
+            if (buyerEmail != null) {
+                Users buyer = new Users();
+                buyer.setUser_id((int) rs.getLong("buyer_id"));
+                buyer.setEmail(buyerEmail);
+                buyer.setFull_name(rs.getString("buyer_name"));
+                order.setBuyer(buyer);
+            }
+        } catch (SQLException ignored) {}
+        
+        // Seller
+        try {
+            String sellerName = rs.getString("seller_name");
+            if (sellerName != null) {
+                Users seller = new Users();
+                seller.setUser_id((int) rs.getLong("seller_id"));
+                seller.setFull_name(sellerName);
+                order.setSeller(seller);
+            }
+        } catch (SQLException ignored) {}
+        
+        // Product
+        try {
             if (rs.getString("product_name") != null) {
                 Products product = new Products();
                 product.setProduct_id(rs.getLong("product_id"));
@@ -239,9 +290,7 @@ public class OrderDAO extends DBConnection {
                 product.setSlug(rs.getString("product_slug"));
                 order.setProduct(product);
             }
-        } catch (SQLException ignored) {
-            // Joined columns might not exist
-        }
+        } catch (SQLException ignored) {}
         
         return order;
     }
@@ -370,6 +419,57 @@ public class OrderDAO extends DBConnection {
         return null;
     }
 
+    // Top buyer by number of orders (ties broken by total amount)
+    public model.analytics.TopBuyerStats getTopBuyerByOrders() {
+        String sql = "SELECT o.buyer_id, u.full_name, u.email, COUNT(*) AS orders, COALESCE(SUM(o.total_amount),0) AS total " +
+                     "FROM orders o JOIN users u ON u.user_id = o.buyer_id " +
+                     "GROUP BY o.buyer_id, u.full_name, u.email " +
+                     "ORDER BY orders DESC, total DESC LIMIT 1";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                model.analytics.TopBuyerStats s = new model.analytics.TopBuyerStats();
+                s.setUserId(rs.getInt("buyer_id"));
+                s.setFullName(rs.getString("full_name"));
+                s.setEmail(rs.getString("email"));
+                s.setOrders(rs.getInt("orders"));
+                s.setTotalAmount(rs.getBigDecimal("total"));
+                return s;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Top N buyers by number of orders
+    public java.util.List<model.analytics.TopBuyerStats> getTopBuyersByOrders(int limit) {
+        java.util.List<model.analytics.TopBuyerStats> list = new java.util.ArrayList<>();
+        String sql = "SELECT o.buyer_id, u.full_name, u.email, COUNT(*) AS orders, COALESCE(SUM(o.total_amount),0) AS total " +
+                     "FROM orders o JOIN users u ON u.user_id = o.buyer_id " +
+                     "GROUP BY o.buyer_id, u.full_name, u.email " +
+                     "ORDER BY orders DESC, total DESC LIMIT ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    model.analytics.TopBuyerStats s = new model.analytics.TopBuyerStats();
+                    s.setUserId(rs.getInt("buyer_id"));
+                    s.setFullName(rs.getString("full_name"));
+                    s.setEmail(rs.getString("email"));
+                    s.setOrders(rs.getInt("orders"));
+                    s.setTotalAmount(rs.getBigDecimal("total"));
+                    list.add(s);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     // Wrapper to keep backward compatibility with controllers calling (int, String)
     public boolean updateOrderStatus(int orderId, String orderStatus) {
         return updateOrderStatus((long) orderId, orderStatus, "PROCESSING");
@@ -485,7 +585,7 @@ public class OrderDAO extends DBConnection {
         return list;
     }
 
-    public int getOrderCount(String status) {
+public int getOrderCount(String status) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM orders");
         if (status != null && !status.trim().isEmpty()) {
             sql.append(" WHERE LOWER(status) = LOWER(?)");

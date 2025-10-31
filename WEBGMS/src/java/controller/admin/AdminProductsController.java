@@ -2,6 +2,8 @@ package controller.admin;
 
 import dao.ProductDAO;
 import dao.ProductCategoriesDAO;
+import dao.DigitalProductDAO;
+import dao.InventoryDAO;
 import dao.ProductImageDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -33,6 +35,19 @@ public class AdminProductsController extends HttpServlet {
             int page = 1; int pageSize = 12;
             try { String p = request.getParameter("page"); if (p != null) page = Integer.parseInt(p);} catch (Exception ignore) {}
             List<Products> list = productDAO.adminFilterProducts(page, pageSize, keyword, category, status);
+            // Sync quantity with real stock (digital -> digital_products; else Inventory)
+            DigitalProductDAO digitalDAO = new DigitalProductDAO();
+            InventoryDAO inventoryDAO = new InventoryDAO();
+            if (list != null) {
+                for (Products p : list) {
+                    int available = digitalDAO.getAvailableStock(p.getProduct_id());
+                    if (available <= 0) {
+                        // fallback to inventory if not a digital product
+                        try { available = inventoryDAO.getAvailableQuantity(p.getProduct_id()); } catch (Exception ignore) {}
+                    }
+                    p.setQuantity(available);
+                }
+            }
             int total = productDAO.adminCountFilteredProducts(keyword, category, status);
             int totalPages = (int)Math.ceil((double)total / pageSize);
             ProductCategoriesDAO cateDAO = new ProductCategoriesDAO();
@@ -90,6 +105,15 @@ public class AdminProductsController extends HttpServlet {
                 existing.setStatus(status);
                 existing.setUpdated_at(new Timestamp(System.currentTimeMillis()));
                 ProductCategories cate = new ProductCategories(); cate.setCategory_id(categoryId); existing.setCategory_id(cate);
+                // Update real stock for non-digital products
+                try {
+                    DigitalProductDAO ddao = new DigitalProductDAO();
+                    int digitalCount = ddao.getAvailableStock(productId);
+                    if (digitalCount <= 0) {
+                        // Treat as physical/inventory product
+                        new InventoryDAO().upsertQuantity(productId, quantity);
+                    }
+                } catch (Exception ignore) {}
                 if (imagePart != null && imagePart.getSize() > 0) {
                     String lower = imagePart.getSubmittedFileName()==null?"":imagePart.getSubmittedFileName().toLowerCase();
                     if (!(lower.endsWith(".jpg")||lower.endsWith(".jpeg")||lower.endsWith(".png")||lower.endsWith(".webp"))) {

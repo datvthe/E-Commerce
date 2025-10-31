@@ -257,6 +257,35 @@ public class Orders {
         this.product = product;
     }
 
+    // ===== Compatibility helpers for legacy code (underscore style) =====
+    // Getter aliases
+    public Long getOrder_id() { return this.orderId; }
+    public String getOrder_number() { return this.orderNumber; }
+    public java.sql.Timestamp getCreated_at() { return this.createdAt; }
+    public java.sql.Timestamp getUpdated_at() { return this.updatedAt; }
+    public java.math.BigDecimal getTotal_amount() { return this.totalAmount; }
+    public String getPayment_status() { return this.paymentStatus; }
+    public String getOrder_status() { return this.orderStatus; }
+    public String getDelivery_status() { return this.deliveryStatus; }
+    public Users getSeller_id() { return this.seller; }
+    public void setSeller_id(Users seller) { this.seller = seller; }
+    public Users getBuyer_id() { return this.buyer; }
+    public void setBuyer_id(Users buyer) { this.buyer = buyer; }
+    // Setter aliases
+    public void setTotal_amount(java.math.BigDecimal v) { this.totalAmount = v; }
+    public void setShipping_address(String v) { this.shippingAddress = v; }
+    public void setShipping_method(String v) { this.shippingMethod = v; }
+    public void setTracking_number(String v) { this.trackingNumber = v; }
+    // Getter aliases (underscore style)
+    public String getShipping_address() { return this.shippingAddress; }
+    public String getShipping_method() { return this.shippingMethod; }
+    public String getTracking_number() { return this.trackingNumber; }
+    public String getPayment_method() { return this.paymentMethod; }
+    public String getQueue_status() { return this.queueStatus; }
+    public String getTransaction_id() { return this.transactionId; }
+    public String getStatus() { return this.orderStatus; }
+    public void setStatus(String v) { this.orderStatus = v; }
+
     @Override
     public String toString() {
         return "Orders{" +

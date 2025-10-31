@@ -188,7 +188,7 @@
                                         </li>
                                         <li class="divider"></li>
                                         <li>
-                                            <a href="<%= request.getContextPath() %>/profile">
+                                            <a href="<%= request.getContextPath() %>/admin/profile">
                                                 <i class="lni lni-user"></i> Xem hồ sơ
                                             </a>
                                         </li>

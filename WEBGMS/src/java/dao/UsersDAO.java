@@ -325,6 +325,27 @@ public class UsersDAO extends DBConnection {
         }
         return user;
     }
+
+    /**
+     * Get any admin user (fallback when configured email not found)
+     */
+    public Users getAnyAdminUser() {
+        String sql = "SELECT u.* FROM users u " +
+                     "LEFT JOIN User_Roles ur ON ur.user_id = u.user_id " +
+                     "LEFT JOIN roles r ON r.role_id = ur.role_id " +
+                     "WHERE u.default_role = 'admin' OR r.name = 'admin' " +
+                     "ORDER BY u.user_id ASC LIMIT 1";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return mapUser(rs);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     
     public boolean updateUser(Users user) {
         String sql = "UPDATE users SET full_name = ?, email = ?, phone_number = ?, address = ?, default_role = ?, gender = ?, date_of_birth = ?, avatar_url = ?, updated_at = NOW() WHERE user_id = ?";

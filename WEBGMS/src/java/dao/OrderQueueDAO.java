@@ -10,6 +10,27 @@ import java.util.List;
  */
 public class OrderQueueDAO extends DBConnection {
     
+    private void ensureOrderQueueTable(Connection conn) throws SQLException {
+        String ddl = "CREATE TABLE IF NOT EXISTS order_queue (" +
+                "queue_id BIGINT NOT NULL AUTO_INCREMENT, " +
+                "order_id BIGINT NOT NULL, " +
+                "priority INT DEFAULT 0, " +
+                "status VARCHAR(20) DEFAULT 'WAITING', " +
+                "attempts INT DEFAULT 0, " +
+                "error_message TEXT, " +
+                "processor_id VARCHAR(64), " +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                "started_at TIMESTAMP NULL, " +
+                "completed_at TIMESTAMP NULL, " +
+                "PRIMARY KEY (queue_id), " +
+                "INDEX idx_oq_status (status), " +
+                "INDEX idx_oq_created (created_at), " +
+                "INDEX idx_oq_order (order_id), " +
+                "FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE" +
+                ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+        try (Statement st = conn.createStatement()) { st.executeUpdate(ddl); }
+    }
+    
     /**
      * Thêm order vào queue
      */
@@ -17,13 +38,13 @@ public class OrderQueueDAO extends DBConnection {
         String sql = "INSERT INTO order_queue (order_id, priority, status, attempts) " +
                     "VALUES (?, ?, 'WAITING', 0)";
         
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setLong(1, orderId);
-            ps.setInt(2, priority);
-            
-            return ps.executeUpdate() > 0;
+        try (Connection conn = DBConnection.getConnection()) {
+            ensureOrderQueueTable(conn);
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setLong(1, orderId);
+                ps.setInt(2, priority);
+                return ps.executeUpdate() > 0;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -43,14 +64,14 @@ public class OrderQueueDAO extends DBConnection {
                     "ORDER BY priority DESC, created_at ASC " +
                     "LIMIT ?";
         
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setInt(1, limit);
-            
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    items.add(extractQueueFromResultSet(rs));
+        try (Connection conn = DBConnection.getConnection()) {
+            ensureOrderQueueTable(conn);
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, limit);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        items.add(extractQueueFromResultSet(rs));
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -71,13 +92,13 @@ public class OrderQueueDAO extends DBConnection {
                     "attempts = attempts + 1 " +
                     "WHERE queue_id = ? AND status = 'WAITING'";
         
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setString(1, processorId);
-            ps.setLong(2, queueId);
-            
-            return ps.executeUpdate() > 0;
+        try (Connection conn = DBConnection.getConnection()) {
+            ensureOrderQueueTable(conn);
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, processorId);
+                ps.setLong(2, queueId);
+                return ps.executeUpdate() > 0;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -94,12 +115,12 @@ public class OrderQueueDAO extends DBConnection {
                     "completed_at = NOW() " +
                     "WHERE queue_id = ?";
         
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setLong(1, queueId);
-            
-            return ps.executeUpdate() > 0;
+        try (Connection conn = DBConnection.getConnection()) {
+            ensureOrderQueueTable(conn);
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setLong(1, queueId);
+                return ps.executeUpdate() > 0;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -117,13 +138,13 @@ public class OrderQueueDAO extends DBConnection {
                     "completed_at = NOW() " +
                     "WHERE queue_id = ?";
         
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setString(1, errorMessage);
-            ps.setLong(2, queueId);
-            
-            return ps.executeUpdate() > 0;
+        try (Connection conn = DBConnection.getConnection()) {
+            ensureOrderQueueTable(conn);
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, errorMessage);
+                ps.setLong(2, queueId);
+                return ps.executeUpdate() > 0;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -137,14 +158,14 @@ public class OrderQueueDAO extends DBConnection {
     public OrderQueue getByOrderId(Long orderId) {
         String sql = "SELECT * FROM order_queue WHERE order_id = ?";
         
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setLong(1, orderId);
-            
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return extractQueueFromResultSet(rs);
+        try (Connection conn = DBConnection.getConnection()) {
+            ensureOrderQueueTable(conn);
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setLong(1, orderId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return extractQueueFromResultSet(rs);
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -160,12 +181,13 @@ public class OrderQueueDAO extends DBConnection {
     public int countWaitingItems() {
         String sql = "SELECT COUNT(*) FROM order_queue WHERE status = 'WAITING'";
         
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            
-            if (rs.next()) {
-                return rs.getInt(1);
+        try (Connection conn = DBConnection.getConnection()) {
+            ensureOrderQueueTable(conn);
+            try (PreparedStatement ps = conn.prepareStatement(sql);
+                 ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
