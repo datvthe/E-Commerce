@@ -141,14 +141,14 @@ public class AdminOrdersController extends HttpServlet {
                 String status = request.getParameter("status");
 
                 Orders order = new Orders();
-                Users buyer = new Users(); buyer.setUser_id(buyerId); order.setBuyer_id(buyer);
-                Users seller = new Users(); seller.setUser_id(sellerId); order.setSeller_id(seller);
-                order.setTotal_amount(totalAmount);
+                Users buyer = new Users(); buyer.setUser_id(buyerId); order.setBuyer(buyer);
+                Users seller = new Users(); seller.setUser_id(sellerId); order.setSeller(seller);
+                order.setTotalAmount(totalAmount);
                 order.setCurrency(currency);
-                order.setShipping_address(shippingAddress);
-                order.setShipping_method(shippingMethod);
-                order.setTracking_number(trackingNumber);
-                order.setStatus(status);
+                order.setShippingAddress(shippingAddress);
+                order.setShippingMethod(shippingMethod);
+                order.setTrackingNumber(trackingNumber);
+                order.setOrderStatus(status);
 
                 int newId = orderDAO.createOrder(order);
                 if (newId > 0) {

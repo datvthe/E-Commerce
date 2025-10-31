@@ -29,6 +29,72 @@
             .product-card .card-img-top { height: 220px; width: 100%; object-fit: contain; }
             .product-card .card-body { display: flex; flex-direction: column; }
             .product-card .btn { margin-top: auto; }
+            
+            /* Product Detail Layout Improvements */
+            .single-product {
+                background: #fff;
+                border-radius: 12px;
+                padding: 2rem;
+                box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            }
+            
+            .single-carousel {
+                border-radius: 8px;
+                overflow: hidden;
+                background: #f8f9fa;
+            }
+            
+            .single-carousel .single-inner {
+                padding: 1.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 400px;
+            }
+            
+            .single-carousel .single-inner img {
+                max-height: 400px;
+                object-fit: contain;
+            }
+            
+            .product-info {
+                padding-left: 1.5rem;
+            }
+            
+            @media (max-width: 768px) {
+                .product-info {
+                    padding-left: 0;
+                    margin-top: 1.5rem;
+                }
+                
+                .single-product {
+                    padding: 1rem;
+                }
+            }
+            
+            /* Product title styling */
+            .product-title {
+                font-size: 1.75rem;
+                font-weight: 700;
+                color: #2c3e50;
+                line-height: 1.3;
+            }
+            
+            /* Price section enhancement */
+            .price-section h2 {
+                font-size: 2rem;
+                font-weight: 700;
+            }
+            
+            /* Seller info box styling */
+            .seller-info {
+                transition: all 0.3s ease;
+            }
+            
+            .seller-info:hover {
+                box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+                transform: translateY(-2px);
+            }
         </style>
     </head>
     <body>
@@ -212,81 +278,12 @@
                         </div>
                     </c:when>
                     <c:otherwise>
-                <div class="row g-4">
-                    <div class="col-lg-5 col-xl-3 wow fadeInUp" data-wow-delay="0.1s">
-                        <div class="input-group w-100 mx-auto d-flex mb-4">
-                            <input type="search" class="form-control p-3" placeholder="Từ khóa" aria-describedby="search-icon-1">
-                            <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
-                        </div>
-                        <div class="product-categories mb-4">
-                            <h4>Danh mục sản phẩm</h4>
-                            <ul class="list-unstyled">
-                                <li>
-                                    <div class="categories-item">
-                                        <a href="#" class="text-dark"><i class="fas fa-apple-alt text-secondary me-2"></i>Phụ kiện</a>
-                                        <span>(3)</span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="categories-item">
-                                        <a href="#" class="text-dark"><i class="fas fa-apple-alt text-secondary me-2"></i>Điện tử & Máy tính</a>
-                                        <span>(5)</span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="categories-item">
-                                        <a href="#" class="text-dark"><i class="fas fa-apple-alt text-secondary me-2"></i>Laptop & Desktop</a>
-                                        <span>(2)</span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="categories-item">
-                                        <a href="#" class="text-dark"><i class="fas fa-apple-alt text-secondary me-2"></i>Điện thoại & Máy tính bảng</a>
-                                        <span>(8)</span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="categories-item">
-                                        <a href="#" class="text-dark"><i class="fas fa-apple-alt text-secondary me-2"></i>SmartPhone & Smart TV</a>
-                                        <span>(5)</span>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="featured-products mb-4">
-                            <h4 class="mb-3">Sản phẩm nổi bật</h4>
-                            <c:if test="${not empty similarProducts}">
-                                <c:forEach var="similarProduct" items="${similarProducts}" begin="0" end="5">
-                                    <div class="featured-product-item">
-                                        <div class="rounded me-4" style="width: 100px; height: 100px;">
-                                            <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-1.png" class="img-fluid rounded" alt="Image">
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-2">${similarProduct.name}</h6>
-                                            <div class="d-flex mb-2">
-                                                <c:forEach begin="1" end="5" var="i">
-                                                    <i class="fa fa-star text-secondary"></i>
-                                </c:forEach>
-                            </div>
-                                            <div class="d-flex mb-2">
-                                                <h5 class="fw-bold me-2">
-                                                    <c:choose>
-                                                        <c:when test="${similarProduct.price != null}">
-                                                            <fmt:formatNumber value="${similarProduct.price}" type="currency" currencyCode="VND" pattern="#,##0₫"/>
-                                                        </c:when>
-                                                        <c:otherwise>Liên hệ</c:otherwise>
-                                                    </c:choose>
-                                                </h5>
-                                            </div>
-                                        </div>
-                                            </div>
-                                        </c:forEach>
-                        </c:if>
-                    </div>
-                                </div>
-                    <div class="col-lg-7 col-xl-9 wow fadeInUp" data-wow-delay="0.1s">
+                <!-- Center container with max width for better readability -->
+                <div class="row justify-content-center">
+                    <div class="col-12 col-xxl-10">
                         <div class="row g-4 single-product">
-                            <div class="col-xl-6">
+                            <!-- Product Images - Left Side (40%) -->
+                            <div class="col-12 col-md-5 col-lg-5 wow fadeInUp" data-wow-delay="0.1s">
                                 <div class="single-carousel owl-carousel">
                                     <c:choose>
                                         <c:when test="${not empty images}">
@@ -308,8 +305,10 @@
                                     </c:choose>
                                 </div>
                             </div>
-                            <div class="col-xl-6">
-                        <div class="product-info">
+                            
+                            <!-- Product Information - Right Side (60%) -->
+                            <div class="col-12 col-md-7 col-lg-7 wow fadeInUp" data-wow-delay="0.2s">
+                                <div class="product-info">
                                     <h1 class="product-title mb-3">${empty product.name ? 'Sản phẩm' : product.name}</h1>
                                     
                                     <!-- Product Rating & Reviews -->
@@ -321,16 +320,14 @@
                                             <i class="fa fa-star text-warning"></i>
                                             <i class="fa fa-star text-warning"></i>
                                         </div>
-                                        <span class="text-muted">(127 đánh giá)</span>
-                                        <span class="badge bg-success ms-3">4.8/5</span>
+                                        <span class="text-muted">(${product.total_reviews} đánh giá)</span>
+                                        <span class="badge bg-success ms-3"><fmt:formatNumber value="${product.average_rating}" maxFractionDigits="1"/>/5</span>
                                     </div>
                                     
                                     <!-- Price Section -->
                                     <div class="price-section mb-4">
                                         <div class="d-flex align-items-center">
-                                            <h2 class="text-primary mb-0 me-3">35,990,000₫</h2>
-                                            <span class="text-muted text-decoration-line-through me-2">39,990,000₫</span>
-                                            <span class="badge bg-danger">-10%</span>
+                                            <h2 class="text-primary mb-0 me-3"><fmt:formatNumber value="${product.price}" pattern="#,###"/>₫</h2>
                                         </div>
                                     </div>
                                     
@@ -338,16 +335,32 @@
                                     <div class="product-details mb-4">
                                         <div class="row">
                                             <div class="col-6">
-                                                <p class="mb-2"><strong>Danh mục:</strong> Điện thoại & Máy tính bảng</p>
+                                                <p class="mb-2"><strong>Danh mục:</strong> ${not empty product.category_id ? product.category_id.name : 'Chưa phân loại'}</p>
                                                 <p class="mb-2"><strong>Mã sản phẩm:</strong> IP15PM256</p>
-                                                <p class="mb-2"><strong>Loại:</strong> <span class="badge bg-info">Hàng vật lý</span></p>
+                                                <p class="mb-2"><strong>Loại:</strong> <span class="badge bg-info">Sản phẩm số</span></p>
                                             </div>
                                             <div class="col-6">
                                                 <p class="mb-2"><strong>Tình trạng:</strong> 
-                                                    <span class="text-success"><i class="fas fa-check-circle"></i> Còn hàng</span>
+                                                    <c:choose>
+                                                        <c:when test="${not empty availableStock and availableStock > 0}">
+                                                            <span class="text-success"><i class="fas fa-check-circle"></i> Còn hàng</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-danger"><i class="fas fa-times-circle"></i> Hết hàng</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </p>
-                                                <p class="mb-2"><strong>Số lượng:</strong> <span class="text-primary">25 sản phẩm</span></p>
-                                                <p class="mb-2"><strong>Giao hàng:</strong> <span class="text-success"><i class="fas fa-truck"></i> 1-3 ngày</span></p>
+                                                <p class="mb-2"><strong>Số lượng:</strong> 
+                                                    <c:choose>
+                                                        <c:when test="${not empty availableStock}">
+                                                            <span class="text-primary">${availableStock} sản phẩm</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-danger">0 sản phẩm</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </p>
+                                                <p class="mb-2"><strong>Giao hàng:</strong> <span class="text-success"><i class="fas fa-truck"></i> Tức thì</span></p>
                                             </div>
                                         </div>
                                     </div>
@@ -438,7 +451,7 @@
                                                 </button>
                                             </div>
                                             <input type="number" class="form-control form-control-sm text-center border-0" 
-                                                   value="1" min="1" max="25" id="quantity">
+                                                   value="1" min="1" max="${not empty availableStock ? availableStock : 1}" id="quantity">
                                             <div class="input-group-btn">
                                                 <button class="btn btn-sm btn-plus rounded-circle bg-light border" type="button">
                                                     <i class="fa fa-plus"></i>
@@ -451,18 +464,32 @@
                                     <div class="action-buttons mb-4">
                                         <!-- Physical Goods Buttons -->
                                         <div class="row g-2">
-                                            <div class="col-md-12">
-                                                <button class="btn btn-primary w-100 py-3" onclick="buyNow()">
-                                                    <i class="fas fa-bolt me-2"></i>Mua ngay
-                                                </button>
+                                            <div class="col-md-9">
+                                                <c:choose>
+                                                    <c:when test="${not empty availableStock and availableStock > 0}">
+                                                        <button class="btn btn-primary w-100 py-3" onclick="buyNow()">
+                                                            <i class="fas fa-bolt me-2"></i>Mua ngay
+                                                        </button>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <button class="btn btn-secondary w-100 py-3" disabled>
+                                                            <i class="fas fa-times me-2"></i>Hết hàng
+                                                        </button>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <c:if test="${not empty sessionScope.user}">
+                                                    <button class="btn btn-outline-danger w-100 py-3 wishlist-btn" 
+                                                            data-product-id="${product.product_id}"
+                                                            onclick="toggleWishlist(${product.product_id}, this)"
+                                                            title="Thêm vào yêu thích">
+                                                        <i class="far fa-heart fa-lg"></i>
+                                                    </button>
+                                                </c:if>
                                             </div>
                                         </div>
                                         <div class="row g-2 mt-2">
-                                            <div class="col-md-6">
-                                                <button class="btn btn-outline-danger w-100 py-2" onclick="toggleWishlist()" id="wishlistBtn">
-                                                    <i class="fas fa-heart me-2"></i><span id="wishlistText">Thêm vào yêu thích</span>
-                                                </button>
-                                            </div>
                                             <div class="col-md-6">
                                                 <button class="btn btn-outline-info w-100 py-2" onclick="shareProduct()">
                                                     <i class="fas fa-share-alt me-2"></i>Chia sẻ
@@ -472,7 +499,7 @@
                                     </div>
                         
                                     <!-- Social Sharing -->
-                                    <div class="social-sharing mb-4">
+                                    <!-- <div class="social-sharing mb-4">
                                         <p class="mb-2"><strong>Chia sẻ sản phẩm:</strong></p>
                                         <div class="d-flex gap-2">
                                             <button class="btn btn-primary btn-sm" onclick="shareOnFacebook()">
@@ -485,17 +512,19 @@
                                                 <i class="fab fa-whatsapp me-1"></i>WhatsApp
                                             </button>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
-                            <div class="col-lg-12">
+                            
+                            <!-- Product Tabs - Full Width -->
+                            <div class="col-12">
                                 <nav>
                                     <div class="nav nav-tabs mb-3" id="productTabs">
                                         <button class="nav-link active" type="button" role="tab" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" aria-controls="description" aria-selected="true">
                                             <i class="fas fa-info-circle me-2"></i>Mô tả sản phẩm
                                         </button>
                                         <button class="nav-link" type="button" role="tab" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" aria-controls="reviews" aria-selected="false">
-                                            <i class="fas fa-star me-2"></i>Đánh giá (127)
+                                            <i class="fas fa-star me-2"></i>Đánh giá (${product.total_reviews})
                                         </button>
                                         <button class="nav-link" type="button" role="tab" id="policies-tab" data-bs-toggle="tab" data-bs-target="#policies" aria-controls="policies" aria-selected="false">
                                             <i class="fas fa-shield-alt me-2"></i>Chính sách
@@ -508,43 +537,15 @@
                                         <div class="row">
                                             <div class="col-lg-8">
                                                 <h5 class="mb-3">Mô tả chi tiết</h5>
-                                <div class="product-description">
-                                                    <p class="lead">iPhone 15 Pro Max 256GB với chip A17 Pro mạnh mẽ, camera 48MP và thiết kế titan cao cấp. Sản phẩm mới nhất từ Apple với nhiều tính năng đột phá.</p>
-                                                    
-                                                    <!-- Product Specifications -->
-                                                    <div class="specifications mt-4">
-                                                        <h6 class="mb-3">Thông tin chi tiết</h6>
-                                                        <div class="table-responsive">
-                                                            <table class="table table-striped">
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td><strong>Thương hiệu</strong></td>
-                                                                        <td>Apple</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Model</strong></td>
-                                                                        <td>iPhone 15 Pro Max</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Màu sắc</strong></td>
-                                                                        <td>Titanium Natural</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Kích thước</strong></td>
-                                                                        <td>159.9 x 76.7 x 8.25 mm</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Trọng lượng</strong></td>
-                                                                        <td>221g</td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td><strong>Bảo hành</strong></td>
-                                                                        <td>12 tháng</td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
+                                                <div class="product-description">
+                                                    <c:choose>
+                                                        <c:when test="${not empty product.description}">
+                                                            <p class="lead">${product.description}</p>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <p class="text-muted">Chưa có mô tả cho sản phẩm này.</p>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </div>
                                             </div>
                                             <div class="col-lg-4">
@@ -566,7 +567,7 @@
                                         <div class="row">
                                             <div class="col-lg-4">
                                                 <div class="rating-summary text-center p-4 bg-light rounded">
-                                                    <h2 class="text-primary mb-2">4.8</h2>
+                                                    <h2 class="text-primary mb-2"><fmt:formatNumber value="${product.average_rating}" maxFractionDigits="1"/></h2>
                                                     <div class="stars mb-3">
                                                         <i class="fa fa-star text-warning"></i>
                                                         <i class="fa fa-star text-warning"></i>
@@ -574,7 +575,7 @@
                                                         <i class="fa fa-star text-warning"></i>
                                                         <i class="fa fa-star text-warning"></i>
                                                     </div>
-                                                    <p class="text-muted">Dựa trên 127 đánh giá</p>
+                                                    <p class="text-muted">Dựa trên ${product.total_reviews} đánh giá</p>
                                                     
                                                     <!-- Rating Distribution -->
                                                     <div class="rating-breakdown mt-4">
@@ -763,15 +764,15 @@
                                                     </ul>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
                     </c:otherwise>
                 </c:choose>
         <!-- Single Products End -->
@@ -789,38 +790,39 @@
                                 Xem tất cả <i class="fas fa-arrow-right ms-1"></i>
                             </a>
                                             </div>
-                        <p class="text-muted mb-4">Dựa trên sở thích và lịch sử mua hàng của bạn, chúng tôi gợi ý những sản phẩm phù hợp</p>
+                        <p class="text-muted mb-4">Khám phá các sản phẩm số chất lượng cao với giá cả hợp lý</p>
                         
                         <div class="row g-4">
-                            <!-- Similar Product 1 -->
+                            <!-- Digital Product 1 -->
                             <div class="col-md-6 col-lg-3">
                                 <div class="product-card h-100">
                                     <div class="position-relative">
-                                        <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-2.png" class="card-img-top" alt="MacBook Pro">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/ChatGPT_logo.svg/512px-ChatGPT_logo.svg.png" 
+                                             class="card-img-top" alt="ChatGPT Plus" style="object-fit: contain; padding: 2rem; background: #fff;">
                                         <div class="position-absolute top-0 end-0 p-2">
                                             <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(2)">
                                                 <i class="fas fa-heart"></i>
                                             </button>
                                         </div>
                                         <div class="position-absolute top-0 start-0 p-2">
-                                            <span class="badge bg-success">Mới</span>
+                                            <span class="badge bg-success">Hot</span>
                                     </div>
                                 </div>
                                     <div class="card-body d-flex flex-column">
-                                        <h6 class="card-title">MacBook Pro M3 14 inch</h6>
+                                        <h6 class="card-title">Tài khoản ChatGPT Plus 1 tháng</h6>
                                         <div class="d-flex align-items-center mb-2">
                                             <div class="text-warning me-2">
                                                 <i class="fas fa-star"></i>
                                                 <i class="fas fa-star"></i>
                                                 <i class="fas fa-star"></i>
                                                 <i class="fas fa-star"></i>
-                                                <i class="far fa-star"></i>
+                                                <i class="fas fa-star"></i>
                         </div>
-                                            <small class="text-muted">(89)</small>
+                                            <small class="text-muted">(523)</small>
                     </div>
                                         <div class="d-flex align-items-center justify-content-between mb-3">
                                             <div>
-                                                <span class="h5 text-primary mb-0">45,000,000₫</span>
+                                                <span class="h5 text-primary mb-0">450,000₫</span>
                                             </div>
                                         </div>
                                         <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(2)">
@@ -830,22 +832,23 @@
                                 </div>
                             </div>
                             
-                            <!-- Similar Product 2 -->
+                            <!-- Digital Product 2 -->
                             <div class="col-md-6 col-lg-3">
                                 <div class="product-card h-100">
                                     <div class="position-relative">
-                                        <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-3.png" class="card-img-top" alt="Samsung Galaxy">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/512px-Netflix_2015_logo.svg.png" 
+                                             class="card-img-top" alt="Netflix Premium" style="object-fit: contain; padding: 2rem; background: #000;">
                                         <div class="position-absolute top-0 end-0 p-2">
                                             <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(3)">
                                                 <i class="fas fa-heart"></i>
                                             </button>
                                         </div>
                                         <div class="position-absolute top-0 start-0 p-2">
-                                            <span class="badge bg-danger">-20%</span>
+                                            <span class="badge bg-danger">Giảm giá</span>
                                         </div>
                                     </div>
                                     <div class="card-body d-flex flex-column">
-                                        <h6 class="card-title">Samsung Galaxy S24 Ultra</h6>
+                                        <h6 class="card-title">Tài khoản Netflix Premium 1 tháng</h6>
                                         <div class="d-flex align-items-center mb-2">
                                             <div class="text-warning me-2">
                                                 <i class="fas fa-star"></i>
@@ -854,12 +857,12 @@
                                                 <i class="fas fa-star"></i>
                                                 <i class="fas fa-star"></i>
                                             </div>
-                                            <small class="text-muted">(156)</small>
+                                            <small class="text-muted">(892)</small>
                                         </div>
                                         <div class="d-flex align-items-center justify-content-between mb-3">
                                             <div>
-                                                <span class="h5 text-primary mb-0">32,000,000₫</span>
-                                                <small class="text-muted d-block"><del>40,000,000₫</del></small>
+                                                <span class="h5 text-primary mb-0">180,000₫</span>
+                                                <small class="text-muted d-block"><del>260,000₫</del></small>
                                             </div>
                                         </div>
                                         <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(3)">
@@ -869,32 +872,36 @@
                                 </div>
                             </div>
                             
-                            <!-- Similar Product 3 -->
+                            <!-- Digital Product 3 -->
                             <div class="col-md-6 col-lg-3">
                                 <div class="product-card h-100">
                                     <div class="position-relative">
-                                        <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-4.png" class="card-img-top" alt="AirPods Pro">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/512px-Spotify_logo_without_text.svg.png" 
+                                             class="card-img-top" alt="Spotify Premium" style="object-fit: contain; padding: 2rem; background: #1DB954;">
                                         <div class="position-absolute top-0 end-0 p-2">
                                             <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(4)">
                                                 <i class="fas fa-heart"></i>
                                             </button>
                                         </div>
+                                        <div class="position-absolute top-0 start-0 p-2">
+                                            <span class="badge bg-success">Bán chạy</span>
+                                        </div>
                                     </div>
                                     <div class="card-body d-flex flex-column">
-                                        <h6 class="card-title">AirPods Pro 2nd Gen</h6>
+                                        <h6 class="card-title">Tài khoản Spotify Premium 1 tháng</h6>
                                         <div class="d-flex align-items-center mb-2">
                                             <div class="text-warning me-2">
                                                 <i class="fas fa-star"></i>
                                                 <i class="fas fa-star"></i>
                                                 <i class="fas fa-star"></i>
                                                 <i class="fas fa-star"></i>
-                                                <i class="far fa-star"></i>
+                                                <i class="fas fa-star"></i>
                                             </div>
-                                            <small class="text-muted">(203)</small>
+                                            <small class="text-muted">(1,245)</small>
                                         </div>
                                         <div class="d-flex align-items-center justify-content-between mb-3">
                                             <div>
-                                                <span class="h5 text-primary mb-0">6,500,000₫</span>
+                                                <span class="h5 text-primary mb-0">120,000₫</span>
                                             </div>
                                         </div>
                                         <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(4)">
@@ -904,22 +911,24 @@
                                 </div>
                             </div>
                             
-                            <!-- Similar Product 4 -->
+                            <!-- Digital Product 4 -->
                             <div class="col-md-6 col-lg-3">
                                 <div class="product-card h-100">
                                     <div class="position-relative">
-                                        <img src="<%= request.getContextPath() %>/views/assets/electro/img/product-5.png" class="card-img-top" alt="iPad Air">
+                                        <img src="https://www.quancongnghe.com.vn/wp-content/uploads/2023/07/tai-canva-0.jpg" 
+                                             class="card-img-top" alt="Canva Pro" style="object-fit: contain; padding: 2rem; background: linear-gradient(135deg, #00C4CC 0%, #7C5CFF 100%);"
+                                             onerror="this.src='<%= request.getContextPath() %>/views/assets/electro/img/product-10.png'; this.onerror=null;">
                                         <div class="position-absolute top-0 end-0 p-2">
                                             <button class="btn btn-sm btn-light rounded-circle" onclick="toggleWishlist(5)">
                                                 <i class="fas fa-heart"></i>
                                             </button>
                                         </div>
                                         <div class="position-absolute top-0 start-0 p-2">
-                                            <span class="badge bg-info">Hot</span>
+                                            <span class="badge bg-info">Mới</span>
                                         </div>
                                     </div>
                                     <div class="card-body d-flex flex-column">
-                                        <h6 class="card-title">iPad Air 5th Gen</h6>
+                                        <h6 class="card-title">Tài khoản Canva Pro 1 tháng</h6>
                                         <div class="d-flex align-items-center mb-2">
                                             <div class="text-warning me-2">
                                                 <i class="fas fa-star"></i>
@@ -928,11 +937,11 @@
                                                 <i class="fas fa-star"></i>
                                                 <i class="fas fa-star"></i>
                                             </div>
-                                            <small class="text-muted">(127)</small>
+                                            <small class="text-muted">(687)</small>
                                         </div>
                                         <div class="d-flex align-items-center justify-content-between mb-3">
                                             <div>
-                                                <span class="h5 text-primary mb-0">18,500,000₫</span>
+                                                <span class="h5 text-primary mb-0">280,000₫</span>
                                             </div>
                                         </div>
                                         <button class="btn btn-primary w-100 mt-auto" onclick="viewProduct(5)">
@@ -1023,12 +1032,17 @@
         <!-- Global Variables -->
         <script>
             var productId = parseInt("${empty product.product_id ? 1 : product.product_id}");
-            var maxQuantity = 25;
+            var maxQuantity = parseInt("${not empty availableStock ? availableStock : 0}");
             
             // Check if product data is available
             if (productId === 0) {
                 console.error('Product data not found');
                 document.body.innerHTML = '<div class="container mt-5"><div class="alert alert-danger text-center"><h4>Sản phẩm không tồn tại</h4><p>Xin lỗi, sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p><a href="<%= request.getContextPath() %>/products" class="btn btn-primary">Quay lại cửa hàng</a></div></div>';
+            }
+            
+            // Check if product is out of stock
+            if (maxQuantity <= 0) {
+                console.warn('Product is out of stock');
             }
         </script>
 
@@ -1063,16 +1077,27 @@
                 if (value > maxQuantity) this.value = maxQuantity;
             });
 
-            // Buy Now function
+            // Buy Now function - Instant checkout for digital goods
             function buyNow() {
-                const quantity = document.getElementById('quantity').value;
-                if (quantity > maxQuantity) {
-                    alert('Số lượng vượt quá tồn kho!');
+                // Check if product is in stock
+                if (maxQuantity <= 0) {
+                    alert('Sản phẩm đã hết hàng!');
                     return;
                 }
                 
-                // Redirect to checkout with product and quantity
-                window.location.href = '<%= request.getContextPath() %>/checkout?product=' + productId + '&quantity=' + quantity;
+                const quantity = document.getElementById('quantity').value || 1;
+                if (quantity > maxQuantity) {
+                    alert('Số lượng vượt quá tồn kho! Còn lại: ' + maxQuantity + ' sản phẩm');
+                    return;
+                }
+                
+                if (quantity <= 0) {
+                    alert('Vui lòng chọn số lượng!');
+                    return;
+                }
+                
+                // Redirect to instant checkout (digital goods)
+                window.location.href = '<%= request.getContextPath() %>/checkout/instant?productId=' + productId + '&quantity=' + quantity;
             }
 
             // Buy Digital Goods function
@@ -1308,5 +1333,17 @@
                 isInWishlist = false;
             });
         </script>
+        
+        <!-- Wishlist JavaScript -->
+        <script>
+            // Set context path and user ID for wishlist.js
+            const contextPath = '<%= request.getContextPath() %>';
+            <c:if test="${not empty sessionScope.user}">
+            const currentUserId = ${sessionScope.user.user_id};
+            // Store in sessionStorage for wishlist.js
+            sessionStorage.setItem('userId', ${sessionScope.user.user_id});
+            </c:if>
+        </script>
+        <script src="<%= request.getContextPath() %>/assets/js/wishlist.js?v=<%= System.currentTimeMillis() %>"></script>
     </body>
 </html>

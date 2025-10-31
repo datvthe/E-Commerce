@@ -117,6 +117,8 @@ public class ChatWebSocketServer {
         String messageContent = jsonMessage.get("content").getAsString();
         String messageType = jsonMessage.has("messageType") ? jsonMessage.get("messageType").getAsString() : "text";
         String senderRole = jsonMessage.has("senderRole") ? jsonMessage.get("senderRole").getAsString() : "customer";
+        String attachmentUrl = jsonMessage.has("attachmentUrl") && !jsonMessage.get("attachmentUrl").isJsonNull() 
+                               ? jsonMessage.get("attachmentUrl").getAsString() : null;
         
         // Fix empty senderRole - default to "customer" if empty or null
         if (senderRole == null || senderRole.trim().isEmpty()) {
@@ -124,7 +126,9 @@ public class ChatWebSocketServer {
         }
         
         System.out.println("[WebSocket] Message content: " + messageContent);
+        System.out.println("[WebSocket] Message type: " + messageType);
         System.out.println("[WebSocket] Sender role: " + senderRole);
+        System.out.println("[WebSocket] Attachment URL: " + attachmentUrl);
         System.out.println("[WebSocket] Calling chatMessageDAO.createMessage()...");
         
         // Save message to database
@@ -134,7 +138,7 @@ public class ChatWebSocketServer {
             senderRole,
             messageType,
             messageContent,
-            null,
+            attachmentUrl,
             false
         );
         

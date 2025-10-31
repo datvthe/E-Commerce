@@ -27,34 +27,71 @@ public double getBalance(int userId) {
 
 public void processTopUp(int userId, double amount, String transactionId, String bank) throws SQLException {
     Connection conn = null;
+    PreparedStatement psCheck = null;
     PreparedStatement ps1 = null;
     PreparedStatement ps2 = null;
+    PreparedStatement psCreate = null;
+    ResultSet rs = null;
+    
     try {
         conn = DBConnection.getConnection();
         conn.setAutoCommit(false);
 
-        // 1️⃣ Ghi lịch sử
-        String sql1 = "INSERT INTO transactions (transaction_id, user_id, amount, status, note, created_at) VALUES (?, ?, ?, ?, ?, NOW())";
+        // 0️⃣ Kiểm tra và tạo wallet nếu chưa có
+        String sqlCheck = "SELECT wallet_id FROM wallets WHERE user_id = ?";
+        psCheck = conn.prepareStatement(sqlCheck);
+        psCheck.setInt(1, userId);
+        rs = psCheck.executeQuery();
+        
+        if (!rs.next()) {
+            System.out.println("⚠️ Wallet chưa tồn tại cho user_id=" + userId + ", đang tạo mới...");
+            String sqlCreate = "INSERT INTO wallets (user_id, balance, currency) VALUES (?, 0.00, 'VND')";
+            psCreate = conn.prepareStatement(sqlCreate);
+            psCreate.setInt(1, userId);
+            psCreate.executeUpdate();
+            System.out.println("✅ Đã tạo wallet mới cho user_id=" + userId);
+        }
+
+        // 1️⃣ Ghi lịch sử giao dịch
+        System.out.println("🔍 Inserting transaction...");
+        String sql1 = "INSERT INTO transactions (transaction_id, user_id, type, amount, status, note, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())";
         ps1 = conn.prepareStatement(sql1);
         ps1.setString(1, transactionId);
         ps1.setInt(2, userId);
-        ps1.setDouble(3, amount);
-        ps1.setString(4, "SUCCESS");
-        ps1.setString(5, "Auto deposit via SePay (" + bank + ")");
-        ps1.executeUpdate();
+        ps1.setString(3, "deposit");
+        ps1.setDouble(4, amount);
+        ps1.setString(5, "success");
+        ps1.setString(6, "Auto deposit via SePay (" + bank + ")");
+        int rowsInserted = ps1.executeUpdate();
+        System.out.println("✅ Transaction inserted: " + rowsInserted + " row(s)");
 
         // 2️⃣ Cập nhật số dư ví
+        System.out.println("🔍 Updating wallet balance...");
         String sql2 = "UPDATE wallets SET balance = balance + ? WHERE user_id = ?";
         ps2 = conn.prepareStatement(sql2);
         ps2.setDouble(1, amount);
         ps2.setInt(2, userId);
-        ps2.executeUpdate();
+        int rowsUpdated = ps2.executeUpdate();
+        System.out.println("✅ Wallet updated: " + rowsUpdated + " row(s)");
+        
+        if (rowsUpdated == 0) {
+            throw new SQLException("❌ Failed to update wallet. No rows affected!");
+        }
 
         conn.commit();
+        System.out.println("✅ Transaction committed successfully!");
+        
     } catch (Exception e) {
-        if (conn != null) conn.rollback();
+        System.err.println("❌ Error in processTopUp: " + e.getMessage());
+        if (conn != null) {
+            System.out.println("🔄 Rolling back transaction...");
+            conn.rollback();
+        }
         throw e;
     } finally {
+        if (rs != null) try { rs.close(); } catch (Exception ignored) {}
+        if (psCheck != null) try { psCheck.close(); } catch (Exception ignored) {}
+        if (psCreate != null) try { psCreate.close(); } catch (Exception ignored) {}
         if (ps1 != null) try { ps1.close(); } catch (Exception ignored) {}
         if (ps2 != null) try { ps2.close(); } catch (Exception ignored) {}
         if (conn != null) try { conn.close(); } catch (Exception ignored) {}

@@ -126,7 +126,17 @@ function createMessageElement(msg) {
     
     const div = document.createElement('div');
     const isAi = msg.senderRole === 'ai' || msg.isAiResponse === true;
+    const isOwnMessage = !isAi; // User's own message
     div.className = `chat-message ${isAi ? 'chat-message-ai' : 'chat-message-user'}`;
+    div.dataset.messageId = msg.messageId || msg.message_id || '';
+    
+    // Add own message class for right alignment
+    if (isOwnMessage) {
+        div.classList.add('widget-message-own');
+        console.log('✅ AI CHAT - TIN NHAN CUA BAN');
+    } else {
+        div.classList.add('widget-message-other');
+    }
     
     let time = 'now';
     if (msg.createdAt) {
@@ -145,12 +155,61 @@ function createMessageElement(msg) {
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Bold
         .replace(/\n/g, '<br>');  // Line breaks
     
+    // Check for attachment (image/file)
+    let attachmentHtml = '';
+    if (msg.attachmentUrl) {
+        const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(msg.attachmentUrl);
+        if (isImage) {
+            attachmentHtml = `
+                <img src="${getContextPath()}${msg.attachmentUrl}" 
+                     class="message-image" 
+                     alt="Image" 
+                     onclick="window.open('${getContextPath()}${msg.attachmentUrl}', '_blank')"
+                     style="max-width: 150px; max-height: 150px; object-fit: cover;">
+            `;
+        } else {
+            const fileName = msg.attachmentUrl.split('/').pop();
+            attachmentHtml = `
+                <a href="${getContextPath()}${msg.attachmentUrl}" 
+                   target="_blank" 
+                   class="widget-message-file">
+                    <i class="fas fa-file"></i>
+                    <span>${fileName}</span>
+                    <i class="fas fa-download"></i>
+                </a>
+            `;
+        }
+    }
+    
+    // Action buttons (only for user's own messages, not AI)
+    let actionsHtml = '';
+    if (isOwnMessage && msg.messageId) {
+        actionsHtml = `
+            <div class="message-actions">
+                <button class="btn-message-action btn-message-edit" 
+                        onclick="event.stopPropagation(); editMessage('${msg.messageId}');" 
+                        title="Sửa">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-message-action btn-message-delete" 
+                        onclick="event.stopPropagation(); deleteMessage('${msg.messageId}');" 
+                        title="Xóa">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+    }
+    
     div.innerHTML = `
+        ${isAi ? '<i class="fas fa-robot message-icon"></i>' : ''}
         <div class="chat-message-content">
-            ${isAi ? '<i class="fas fa-robot message-icon"></i>' : ''}
-            <div class="chat-message-bubble">
-                <p>${formattedContent}</p>
+            <div class="chat-message-bubble" id="bubble-${msg.messageId}">
+                <p id="text-${msg.messageId}">${formattedContent}</p>
+                ${attachmentHtml}
+            </div>
+            <div class="widget-message-footer">
                 <span class="chat-message-time">${time}</span>
+                ${isOwnMessage ? actionsHtml : ''}
             </div>
         </div>
     `;
@@ -159,17 +218,68 @@ function createMessageElement(msg) {
 }
 
 // Send message to AI Bot
-function sendToAIBot() {
+async function sendToAIBot() {
     const input = document.getElementById('aiBotMessageInput');
     const message = input.value.trim();
     
-    if (!message || !aiBotRoomId) return;
+    // Check if there's a file to upload (from global variable set by chat-widget.js)
+    const hasFile = typeof aiBotSelectedFile !== 'undefined' && aiBotSelectedFile !== null;
+    
+    console.log('[AI Bot] sendToAIBot called - Message:', message, 'Has file:', hasFile);
+    
+    // Must have either message or file
+    if (!message && !hasFile) {
+        console.log('[AI Bot] No message or file to send');
+        return;
+    }
+    
+    if (!aiBotRoomId) {
+        console.error('[AI Bot] No room ID');
+        alert('Chưa khởi tạo AI Bot!');
+        return;
+    }
     
     // Disable input
     input.disabled = true;
     
     // Show typing indicator
     document.getElementById('aiBotTypingIndicator').style.display = 'flex';
+    
+    let attachmentUrl = null;
+    
+    // Upload file first if exists
+    if (hasFile) {
+        console.log('[AI Bot] Uploading file first...', aiBotSelectedFile.name);
+        try {
+            const uploadResult = await window.uploadChatFile(aiBotSelectedFile);
+            if (uploadResult && uploadResult.url) {
+                attachmentUrl = uploadResult.url;
+                console.log('[AI Bot] File uploaded successfully:', attachmentUrl);
+                
+                // Clear file preview
+                document.getElementById('aiBotFilePreview').style.display = 'none';
+                document.getElementById('aiBotFileInput').value = '';
+                aiBotSelectedFile = null;
+            } else {
+                console.error('[AI Bot] File upload failed');
+                alert('Không thể tải file lên. Vui lòng thử lại!');
+                input.disabled = false;
+                document.getElementById('aiBotTypingIndicator').style.display = 'none';
+                return;
+            }
+        } catch (error) {
+            console.error('[AI Bot] File upload error:', error);
+            alert('Lỗi khi tải file: ' + error.message);
+            input.disabled = false;
+            document.getElementById('aiBotTypingIndicator').style.display = 'none';
+            return;
+        }
+    }
+    
+    // Prepare message
+    const messageToSend = message || '[Đã gửi file]';
+    
+    console.log('[AI Bot] Sending message with attachment:', attachmentUrl);
     
     const contextPath = getContextPath();
     fetch(contextPath + '/aibot/send', {
@@ -179,7 +289,8 @@ function sendToAIBot() {
         },
         body: JSON.stringify({
             roomId: aiBotRoomId,
-            message: message
+            message: messageToSend,
+            attachmentUrl: attachmentUrl
         })
     })
     .then(response => {

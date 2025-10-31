@@ -222,15 +222,61 @@ function appendMessage(message) {
     const messageDiv = document.createElement('div');
     
     // Convert both to numbers for comparison (handle string/number mismatch)
-    const isOwn = parseInt(message.senderId) === parseInt(currentUserId);
+    const senderId = parseInt(message.senderId || message.sender_id);
+    const userId = parseInt(currentUserId);
+    const isOwn = senderId === userId;
     const isAI = message.isAiResponse || message.senderRole === 'ai';
+    const messageId = message.messageId || message.message_id || '';
     
-    console.log('[Chat] Rendering message - senderId:', message.senderId, 'currentUserId:', currentUserId, 'isOwn:', isOwn);
+    console.log('[Chat] Rendering message:');
+    console.log('  - senderId (parsed):', senderId, '(original:', message.senderId, ')');
+    console.log('  - currentUserId (parsed):', userId, '(original:', currentUserId, ')');
+    console.log('  - isOwn:', isOwn);
+    console.log('  - isAI:', isAI);
+    console.log('  - messageId:', messageId);
     
     messageDiv.className = `message ${isOwn ? 'message-own' : 'message-other'} ${isAI ? 'message-ai' : ''}`;
+    messageDiv.dataset.messageId = messageId;
+    messageDiv.style.position = 'relative';
     
     // Handle both 'content' and 'messageContent' field names
     const messageText = message.content || message.messageContent || '';
+    const attachmentUrl = message.attachmentUrl || message.attachment_url;
+    
+    // Build attachment HTML if exists
+    let attachmentHtml = '';
+    if (attachmentUrl) {
+        const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(attachmentUrl);
+        if (isImage) {
+            attachmentHtml = `<img src="${contextPath}${attachmentUrl}" alt="Image" class="message-image" onclick="window.open('${contextPath}${attachmentUrl}', '_blank')" style="max-width: 180px; max-height: 180px; width: auto; height: auto; object-fit: contain; margin-top: 8px; border-radius: 12px; cursor: pointer;">`;
+        } else {
+            const fileName = attachmentUrl.split('/').pop();
+            attachmentHtml = `<div class="message-file" onclick="window.open('${contextPath}${attachmentUrl}', '_blank')" style="display: flex; align-items: center; gap: 8px; padding: 8px; background: rgba(0,0,0,0.05); border-radius: 8px; margin-top: 8px; cursor: pointer;">
+                <i class="fas fa-file"></i>
+                <span>${fileName}</span>
+                <i class="fas fa-download"></i>
+            </div>`;
+        }
+    }
+    
+    // Add action buttons for own messages (not AI)
+    let actionsHtml = '';
+    if (isOwn && !isAI && messageId) {
+        actionsHtml = `
+            <div class="message-actions">
+                <button class="btn-message-action btn-message-edit" 
+                        onclick="event.stopPropagation(); editMessage('${messageId}');" 
+                        title="Sửa">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-message-action btn-message-delete" 
+                        onclick="event.stopPropagation(); deleteMessage('${messageId}');" 
+                        title="Xóa">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+    }
     
     messageDiv.innerHTML = `
         ${!isOwn ? `<img src="${message.senderAvatar || contextPath + '/assets/images/default-avatar.png'}" 
@@ -240,12 +286,14 @@ function appendMessage(message) {
                          onclick="navigateToProfile('${message.senderId}')">` : ''}
         <div class="message-content">
             ${!isOwn ? `<div class="message-sender">${message.senderName || 'User'}${isAI ? ' (AI)' : ''}</div>` : ''}
-            <div class="message-bubble">
-                ${escapeHtml(messageText)}
-                ${message.isEdited ? '<span class="message-edited">(đã chỉnh sửa)</span>' : ''}
+            <div class="message-bubble" id="bubble-${messageId}">
+                <p id="text-${messageId}">${escapeHtml(messageText)}</p>
+                ${attachmentHtml}
+                ${message.isEdited ? '<span style="font-size: 0.9em; opacity: 0.7;">(đã chỉnh sửa)</span>' : ''}
             </div>
             <div class="message-time">${formatMessageTime(message.createdAt)}</div>
         </div>
+        ${isOwn ? actionsHtml : ''}
     `;
     
     chatMessages.appendChild(messageDiv);

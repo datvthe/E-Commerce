@@ -17,6 +17,14 @@ function initChatWidget(contextPath, userId, userRole) {
     widgetUserId = userId;
     widgetUserRole = userRole;
     
+    console.log('[Widget] initChatWidget called - userId:', userId, 'role:', userRole);
+    
+    // Setup file handlers after a short delay to ensure elements are ready
+    setTimeout(() => {
+        console.log('[Widget] Setting up file handlers from initChatWidget');
+        window.setupWidgetFileHandlers();
+    }, 500);
+    
     if (userId > 0) {
         loadWidgetChatRooms();
         // Refresh every 30 seconds
@@ -34,6 +42,10 @@ function toggleChatWidget() {
     if (container.style.display === 'none') {
         container.style.display = 'flex';
         button.innerHTML = '<i class="fas fa-times"></i>';
+        
+        // Setup file handlers when widget opens
+        setTimeout(() => setupWidgetFileHandlers(), 100);
+        
         if (widgetUserId > 0) {
             loadWidgetChatRooms();
         }
@@ -116,6 +128,9 @@ function openWidgetChat(roomId) {
     // Switch views
     document.getElementById('chatWidgetListView').style.display = 'none';
     document.getElementById('chatWidgetConversationView').style.display = 'flex';
+    
+    // Setup file handlers for this view
+    setupWidgetFileHandlers();
     
     // Load room details
     fetch(widgetContextPath + '/chat/room/' + roomId)
@@ -254,32 +269,87 @@ function appendWidgetMessage(message) {
     }
     
     const messageContent = message.content || message.messageContent;
-    if (!messageContent) {
-        console.error('[Widget] Message has no content:', message);
+    const messageType = message.messageType || 'text';
+    const attachmentUrl = message.attachmentUrl || message.attachment_url;
+    const messageId = message.messageId || message.message_id || '';
+    
+    // Skip if no content and no image
+    if (!messageContent && !attachmentUrl) {
+        console.error('[Widget] Message has no content or image:', message);
         return;
     }
     
-    console.log('[Widget] Appending message:', {
-        senderId: message.senderId,
-        content: messageContent.substring(0, 30),
-        isOwn: message.senderId === widgetUserId
-    });
+    // Parse IDs to numbers for proper comparison
+    const senderId = parseInt(message.senderId || message.sender_id);
+    const userId = parseInt(widgetUserId);
+    const isOwn = senderId === userId;
+    const isAI = message.isAiResponse || message.senderRole === 'ai';
+    
+    console.log('[Widget] Appending message:');
+    console.log('  - messageId:', messageId);
+    console.log('  - senderId (parsed):', senderId, '(original:', message.senderId, ')');
+    console.log('  - widgetUserId (parsed):', userId, '(original:', widgetUserId, ')');
+    console.log('  - isOwn:', isOwn);
+    console.log('  - isAI:', isAI);
+    console.log('  - content:', messageContent ? messageContent.substring(0, 30) : '(image)');
     
     const messageDiv = document.createElement('div');
     
-    const isOwn = message.senderId === widgetUserId;
-    const isAI = message.isAiResponse || message.senderRole === 'ai';
-    
     messageDiv.className = `widget-message ${isOwn ? 'widget-message-own' : 'widget-message-other'} ${isAI ? 'widget-message-ai' : ''}`;
+    messageDiv.dataset.messageId = messageId;
+    
+    // DEBUG LOG
+    if (isOwn) {
+        console.log('✅ TIN NHAN CUA BAN - CLASS: widget-message-own');
+    }
+    
+    // Build message content HTML
+    let messageHTML = '';
+    if (messageContent && messageContent.trim()) {
+        messageHTML += `<div class="widget-message-bubble" id="bubble-${messageId}">
+            <p id="text-${messageId}">${escapeWidgetHtml(messageContent)}</p>
+            ${message.isEdited ? '<span style="font-size: 0.8em; opacity: 0.7;">(đã chỉnh sửa)</span>' : ''}
+        </div>`;
+    }
+    if (messageType === 'image' && attachmentUrl) {
+        messageHTML += `<img src="${widgetContextPath}${attachmentUrl}" alt="Image" class="widget-message-image" onclick="window.open('${widgetContextPath}${attachmentUrl}', '_blank')">`;
+    } else if (messageType === 'file' && attachmentUrl) {
+        const fileName = attachmentUrl.split('/').pop();
+        messageHTML += `<div class="widget-message-file" onclick="window.open('${widgetContextPath}${attachmentUrl}', '_blank')">
+            <i class="fas fa-file"></i>
+            <span>${fileName}</span>
+            <i class="fas fa-download"></i>
+        </div>`;
+    }
+    
+    // Add action buttons for own messages (not AI)
+    let actionsHtml = '';
+    if (isOwn && !isAI && messageId) {
+        actionsHtml = `
+            <div class="message-actions">
+                <button class="btn-message-action btn-message-edit" 
+                        onclick="event.stopPropagation(); editMessage('${messageId}');" 
+                        title="Sửa">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-message-action btn-message-delete" 
+                        onclick="event.stopPropagation(); deleteMessage('${messageId}');" 
+                        title="Xóa">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+    }
     
     messageDiv.innerHTML = `
         ${!isOwn ? `<img src="${message.senderAvatar || widgetContextPath + '/assets/images/default-avatar.png'}" 
                          alt="Avatar" class="widget-message-avatar">` : ''}
         <div class="widget-message-content">
-            <div class="widget-message-bubble">
-                ${escapeWidgetHtml(messageContent)}
+            ${messageHTML}
+            <div class="widget-message-footer">
+                <div class="widget-message-time">${formatWidgetMessageTime(message.createdAt)}</div>
+                ${isOwn ? actionsHtml : ''}
             </div>
-            <div class="widget-message-time">${formatWidgetMessageTime(message.createdAt)}</div>
         </div>
     `;
     
@@ -289,11 +359,16 @@ function appendWidgetMessage(message) {
 /**
  * Send message from widget
  */
-function widgetSendMessage() {
+async function widgetSendMessage() {
+    console.log('[Widget] widgetSendMessage called');
     const input = document.getElementById('widgetMessageInput');
     const content = input.value.trim();
     
-    if (!content) {
+    console.log('[Widget] Message content:', content);
+    console.log('[Widget] widgetSelectedFile:', widgetSelectedFile);
+    
+    // Check if there's a message or file
+    if (!content && !widgetSelectedFile) {
         console.log('[Widget] Empty message, not sending');
         return;
     }
@@ -304,13 +379,34 @@ function widgetSendMessage() {
         return;
     }
     
-    console.log('[Widget] Sending message:', content);
+    let attachmentUrl = null;
+    let messageType = 'text';
+    
+    // Upload file if selected
+    if (widgetSelectedFile) {
+        console.log('[Widget] File detected! Uploading file:', widgetSelectedFile.name);
+        const uploadResult = await uploadChatFile(widgetSelectedFile);
+        console.log('[Widget] Upload result:', uploadResult);
+        
+        if (!uploadResult) {
+            console.error('[Widget] Upload failed, aborting send');
+            return; // Upload failed
+        }
+        
+        attachmentUrl = uploadResult.url;
+        messageType = uploadResult.type === 'image' ? 'image' : 'file';
+        console.log('[Widget] File uploaded successfully! URL:', attachmentUrl, 'Type:', messageType);
+        removeWidgetFile(); // Clear preview
+    }
+    
+    console.log('[Widget] Sending message:', content, 'Attachment:', attachmentUrl);
     
     const message = {
         type: 'message',
-        content: content,
-        messageType: 'text',
-        senderRole: widgetUserRole
+        content: content || (messageType === 'image' ? 'Đã gửi một hình ảnh' : 'Đã gửi một file'),
+        messageType: messageType,
+        senderRole: widgetUserRole,
+        attachmentUrl: attachmentUrl
     };
     
     // Send via WebSocket
@@ -319,10 +415,11 @@ function widgetSendMessage() {
     // Optimistically display user's own message immediately
     const userMessage = {
         senderId: widgetUserId,
-        messageContent: content,
-        content: content,
+        messageContent: content || (messageType === 'image' ? 'Đã gửi một hình ảnh' : 'Đã gửi một file'),
+        content: content || (messageType === 'image' ? 'Đã gửi một hình ảnh' : 'Đã gửi một file'),
         senderRole: widgetUserRole,
-        messageType: 'text',
+        messageType: messageType,
+        attachmentUrl: attachmentUrl,
         createdAt: new Date().toISOString(),
         isAiResponse: false
     };
@@ -487,6 +584,8 @@ function playWidgetNotification() {
  * Input handlers
  */
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('[Widget] DOMContentLoaded - Setting up event listeners');
+    
     const input = document.getElementById('widgetMessageInput');
     if (input) {
         input.addEventListener('keypress', function(e) {
@@ -501,6 +600,13 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.height = Math.min(this.scrollHeight, 80) + 'px';
         });
     }
+    
+    // Setup file input handlers
+    window.setupWidgetFileHandlers();
+    
+    // Setup again after delays to catch dynamically loaded elements
+    setTimeout(() => window.setupWidgetFileHandlers(), 1000);
+    setTimeout(() => window.setupWidgetFileHandlers(), 2000);
     
     // Search functionality
     const searchInput = document.getElementById('widgetSearchInput');
@@ -522,3 +628,188 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+/**
+ * File Upload Functions
+ */
+let widgetSelectedFile = null;
+let aiBotSelectedFile = null;
+
+// Setup file input handlers
+window.setupWidgetFileHandlers = function() {
+    console.log('[Widget] Setting up file handlers');
+    
+    const widgetFileInput = document.getElementById('widgetFileInput');
+    if (widgetFileInput) {
+        // Remove old listener if any
+        widgetFileInput.removeEventListener('change', window.handleWidgetFileSelect);
+        // Add new listener
+        widgetFileInput.addEventListener('change', window.handleWidgetFileSelect);
+        console.log('[Widget] widgetFileInput handler attached');
+    } else {
+        console.warn('[Widget] widgetFileInput element not found');
+    }
+    
+    const aiBotFileInput = document.getElementById('aiBotFileInput');
+    if (aiBotFileInput) {
+        // Remove old listener if any
+        aiBotFileInput.removeEventListener('change', window.handleAIBotFileSelect);
+        // Add new listener
+        aiBotFileInput.addEventListener('change', window.handleAIBotFileSelect);
+        console.log('[Widget] aiBotFileInput handler attached');
+    } else {
+        console.warn('[Widget] aiBotFileInput element not found');
+    }
+}
+
+// Handle file selection for widget conversation
+window.handleWidgetFileSelect = function(event) {
+    console.log('[Widget] handleWidgetFileSelect called');
+    const file = event.target.files[0];
+    if (!file) {
+        console.log('[Widget] No file selected');
+        return;
+    }
+    
+    console.log('[Widget] File selected:', file.name, 'Type:', file.type, 'Size:', file.size);
+    
+    // Validate file size (10MB max)
+    const maxSize = file.type.startsWith('image/') ? 5 * 1024 * 1024 : 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+        console.error('[Widget] File too large:', file.size, 'Max:', maxSize);
+        alert(`Kích thước file không được vượt quá ${maxSize / 1024 / 1024}MB!`);
+        return;
+    }
+    
+    widgetSelectedFile = file;
+    console.log('[Widget] File stored in widgetSelectedFile');
+    
+    // Preview file
+    const previewContainer = document.getElementById('widgetFilePreview');
+    const previewImg = document.getElementById('widgetPreviewImg');
+    const fileInfo = document.getElementById('widgetFileInfo');
+    const fileName = document.getElementById('widgetFileName');
+    
+    console.log('[Widget] Preview elements:', {
+        container: !!previewContainer,
+        img: !!previewImg,
+        fileInfo: !!fileInfo,
+        fileName: !!fileName
+    });
+    
+    if (file.type.startsWith('image/')) {
+        // Preview image
+        console.log('[Widget] Previewing image...');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            previewImg.style.display = 'block';
+            fileInfo.style.display = 'none';
+            console.log('[Widget] Image preview loaded');
+        };
+        reader.readAsDataURL(file);
+    } else {
+        // Show file info
+        console.log('[Widget] Showing file info for:', file.name);
+        fileName.textContent = file.name;
+        fileInfo.style.display = 'block';
+        previewImg.style.display = 'none';
+    }
+    
+    previewContainer.style.display = 'block';
+    console.log('[Widget] Preview container shown');
+}
+
+// Remove selected file from widget
+window.removeWidgetFile = function() {
+    widgetSelectedFile = null;
+    document.getElementById('widgetFileInput').value = '';
+    document.getElementById('widgetFilePreview').style.display = 'none';
+}
+
+// Handle file selection for AI bot
+window.handleAIBotFileSelect = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Validate file size (10MB max)
+    const maxSize = file.type.startsWith('image/') ? 5 * 1024 * 1024 : 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+        alert(`Kích thước file không được vượt quá ${maxSize / 1024 / 1024}MB!`);
+        return;
+    }
+    
+    aiBotSelectedFile = file;
+    
+    // Preview file
+    const previewContainer = document.getElementById('aiBotFilePreview');
+    const previewImg = document.getElementById('aiBotPreviewImg');
+    const fileInfo = document.getElementById('aiBotFileInfo');
+    const fileName = document.getElementById('aiBotFileName');
+    
+    if (file.type.startsWith('image/')) {
+        // Preview image
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            previewImg.style.display = 'block';
+            fileInfo.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        // Show file info
+        fileName.textContent = file.name;
+        fileInfo.style.display = 'block';
+        previewImg.style.display = 'none';
+    }
+    
+    previewContainer.style.display = 'block';
+}
+
+// Remove selected file from AI bot
+window.removeAIBotFile = function() {
+    aiBotSelectedFile = null;
+    document.getElementById('aiBotFileInput').value = '';
+    document.getElementById('aiBotFilePreview').style.display = 'none';
+}
+
+// Upload file to server
+window.uploadChatFile = async function(file) {
+    console.log('[Upload] Starting upload for file:', file.name, 'Type:', file.type, 'Size:', file.size);
+    
+    const formData = new FormData();
+    const paramName = file.type.startsWith('image/') ? 'image' : 'file';
+    formData.append(paramName, file);
+    
+    console.log('[Upload] FormData created with param:', paramName);
+    console.log('[Upload] Upload URL:', widgetContextPath + '/chat/upload-file');
+    
+    try {
+        const response = await fetch(widgetContextPath + '/chat/upload-file', {
+            method: 'POST',
+            body: formData
+        });
+        
+        console.log('[Upload] Response status:', response.status);
+        console.log('[Upload] Response ok:', response.ok);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('[Upload] Error response:', errorText);
+            throw new Error('Upload failed: ' + response.status);
+        }
+        
+        const data = await response.json();
+        console.log('[Upload] Success response:', data);
+        
+        return {
+            url: data.fileUrl || data.imageUrl,
+            type: data.fileType,
+            name: data.fileName
+        };
+    } catch (error) {
+        console.error('[Upload] Exception:', error);
+        alert('Không thể tải file lên. Vui lòng thử lại!\n' + error.message);
+        return null;
+    }
+}

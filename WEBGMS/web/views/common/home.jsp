@@ -1,6 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%> <%@ taglib prefix="c"
-uri="jakarta.tags.core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+uri="jakarta.tags.core" %> <%@ taglib prefix="fn"
+uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -150,6 +150,44 @@ uri="jakarta.tags.core" %>
         </div>
         <div class="col-lg-4 text-center text-lg-end">
           <div class="d-inline-flex align-items-center" style="height: 45px">
+            <!-- Notification Button -->
+            <c:choose>
+              <c:when test="${not empty sessionScope.user}">
+                <!-- User đã đăng nhập - cho phép truy cập -->
+                <a
+                  href="<%= request.getContextPath() %>/notifications"
+                  class="text-muted me-3 position-relative"
+                  title="Thông báo"
+                  style="text-decoration: none"
+                >
+                  <i class="bi bi-bell" style="font-size: 1.2rem"></i>
+                  <c:if
+                    test="${not empty unreadNotificationCount && unreadNotificationCount > 0}"
+                  >
+                    <span
+                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                      style="font-size: 0.65rem"
+                    >
+                      ${unreadNotificationCount > 99 ? '99+' :
+                      unreadNotificationCount}
+                      <span class="visually-hidden">thông báo mới</span>
+                    </span>
+                  </c:if>
+                </a>
+              </c:when>
+              <c:otherwise>
+                <!-- Guest user - yêu cầu đăng nhập -->
+                <a
+                  href="#"
+                  class="text-muted me-3 position-relative"
+                  title="Thông báo"
+                  style="text-decoration: none"
+                  onclick="showLoginPrompt(); return false;"
+                >
+                  <i class="bi bi-bell" style="font-size: 1.2rem"></i>
+                </a>
+              </c:otherwise>
+            </c:choose>
             <div class="dropdown">
               <a
                 href="#"
@@ -294,17 +332,23 @@ uri="jakarta.tags.core" %>
                   <c:forEach var="cat" items="${pinnedCategories}">
                     <li>
                       <div class="categories-bars-item">
-                        <a href="<%= request.getContextPath() %>/products?category=${cat.categoryId}">
+                        <a
+                          href="<%= request.getContextPath() %>/products?category=${cat.categoryId}"
+                        >
                           <i class="fas fa-folder-open me-2"></i>${cat.name}
                         </a>
-                        <c:if test="${cat.productCount > 0}"><span>(${cat.productCount})</span></c:if>
+                        <c:if test="${cat.productCount > 0}"
+                          ><span>(${cat.productCount})</span></c:if
+                        >
                       </div>
                     </li>
                   </c:forEach>
                   <c:forEach var="cat" items="${extraCategories}">
                     <li>
                       <div class="categories-bars-item">
-                        <a href="<%= request.getContextPath() %>/products?category=${cat.category_id}">
+                        <a
+                          href="<%= request.getContextPath() %>/products?category=${cat.category_id}"
+                        >
                           <i class="fas fa-folder-open me-2"></i>${cat.name}
                         </a>
                       </div>
@@ -354,26 +398,45 @@ uri="jakarta.tags.core" %>
                   >
                   <div class="dropdown-menu m-0">
                     <c:forEach var="cat" items="${pinnedCategories}">
-                      <a href="<%= request.getContextPath() %>/products?category=${cat.categoryId}"
-                         class="dropdown-item">
+                      <a
+                        href="<%= request.getContextPath() %>/products?category=${cat.categoryId}"
+                        class="dropdown-item"
+                      >
                         <i class="fas fa-folder-open me-2"></i>${cat.name}
                       </a>
                     </c:forEach>
                     <c:forEach var="cat" items="${extraCategories}">
-                      <a href="<%= request.getContextPath() %>/products?category=${cat.category_id}"
-                         class="dropdown-item">
+                      <a
+                        href="<%= request.getContextPath() %>/products?category=${cat.category_id}"
+                        class="dropdown-item"
+                      >
                         <i class="fas fa-folder-open me-2"></i>${cat.name}
                       </a>
                     </c:forEach>
                   </div>
                 </div>
-                <a href="<%= request.getContextPath() %>/blog" class="nav-item nav-link">Tin tức</a>
+                <a
+                  href="<%= request.getContextPath() %>/blog"
+                  class="nav-item nav-link"
+                  >Tin tức</a
+                >
                 <a href="#" class="nav-item nav-link">Chia sẻ</a>
                 <a
                   href="<%= request.getContextPath() %>/contact"
-                  class="nav-item nav-link me-2"
+                  class="nav-item nav-link"
                   >Hỗ trợ</a
                 >
+                <c:if test="${not empty sessionScope.user}">
+                <a
+                  href="<%= request.getContextPath() %>/wishlist"
+                  class="nav-item nav-link me-2 position-relative"
+                  title="Danh sách yêu thích"
+                  >
+                  <i class="fas fa-heart me-1"></i>Yêu thích
+                  <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" 
+                        id="wishlistCount" style="display: none; font-size: 0.7rem;">0</span>
+                </a>
+                </c:if>
                 <div class="nav-item dropdown d-block d-lg-none mb-3">
                   <a
                     href="#"
@@ -496,20 +559,42 @@ uri="jakarta.tags.core" %>
           <c:forEach var="cat" items="${pinnedCategories}" varStatus="s">
             <c:if test="${s.index < 6}">
               <div class="col-lg-2 col-md-4 col-6">
-                <a href="<%= request.getContextPath() %>/products?category=${cat.categoryId}" class="text-decoration-none">
-                  <div class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100">
+                <a
+                  href="<%= request.getContextPath() %>/products?category=${cat.categoryId}"
+                  class="text-decoration-none"
+                >
+                  <div
+                    class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
+                  >
                     <div class="category-icon mb-3">
                       <c:choose>
-                        <c:when test="${(s.index % 6) == 0}"><i class="fas fa-graduation-cap fa-3x text-primary"></i></c:when>
-                        <c:when test="${(s.index % 6) == 1}"><i class="fas fa-play-circle fa-3x text-danger"></i></c:when>
-                        <c:when test="${(s.index % 6) == 2}"><i class="fas fa-laptop-code fa-3x text-success"></i></c:when>
-                        <c:when test="${(s.index % 6) == 3}"><i class="fas fa-file-alt fa-3x text-warning"></i></c:when>
-                        <c:when test="${(s.index % 6) == 4}"><i class="fas fa-gift fa-3x text-primary"></i></c:when>
-                        <c:otherwise><i class="fas fa-gamepad fa-3x text-info"></i></c:otherwise>
+                        <c:when test="${(s.index % 6) == 0}"
+                          ><i
+                            class="fas fa-graduation-cap fa-3x text-primary"
+                          ></i
+                        ></c:when>
+                        <c:when test="${(s.index % 6) == 1}"
+                          ><i class="fas fa-play-circle fa-3x text-danger"></i
+                        ></c:when>
+                        <c:when test="${(s.index % 6) == 2}"
+                          ><i class="fas fa-laptop-code fa-3x text-success"></i
+                        ></c:when>
+                        <c:when test="${(s.index % 6) == 3}"
+                          ><i class="fas fa-file-alt fa-3x text-warning"></i
+                        ></c:when>
+                        <c:when test="${(s.index % 6) == 4}"
+                          ><i class="fas fa-gift fa-3x text-primary"></i
+                        ></c:when>
+                        <c:otherwise
+                          ><i class="fas fa-gamepad fa-3x text-info"></i
+                        ></c:otherwise>
                       </c:choose>
                     </div>
                     <h5 class="fw-bold text-dark">${cat.name}</h5>
-                    <p class="text-muted small">${empty cat.description ? 'Danh mục sản phẩm' : cat.description}</p>
+                    <p class="text-muted small">
+                      ${empty cat.description ? 'Danh mục sản phẩm' :
+                      cat.description}
+                    </p>
                     <span class="badge bg-primary">Mới</span>
                   </div>
                 </a>
@@ -523,20 +608,44 @@ uri="jakarta.tags.core" %>
             <c:forEach var="cat" items="${extraCategories}" varStatus="s">
               <c:if test="${s.index < 6}">
                 <div class="col-lg-2 col-md-4 col-6">
-                  <a href="<%= request.getContextPath() %>/products?category=${cat.category_id}" class="text-decoration-none">
-                    <div class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100">
+                  <a
+                    href="<%= request.getContextPath() %>/products?category=${cat.category_id}"
+                    class="text-decoration-none"
+                  >
+                    <div
+                      class="category-card text-center p-4 bg-white rounded-3 shadow-sm h-100"
+                    >
                       <div class="category-icon mb-3">
                         <c:choose>
-                          <c:when test="${(s.index % 6) == 0}"><i class="fas fa-folder-open fa-3x text-primary"></i></c:when>
-                          <c:when test="${(s.index % 6) == 1}"><i class="fas fa-tags fa-3x text-danger"></i></c:when>
-                          <c:when test="${(s.index % 6) == 2}"><i class="fas fa-layer-group fa-3x text-success"></i></c:when>
-                          <c:when test="${(s.index % 6) == 3}"><i class="fas fa-th-large fa-3x text-warning"></i></c:when>
-                          <c:when test="${(s.index % 6) == 4}"><i class="fas fa-star fa-3x text-info"></i></c:when>
-                          <c:otherwise><i class="fas fa-list fa-3x text-secondary"></i></c:otherwise>
+                          <c:when test="${(s.index % 6) == 0}"
+                            ><i
+                              class="fas fa-folder-open fa-3x text-primary"
+                            ></i
+                          ></c:when>
+                          <c:when test="${(s.index % 6) == 1}"
+                            ><i class="fas fa-tags fa-3x text-danger"></i
+                          ></c:when>
+                          <c:when test="${(s.index % 6) == 2}"
+                            ><i
+                              class="fas fa-layer-group fa-3x text-success"
+                            ></i
+                          ></c:when>
+                          <c:when test="${(s.index % 6) == 3}"
+                            ><i class="fas fa-th-large fa-3x text-warning"></i
+                          ></c:when>
+                          <c:when test="${(s.index % 6) == 4}"
+                            ><i class="fas fa-star fa-3x text-info"></i
+                          ></c:when>
+                          <c:otherwise
+                            ><i class="fas fa-list fa-3x text-secondary"></i
+                          ></c:otherwise>
                         </c:choose>
                       </div>
                       <h5 class="fw-bold text-dark">${cat.name}</h5>
-                      <p class="text-muted small">${empty cat.description ? 'Danh mục sản phẩm' : cat.description}</p>
+                      <p class="text-muted small">
+                        ${empty cat.description ? 'Danh mục sản phẩm' :
+                        cat.description}
+                      </p>
                       <span class="badge bg-secondary">Mới</span>
                     </div>
                   </a>
@@ -926,6 +1035,19 @@ uri="jakarta.tags.core" %>
         }
       }
 
+      // Show login prompt when guest user clicks notification button
+      function showLoginPrompt() {
+        // Create a custom styled alert/confirm dialog
+        const result = confirm(
+          "Vui lòng đăng nhập để xem thông báo.\n\nBạn có muốn đăng nhập ngay không?"
+        );
+
+        if (result) {
+          // Redirect to login page
+          window.location.href = "<%= request.getContextPath() %>/login";
+        }
+      }
+
       function updateLogoutUI() {
         // Update top bar to show login/register buttons
         const topBarUserSection = document.querySelector(
@@ -1165,37 +1287,187 @@ uri="jakarta.tags.core" %>
                         </div>
             </div>
                 `;
-      }
-
-      function viewMode(mode) {
-        const productGrid = document.getElementById("productGrid");
-        if (mode === "list") {
-          productGrid.className = "row g-4 list-view";
-        } else {
-          productGrid.className = "row g-4";
-        }
-      }
-
-      function viewProduct(productId) {
-        window.location.href =
-          "<%= request.getContextPath() %>/product/" + productId;
-      }
-
-      function loadMoreProducts() {
-        const loadMoreBtn = event.target;
-        loadMoreBtn.innerHTML =
-          '<i class="fas fa-spinner fa-spin me-2"></i> Đang tải...';
-
-        setTimeout(() => {
-          loadMoreBtn.innerHTML =
-            '<i class="fas fa-plus me-2"></i> Xem thêm sản phẩm';
-        }, 2000);
-      }
-
-      // Initialize page
-      document.addEventListener("DOMContentLoaded", function () {
-        console.log("Gicungco Marketplace - Buyer Homepage Loaded");
-      });
-    </script>
-  </body>
+            }
+            
+            function viewMode(mode) {
+                const productGrid = document.getElementById('productGrid');
+                if (mode === 'list') {
+                    productGrid.className = 'row g-4 list-view';
+                } else {
+                    productGrid.className = 'row g-4';
+                }
+            }
+            
+            function viewProduct(productId) {
+                window.location.href = '<%= request.getContextPath() %>/product/' + productId;
+            }
+            
+            function loadMoreProducts() {
+                const loadMoreBtn = event.target;
+                loadMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Đang tải...';
+                
+                setTimeout(() => {
+                    loadMoreBtn.innerHTML = '<i class="fas fa-plus me-2"></i> Xem thêm sản phẩm';
+                }, 2000);
+            }
+            
+            // Initialize wishlist functionality
+            function loadWishlistCount() {
+                <c:if test="${not empty sessionScope.user}">
+                    $.ajax({
+                        url: '<%= request.getContextPath() %>/api/wishlist/count',
+                        method: 'GET',
+                        success: function(response) {
+                            if (response.success) {
+                                const wishlistCountElement = document.getElementById('wishlistCount');
+                                if (wishlistCountElement) {
+                                    wishlistCountElement.textContent = response.count;
+                                    if (response.count > 0) {
+                                        wishlistCountElement.style.display = 'inline-block';
+                                    } else {
+                                        wishlistCountElement.style.display = 'none';
+                                    }
+                                }
+                            }
+                        },
+                        error: function() {
+                            console.log('Could not load wishlist count');
+                        }
+                    });
+                </c:if>
+            }
+            
+            // Add to wishlist function for product cards
+            function toggleWishlist(productId, element) {
+                <c:choose>
+                    <c:when test="${not empty sessionScope.user}">
+                        $.ajax({
+                            url: '<%= request.getContextPath() %>/wishlist',
+                            method: 'POST',
+                            data: {
+                                action: 'toggle',
+                                productId: productId
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    // Update heart icon
+                                    const heartIcon = element.querySelector('i');
+                                    if (response.message.includes('added')) {
+                                        heartIcon.className = 'fas fa-heart text-danger';
+                                        element.setAttribute('title', 'Remove from wishlist');
+                                        showToast('Added to wishlist!', 'success');
+                                    } else {
+                                        heartIcon.className = 'fas fa-heart';
+                                        element.setAttribute('title', 'Add to wishlist');
+                                        showToast('Removed from wishlist!', 'success');
+                                    }
+                                    // Update wishlist count
+                                    loadWishlistCount();
+                                } else {
+                                    showToast('Error: ' + response.message, 'error');
+                                }
+                            },
+                            error: function() {
+                                showToast('Failed to update wishlist. Please try again.', 'error');
+                            }
+                        });
+                    </c:when>
+                    <c:otherwise>
+                        showWarningModal('Login Required', 'Please login to use wishlist feature.');
+                        // Update modal button to redirect to login
+                        setTimeout(function() {
+                            const modal = document.getElementById('notificationModal');
+                            const footerButton = modal.querySelector('.modal-footer .btn');
+                            footerButton.onclick = function() {
+                                window.location.href = '<%= request.getContextPath() %>/login';
+                            };
+                            footerButton.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Login Now';
+                        }, 100);
+                    </c:otherwise>
+                </c:choose>
+            }
+            
+            // Initialize page
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('Gicungco Marketplace - Buyer Homepage Loaded');
+                
+                // Initialize tooltips
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+                
+                // Load wishlist count for logged-in users
+                loadWishlistCount();
+                
+                // Handle server-side messages - with duplicate prevention
+                const notificationShown = sessionStorage.getItem('notificationShown');
+                
+                <c:if test="${not empty sessionScope.message}">
+                    if (!notificationShown || notificationShown !== 'message_${sessionScope.message}') {
+                        showSuccessModal('Notice!', '${sessionScope.message}');
+                        sessionStorage.setItem('notificationShown', 'message_${sessionScope.message}');
+                    }
+                    <c:remove var="message" scope="session" />
+                </c:if>
+                
+                <c:if test="${not empty sessionScope.success}">
+                    if (!notificationShown || notificationShown !== 'success_${sessionScope.success}') {
+                        showSuccessModal('Success!', '${sessionScope.success}');
+                        sessionStorage.setItem('notificationShown', 'success_${sessionScope.success}');
+                    }
+                    <c:remove var="success" scope="session" />
+                </c:if>
+                
+                <c:if test="${not empty sessionScope.error}">
+                    if (!notificationShown || notificationShown !== 'error_${sessionScope.error}') {
+                        showErrorModal('Error!', '${sessionScope.error}');
+                        sessionStorage.setItem('notificationShown', 'error_${sessionScope.error}');
+                    }
+                    <c:remove var="error" scope="session" />
+                </c:if>
+                
+                // Clear the notification flag after modal is shown
+                setTimeout(() => {
+                    sessionStorage.removeItem('notificationShown');
+                }, 5000);
+                
+                // Chat widget initialized below
+            });
+        </script>
+        
+        <!-- Wishlist JavaScript -->
+        <script>
+            // Set context path and user ID for wishlist.js
+            const contextPath = '<%= request.getContextPath() %>';
+            <c:if test="${not empty sessionScope.user}">
+            const currentUserId = ${sessionScope.user.user_id};
+            // Store in sessionStorage for wishlist.js
+            sessionStorage.setItem('userId', ${sessionScope.user.user_id});
+            </c:if>
+        </script>
+        <script src="<%= request.getContextPath() %>/assets/js/wishlist.js?v=<%= System.currentTimeMillis() %>"></script>
+        
+        <!-- Chat Widget -->
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/chat-widget.css?v=<%= System.currentTimeMillis() %>" />
+        <jsp:include page="../component/chat-widget.jsp" />
+        <script src="<%= request.getContextPath() %>/assets/js/chat-widget.js?v=<%= System.currentTimeMillis() %>"></script>
+        <script src="<%= request.getContextPath() %>/assets/js/aibot-widget.js?v=<%= System.currentTimeMillis() %>"></script>
+        <script src="<%= request.getContextPath() %>/assets/js/message-actions.js?v=<%= System.currentTimeMillis() %>"></script>
+        <script>
+            // Initialize chat widget after DOM is ready
+            document.addEventListener('DOMContentLoaded', function() {
+                try {
+                    const userId = ${sessionScope.user != null ? sessionScope.user.user_id : -1};
+                    const userRole = '${sessionScope.user != null ? sessionScope.user.default_role : "guest"}';
+                    if (typeof initChatWidget === 'function') {
+                        initChatWidget('<%= request.getContextPath() %>', userId, userRole);
+                        console.log('[Chat Widget] Initialized for home.jsp');
+                    }
+                } catch(e) {
+                    console.error('[Chat Widget] Init error:', e);
+                }
+            });
+        </script>
+    </body>
 </html>

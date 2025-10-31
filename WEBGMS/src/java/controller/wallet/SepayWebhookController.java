@@ -44,30 +44,58 @@ public class SepayWebhookController extends HttpServlet {
             Gson gson = new Gson();
             JsonObject data = gson.fromJson(json, JsonObject.class);
 
-            String description = data.has("description") ? data.get("description").getAsString() : "";
-            double amount = data.has("amount") ? data.get("amount").getAsDouble() : 0;
-            String transactionId = data.has("tran_id")
-                    ? data.get("tran_id").getAsString()
-                    : (data.has("tid") ? data.get("tid").getAsString() : "UNKNOWN");
+            // ✅ Hỗ trợ cả format test và SePay real
+            // Description: ưu tiên "content" (SePay real), fallback "description"
+            String description = data.has("content") 
+                    ? data.get("content").getAsString() 
+                    : (data.has("description") ? data.get("description").getAsString() : "");
+            
+            // Amount: ưu tiên "transferAmount" (SePay real), fallback "amount"
+            double amount = data.has("transferAmount") 
+                    ? data.get("transferAmount").getAsDouble() 
+                    : (data.has("amount") ? data.get("amount").getAsDouble() : 0);
+            
+            // Transaction ID: ưu tiên "id" (SePay real), fallback "tran_id"
+            String transactionId = data.has("id") 
+                    ? data.get("id").getAsString() 
+                    : (data.has("tran_id") ? data.get("tran_id").getAsString() : 
+                      (data.has("tid") ? data.get("tid").getAsString() : "UNKNOWN"));
 
-            String bank = data.has("bank_name") ? data.get("bank_name").getAsString() : "Unknown Bank";
+            // Bank: ưu tiên "gateway" (SePay real), fallback "bank_name"
+            String bank = data.has("gateway") 
+                    ? data.get("gateway").getAsString() 
+                    : (data.has("bank_name") ? data.get("bank_name").getAsString() : "Unknown Bank");
+
+            System.out.println("🔍 DEBUG - Description: " + description);
+            System.out.println("🔍 DEBUG - Amount: " + amount);
+            System.out.println("🔍 DEBUG - Transaction ID: " + transactionId);
+            System.out.println("🔍 DEBUG - Bank: " + bank);
 
             WalletDAO walletDAO = new WalletDAO();
             int userId = walletDAO.findUserIdByDescription(description);
+            
+            System.out.println("🔍 DEBUG - Parsed User ID: " + userId);
 
             if (userId == -1) {
                 System.out.println("⚠️ Không tìm thấy userId trong mô tả: " + description);
-                response.getWriter().write("{\"success\": false, \"message\": \"Invalid description\"}");
+                System.out.println("⚠️ Format đúng phải là: TOPUP-{số}");
+                response.getWriter().write("{\"success\": false, \"message\": \"Invalid description format. Expected: TOPUP-{number}\"}");
                 return;
             }
 
-            // Kiểm tra trùng giao dịch
+            // Kiểm tra user tồn tại
+            System.out.println("🔍 DEBUG - Checking if user exists...");
+            
+            // Kiểm tra wallet tồn tại
+            System.out.println("🔍 DEBUG - Processing top up...");
             walletDAO.processTopUp(userId, amount, transactionId, bank);
 
             System.out.println("✅ Nạp tiền thành công: +" + amount + "đ cho user_id=" + userId);
-            response.getWriter().write("{\"success\": true, \"message\": \"Deposit success\"}");
+            System.out.println("✅ Transaction ID: " + transactionId);
+            response.getWriter().write("{\"success\": true, \"message\": \"Deposit success\", \"user_id\": " + userId + ", \"amount\": " + amount + "}");
 
         } catch (Exception e) {
+            System.err.println("❌ ERROR in webhook: " + e.getMessage());
             e.printStackTrace();
             response.setStatus(500);
             response.getWriter().write("{\"success\": false, \"message\": \"Server error: " + e.getMessage() + "\"}");

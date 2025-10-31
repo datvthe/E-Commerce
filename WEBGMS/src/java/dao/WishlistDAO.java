@@ -70,6 +70,7 @@ public class WishlistDAO extends DBConnection {
 
             ps.setInt(1, userId);
             ps.setLong(2, productId);
+            
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
             }
@@ -111,6 +112,7 @@ public class WishlistDAO extends DBConnection {
             ps.setInt(1, userId);
             ps.setInt(2, limit);
             ps.setInt(3, offset);
+            
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Wishlist wishlist = new Wishlist();
@@ -162,6 +164,7 @@ public class WishlistDAO extends DBConnection {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
+            
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     count = rs.getInt("count");
@@ -208,6 +211,7 @@ public class WishlistDAO extends DBConnection {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
+            
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     summary.setTotalItems(rs.getInt("total_items"));

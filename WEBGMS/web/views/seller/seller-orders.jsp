@@ -7,6 +7,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Quản lý đơn hàng - Giicungco Seller</title>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
         body {
             font-family: "Poppins", sans-serif;
@@ -36,103 +38,182 @@
 
         h1 {
             color: #333;
-            font-size: 24px;
+            font-size: 28px;
             margin-bottom: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .subtitle {
             color: #777;
             margin-bottom: 25px;
+            font-size: 15px;
         }
 
+        /* Stats Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
+            gap: 15px;
+            margin-bottom: 30px;
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #ff6600, #ff8533);
-            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
             border-radius: 12px;
-            text-align: center;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
         }
 
-        .stat-card h3 {
-            margin: 0 0 10px 0;
-            font-size: 14px;
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card.orange {
+            background: linear-gradient(135deg, #ff6600 0%, #ff8c3a 100%);
+        }
+
+        .stat-card.green {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .stat-card.blue {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
             opacity: 0.9;
         }
 
+        .stat-card h3 {
+            margin: 0 0 8px 0;
+            font-size: 13px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
         .stat-card .value {
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 28px;
+            font-weight: 700;
             margin: 0;
         }
 
         .filters {
             display: flex;
-            gap: 15px;
+            gap: 10px;
+            flex-wrap: wrap;
             margin-bottom: 20px;
             align-items: flex-end;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
         }
 
         .filter-group {
             display: flex;
             flex-direction: column;
+            flex: 1;
+            min-width: 200px;
         }
 
         .filter-group label {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 5px;
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .filter-group label i {
+            color: #ff6600;
+            margin-right: 5px;
         }
 
         .filter-group select {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            padding: 10px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
             font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-group select:hover {
+            border-color: #ff8c3a;
+        }
+
+        .filter-group select:focus {
+            outline: none;
+            border-color: #ff6600;
+            box-shadow: 0 0 0 3px rgba(255,102,0,0.1);
         }
 
         .btn {
-            background: #ff6600;
+            background: linear-gradient(135deg, #ff6600 0%, #ff8c3a 100%);
             color: white;
-            padding: 8px 16px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
             font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255,102,0,0.3);
         }
 
         .btn:hover {
-            background: #e65c00;
+            background: linear-gradient(135deg, #e65c00 0%, #ff7b00 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,102,0,0.4);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
+            overflow: hidden;
+            border-radius: 10px;
         }
 
         th, td {
-            padding: 12px 14px;
+            padding: 14px 16px;
             border-bottom: 1px solid #f0f0f0;
             text-align: left;
             font-size: 14px;
         }
 
         th {
-            background-color: #fff3e6;
-            color: #ff6600;
+            background: linear-gradient(135deg, #ff6600 0%, #ff7b00 100%);
+            color: white;
             font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
         }
 
-        tr:hover {
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
             background-color: #fff9f3;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transform: scale(1.01);
+        }
+
+        td:first-child {
+            border-left: 3px solid transparent;
+        }
+
+        tbody tr:hover td:first-child {
+            border-left-color: #ff6600;
         }
 
         .status {
@@ -165,27 +246,39 @@
 
         .actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
+            align-items: center;
         }
 
         .btn-action {
-            padding: 6px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
             border: 1px solid #e6e6e6;
             border-radius: 6px;
-            font-size: 12px;
+            font-size: 13px;
             text-decoration: none;
-            color: #333;
-            background: #fff;
-            transition: all 0.15s;
+            color: #fff;
+            background: #6c757d;
+            transition: all 0.2s ease;
+            font-weight: 500;
         }
 
         .btn-action:hover {
-            background: #fafafa;
-            border-color: #dcdcdc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
-        .btn-view { color: #198754; }
-        .btn-update { color: #0d6efd; }
+        .btn-view {
+            background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+            border-color: #198754;
+        }
+
+        .btn-update {
+            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            border-color: #0d6efd;
+        }
 
         .pagination {
             display: flex;
@@ -236,20 +329,23 @@
 
 <!-- Main -->
 <div class="main">
-    <h1>🧾 Quản lý đơn hàng</h1>
-    <p class="subtitle">Theo dõi và quản lý các đơn hàng của bạn.</p>
+    <h1><i class="bi bi-receipt"></i> Quản lý đơn hàng</h1>
+    <p class="subtitle">Theo dõi và quản lý các đơn hàng của bạn trên nền tảng Giicungco</p>
 
     <!-- Thống kê -->
     <div class="stats-grid">
-        <div class="stat-card">
+        <div class="stat-card orange">
+            <div class="stat-icon"><i class="bi bi-cart-check"></i></div>
             <h3>Tổng đơn hàng</h3>
             <p class="value">${totalOrders}</p>
         </div>
-        <div class="stat-card">
+        <div class="stat-card green">
+            <div class="stat-icon"><i class="bi bi-cash-coin"></i></div>
             <h3>Doanh thu hôm nay</h3>
             <p class="value"><fmt:formatNumber value="${revenueToday}" type="number" groupingUsed="true"/> ₫</p>
         </div>
-        <div class="stat-card">
+        <div class="stat-card blue">
+            <div class="stat-icon"><i class="bi bi-graph-up-arrow"></i></div>
             <h3>Tổng doanh thu</h3>
             <p class="value"><fmt:formatNumber value="${totalRevenue}" type="number" groupingUsed="true"/> ₫</p>
         </div>
@@ -267,7 +363,7 @@
         <!-- Bộ lọc -->
         <form method="get" action="${pageContext.request.contextPath}/seller/orders" class="filters">
             <div class="filter-group">
-                <label>Trạng thái</label>
+                <label><i class="bi bi-toggle-on"></i> Trạng thái</label>
                 <select name="status">
                     <option value="">-- Tất cả --</option>
                     <option value="pending" <c:if test='${status == "pending"}'>selected</c:if>>Chờ thanh toán</option>
@@ -278,7 +374,9 @@
                     <option value="refunded" <c:if test='${status == "refunded"}'>selected</c:if>>Đã hoàn tiền</option>
                 </select>
             </div>
-            <button type="submit" class="btn">🔎 Lọc</button>
+            <button type="submit" class="btn">
+                <i class="bi bi-funnel"></i> Lọc
+            </button>
         </form>
 
         <!-- Nếu không có đơn hàng -->
@@ -315,9 +413,15 @@
                         </td>
                         <td><fmt:formatDate value="${order.created_at}" pattern="dd/MM/yyyy HH:mm"/></td>
                         <td class="actions">
-                            <a href="${pageContext.request.contextPath}/seller/orders/view?id=${order.order_id}" class="btn-action btn-view">Xem</a>
+                            <a href="${pageContext.request.contextPath}/seller/orders/view?id=${order.order_id}" 
+                               class="btn-action btn-view" title="Xem chi tiết">
+                                <i class="bi bi-eye"></i> Xem
+                            </a>
                             <c:if test="${order.status == 'pending' || order.status == 'paid'}">
-                                <a href="#" onclick="showStatusModal(${order.order_id}, '${order.status}')" class="btn-action btn-update">Cập nhật</a>
+                                <a href="#" onclick="showStatusModal(${order.order_id}, '${order.status}')" 
+                                   class="btn-action btn-update" title="Cập nhật trạng thái">
+                                    <i class="bi bi-pencil-square"></i> Cập nhật
+                                </a>
                             </c:if>
                         </td>
                     </tr>

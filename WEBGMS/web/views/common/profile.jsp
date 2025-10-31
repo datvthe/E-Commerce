@@ -163,7 +163,15 @@
                         </li>
                         <li class="nav-item mx-2"><a class="nav-link" href="${pageContext.request.contextPath}/products">Sản phẩm</a></li>
                         <li class="nav-item mx-2"><a class="nav-link" href="${pageContext.request.contextPath}/contact">Liên hệ</a></li>
-                        <li class="nav-item mx-2"><a class="nav-link" href="${pageContext.request.contextPath}/wallet">Nạp tiền</a></li>                        <li class="nav-item mx-2"><a class="nav-link" href="#"><i class="fa fa-search"></i> Tìm kiếm</a></li>
+                        <li class="nav-item mx-2"><a class="nav-link" href="${pageContext.request.contextPath}/wallet">Nạp tiền</a></li>
+                        <li class="nav-item mx-2">
+                            <a class="nav-link position-relative" href="${pageContext.request.contextPath}/wishlist">
+                                <i class="fa fa-heart text-danger me-1"></i> Yêu thích
+                                <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" 
+                                      id="wishlistCount" style="display: none; font-size: 0.7rem;">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item mx-2"><a class="nav-link" href="#"><i class="fa fa-search"></i> Tìm kiếm</a></li>
                         <li class="nav-item dropdown mx-2">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fa fa-user-circle me-1"></i> 
@@ -171,13 +179,18 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3" aria-labelledby="profileDropdown" style="min-width: 230px;">
                                 <li>
-                                    <a class="dropdown-item py-2" href="${pageContext.request.contextPath}/orders">
+                                    <a class="dropdown-item py-2" href="${pageContext.request.contextPath}/user/order-history">
                                         <i class="fa fa-box-open text-primary me-2"></i> Đơn hàng đã mua
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item py-2" href="${pageContext.request.contextPath}/transactions">
+                                    <a class="dropdown-item py-2" href="${pageContext.request.contextPath}/user/payment-history">
                                         <i class="fa fa-receipt text-success me-2"></i> Lịch sử thanh toán
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2" href="${pageContext.request.contextPath}/wishlist">
+                                        <i class="fa fa-heart text-danger me-2"></i> Yêu thích
                                     </a>
                                 </li>
 
@@ -369,5 +382,17 @@
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        
+        <!-- Wishlist JavaScript -->
+        <script>
+            // Set context path and user ID for wishlist.js
+            const contextPath = '${pageContext.request.contextPath}';
+            <c:if test="${not empty sessionScope.user}">
+            const currentUserId = ${sessionScope.user.user_id};
+            // Store in sessionStorage for wishlist.js
+            sessionStorage.setItem('userId', ${sessionScope.user.user_id});
+            </c:if>
+        </script>
+        <script src="${pageContext.request.contextPath}/assets/js/wishlist.js?v=<%= System.currentTimeMillis() %>"></script>
     </body>
 </html>

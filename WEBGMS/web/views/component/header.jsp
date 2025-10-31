@@ -359,8 +359,11 @@ pageEncoding="UTF-8"%>
                                         <li><a class="dropdown-item py-2" href="<%= request.getContextPath() %>/profile">
                                             <i class="fas fa-id-card me-2 text-primary"></i>Hồ sơ cá nhân
                                         </a></li>
-                                        <li><a class="dropdown-item py-2" href="<%= request.getContextPath() %>/orders">
-                                            <i class="fas fa-shopping-bag me-2 text-success"></i>Đơn hàng của tôi
+                                        <li><a class="dropdown-item py-2" href="<%= request.getContextPath() %>/user/order-history">
+                                            <i class="fas fa-shopping-bag me-2 text-success"></i>Đơn hàng đã mua
+                                        </a></li>
+                                        <li><a class="dropdown-item py-2" href="<%= request.getContextPath() %>/user/payment-history">
+                                            <i class="fas fa-receipt me-2 text-info"></i>Lịch sử thanh toán
                                         </a></li>
                                         <li><a class="dropdown-item py-2" href="<%= request.getContextPath() %>/wishlist">
                                             <i class="fas fa-heart me-2 text-danger"></i>Danh sách yêu thích
@@ -801,8 +804,11 @@ pageEncoding="UTF-8"%>
                                                 <a class="dropdown-item py-2" href="<%= request.getContextPath() %>/profile">
                                                     <i class="fas fa-id-card me-2 text-primary"></i>Hồ sơ cá nhân
                                                 </a>
-                                                <a class="dropdown-item py-2" href="<%= request.getContextPath() %>/orders">
-                                                    <i class="fas fa-shopping-bag me-2 text-success"></i>Đơn hàng
+                                                <a class="dropdown-item py-2" href="<%= request.getContextPath() %>/user/order-history">
+                                                    <i class="fas fa-shopping-bag me-2 text-success"></i>Đơn hàng đã mua
+                                                </a>
+                                                <a class="dropdown-item py-2" href="<%= request.getContextPath() %>/user/payment-history">
+                                                    <i class="fas fa-receipt me-2 text-info"></i>Lịch sử thanh toán
                                                 </a>
                                                 <a class="dropdown-item py-2" href="<%= request.getContextPath() %>/wishlist">
                                                     <i class="fas fa-heart me-2 text-danger"></i>Yêu thích

@@ -1869,6 +1869,7 @@ public class DateTimeTest extends BaseTestCase {
                                         assertThrows(props, tVarchar, orig_lt, MysqlType.DATETIME, senderTz,
                                                 ".*Conversion from java.time.LocalTime to DATETIME is not supported.");
                                         assertThrows(props, tVarchar, orig_lt, MysqlType.TIMESTAMP, senderTz,
+<<<<<<< HEAD
                                                 ".*Conversion from java.time.LocalTime to TIMESTAMP is not supported.");
                                         assertThrows(props, tVarchar, orig_lt, MysqlType.YEAR, senderTz,
                                                 ".*Conversion from java.time.LocalTime to YEAR is not supported.");
@@ -4609,3 +4610,6 @@ public class DateTimeTest extends BaseTestCase {
     }
 
 }
+=======
+                                            
+>>>>>>> son
