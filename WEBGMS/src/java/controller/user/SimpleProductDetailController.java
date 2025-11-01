@@ -81,8 +81,8 @@ public class SimpleProductDetailController extends HttpServlet {
         request.setAttribute("availableStock", availableStock);
         request.setAttribute("isInWishlist", isInWishlist);
 
-        // Forward to simple JSP
-        request.getRequestDispatcher("/views/user/product-detail-simple.jsp").forward(request, response);
+        // Forward to full product detail JSP for richer layout
+        request.getRequestDispatcher("/views/user/product-detail.jsp").forward(request, response);
     }
 
     @Override

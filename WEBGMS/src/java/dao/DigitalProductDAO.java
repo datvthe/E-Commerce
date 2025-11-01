@@ -13,25 +13,59 @@ public class DigitalProductDAO extends DBConnection {
     
     /**
      * Kiểm tra số lượng sản phẩm digital còn available
+     * Ưu tiên bảng digital_products; nếu chưa có, fallback sang digital_goods_codes;
+     * cuối cùng fallback về products.quantity để không chặn mua trong môi trường demo.
      */
     public int getAvailableStock(Long productId) {
-        String sql = "SELECT COUNT(*) FROM digital_products " +
-                    "WHERE product_id = ? AND status = 'AVAILABLE'";
-        
+        // 1) Try new table: digital_products
+        String sql1 = "SELECT COUNT(*) FROM digital_products WHERE product_id = ? AND status = 'AVAILABLE'";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
+             PreparedStatement ps = conn.prepareStatement(sql1)) {
             ps.setLong(1, productId);
-            
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt(1);
+                    int c = rs.getInt(1);
+                    if (c > 0) return c;
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        
+        } catch (SQLException ignore) { /* may not exist yet */ }
+
+        // 2) Fallback: legacy table digital_goods_codes (is_used = 0)
+        String sql2 = "SELECT COUNT(*) FROM digital_goods_codes WHERE product_id = ? AND is_used = 0";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql2)) {
+            ps.setLong(1, productId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int c = rs.getInt(1);
+                    if (c > 0) return c;
+                }
+            }
+        } catch (SQLException ignore) { /* table may not exist */ }
+
+        // 3) Try Inventory available (quantity - reserved_quantity)
+        String sql3 = "SELECT (quantity - reserved_quantity) AS avail FROM Inventory WHERE product_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql3)) {
+            ps.setLong(1, productId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int c = rs.getInt(1);
+                    if (c > 0) return c;
+                }
+            }
+        } catch (SQLException ignore) {}
+
+        // 4) Last resort: products.quantity
+        String sql4 = "SELECT COALESCE(quantity,0) FROM products WHERE product_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql4)) {
+            ps.setLong(1, productId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (SQLException ignore) {}
+
         return 0;
     }
     
@@ -46,7 +80,7 @@ public class DigitalProductDAO extends DBConnection {
                     "WHERE product_id = ? AND status = 'AVAILABLE' " +
                     "ORDER BY digital_id ASC " +
                     "LIMIT ? " +
-                    "FOR UPDATE"; // Lock để tránh 2 user mua cùng 1 mã
+                    "FOR UPDATE SKIP LOCKED"; // Lock và bỏ qua row đang bị lock để tránh chờ/timeout
         
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, productId);

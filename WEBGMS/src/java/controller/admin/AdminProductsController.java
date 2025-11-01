@@ -35,19 +35,8 @@ public class AdminProductsController extends HttpServlet {
             int page = 1; int pageSize = 12;
             try { String p = request.getParameter("page"); if (p != null) page = Integer.parseInt(p);} catch (Exception ignore) {}
             List<Products> list = productDAO.adminFilterProducts(page, pageSize, keyword, category, status);
-            // Sync quantity with real stock (digital -> digital_products; else Inventory)
-            DigitalProductDAO digitalDAO = new DigitalProductDAO();
-            InventoryDAO inventoryDAO = new InventoryDAO();
-            if (list != null) {
-                for (Products p : list) {
-                    int available = digitalDAO.getAvailableStock(p.getProduct_id());
-                    if (available <= 0) {
-                        // fallback to inventory if not a digital product
-                        try { available = inventoryDAO.getAvailableQuantity(p.getProduct_id()); } catch (Exception ignore) {}
-                    }
-                    p.setQuantity(available);
-                }
-            }
+            // NOTE: show the quantity saved in Products table (what admin edited)
+            // If you want to see real available digital codes, add a separate column instead.
             int total = productDAO.adminCountFilteredProducts(keyword, category, status);
             int totalPages = (int)Math.ceil((double)total / pageSize);
             ProductCategoriesDAO cateDAO = new ProductCategoriesDAO();

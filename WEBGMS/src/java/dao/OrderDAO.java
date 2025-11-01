@@ -16,6 +16,78 @@ import java.util.List;
 public class OrderDAO extends DBConnection {
     
     /**
+     * Tạo đơn hàng PENDING (khởi tạo khi khách bấm Thanh toán - chờ gateway)
+     */
+    public Long createPendingOrder(Long buyerId, Long sellerId, Long productId,
+                                   Integer quantity, java.math.BigDecimal unitPrice,
+                                   java.math.BigDecimal totalAmount, String paymentMethod) throws SQLException {
+        String orderNumber = generateOrderNumber();
+        String sql = "INSERT INTO orders (order_number, buyer_id, seller_id, product_id, quantity, unit_price, total_amount, currency, payment_method, payment_status, order_status, delivery_status, created_at) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, 'VND', ?, 'PENDING', 'PENDING', 'INSTANT', NOW())";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, orderNumber);
+            ps.setLong(2, buyerId);
+            ps.setLong(3, sellerId);
+            ps.setLong(4, productId);
+            ps.setInt(5, quantity);
+            ps.setBigDecimal(6, unitPrice);
+            ps.setBigDecimal(7, totalAmount);
+            ps.setString(8, paymentMethod != null ? paymentMethod : "GATEWAY");
+            int affected = ps.executeUpdate();
+            if (affected > 0) { try (ResultSet rs = ps.getGeneratedKeys()) { if (rs.next()) return rs.getLong(1); } }
+        } catch (SQLException e) {
+            // Legacy fallback (no product columns)
+            try (Connection conn = DBConnection.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO orders (buyer_id, seller_id, total_amount, currency, status, created_at) VALUES (?, ?, ?, 'VND', 'pending', NOW())",
+                    Statement.RETURN_GENERATED_KEYS)) {
+                ps.setLong(1, buyerId);
+                ps.setLong(2, sellerId);
+                ps.setBigDecimal(3, totalAmount);
+                if (ps.executeUpdate() > 0) { try (ResultSet rs = ps.getGeneratedKeys()) { if (rs.next()) return rs.getLong(1); } }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Thêm 1 order_item cho đơn (idempotent đơn giản theo cặp order_id, product_id, quantity)
+     */
+    public void addOrderItem(long orderId, long productId, int quantity, java.math.BigDecimal unitPrice) throws SQLException {
+        String sql = "INSERT INTO order_items (order_id, product_id, quantity, unit_price, total_price) VALUES (?, ?, ?, ?, ? )";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, orderId);
+            ps.setLong(2, productId);
+            ps.setInt(3, quantity);
+            ps.setBigDecimal(4, unitPrice);
+            ps.setBigDecimal(5, unitPrice.multiply(new java.math.BigDecimal(quantity)));
+            ps.executeUpdate();
+        } catch (SQLException ignore) { /* table may differ; ignore silently */ }
+    }
+
+    /**
+     * Đánh dấu đơn đã thanh toán qua cổng (gateway callback)
+     */
+    public boolean markOrderPaid(Long orderId, String transactionId, String method) {
+        String sql = "UPDATE orders SET payment_status='PAID', order_status='PAID', payment_method = COALESCE(?, payment_method), transaction_id = ?, updated_at = NOW() WHERE order_id = ?";
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, method);
+            ps.setString(2, transactionId);
+            ps.setLong(3, orderId);
+            int ok = ps.executeUpdate();
+            if (ok > 0) return true;
+        } catch (SQLException e) {
+            // Legacy update
+            try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement("UPDATE orders SET status='paid', updated_at = NOW() WHERE order_id = ?")) {
+                ps.setLong(1, orderId);
+                return ps.executeUpdate() > 0;
+            } catch (SQLException ignored) {}
+        }
+        return false;
+    }
+
+    /**
      * Tạo đơn hàng mới (digital goods - instant delivery)
      * @return order_id của đơn hàng mới tạo
      */
@@ -357,6 +429,73 @@ public class OrderDAO extends DBConnection {
     }
     
     /**
+     * Lấy orders hiển thị cho Admin (chỉ Paid/Completed)
+     */
+    public List<Orders> getAdminVisibleOrders(int page, int pageSize) {
+        List<Orders> list = new ArrayList<>();
+        String orderStatusExpr = "COALESCE(o.status, o.order_status)";
+        String sql = "SELECT " +
+                "o.order_id, NULL AS order_number, o.buyer_id, o.seller_id, " +
+                "NULL AS product_id, NULL AS quantity, NULL AS unit_price, " +
+                "o.total_amount, o.currency, o.payment_method, o.payment_status, " +
+                orderStatusExpr + " AS order_status, o.delivery_status, o.transaction_id, o.queue_status, " +
+                "o.processed_at, o.created_at, o.updated_at, " +
+                "b.email AS buyer_email, b.full_name AS buyer_name, " +
+                "s.email AS seller_email, s.full_name AS seller_name, " +
+                "NULL AS product_name, NULL AS product_slug " +
+                "FROM orders o " +
+                "LEFT JOIN users b ON o.buyer_id = b.user_id " +
+                "LEFT JOIN users s ON o.seller_id = s.user_id " +
+                "WHERE (UPPER(COALESCE(o.payment_status,'')) = 'PAID' OR LOWER(" + orderStatusExpr + ") IN ('paid','completed','delivered')) " +
+                "ORDER BY o.created_at DESC LIMIT ? OFFSET ?";
+        try (Connection conn = DBConnection.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, pageSize);
+                ps.setInt(2, (page - 1) * pageSize);
+                try (ResultSet rs = ps.executeQuery()) { while (rs.next()) list.add(extractOrderFromResultSet(rs)); }
+                return list;
+            } catch (SQLException primary) {
+                // Legacy fallback: no payment_status/order_number columns
+                String legacy = "SELECT " +
+                        "o.order_id, NULL AS order_number, o.buyer_id, o.seller_id, " +
+                        "NULL AS product_id, NULL AS quantity, NULL AS unit_price, " +
+                        "o.total_amount, o.currency, NULL AS payment_method, NULL AS payment_status, " +
+                        "o.status AS order_status, o.delivery_status, NULL AS transaction_id, NULL AS queue_status, " +
+                        "NULL AS processed_at, o.created_at, o.updated_at, " +
+                        "b.email AS buyer_email, b.full_name AS buyer_name, " +
+                        "s.email AS seller_email, s.full_name AS seller_name, " +
+                        "NULL AS product_name, NULL AS product_slug " +
+                        "FROM orders o " +
+                        "LEFT JOIN users b ON o.buyer_id = b.user_id " +
+                        "LEFT JOIN users s ON o.seller_id = s.user_id " +
+                        "WHERE LOWER(o.status) IN ('paid','delivered') " +
+                        "ORDER BY o.created_at DESC LIMIT ? OFFSET ?";
+                try (PreparedStatement ps2 = conn.prepareStatement(legacy)) {
+                    ps2.setInt(1, pageSize);
+                    ps2.setInt(2, (page - 1) * pageSize);
+                    try (ResultSet rs = ps2.executeQuery()) { while (rs.next()) list.add(extractOrderFromResultSet(rs)); }
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
+    }
+    public int getAdminVisibleOrderCount() {
+        String orderStatusExpr = "COALESCE(status, order_status)";
+        String sql = "SELECT COUNT(*) FROM orders WHERE (UPPER(COALESCE(payment_status,'')) = 'PAID' OR LOWER(" + orderStatusExpr + ") IN ('paid','completed','delivered'))";
+        try (Connection conn = DBConnection.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            } catch (SQLException primary) {
+                String legacy = "SELECT COUNT(*) FROM orders WHERE LOWER(status) IN ('paid','delivered')";
+                try (PreparedStatement ps2 = conn.prepareStatement(legacy); ResultSet rs2 = ps2.executeQuery()) {
+                    if (rs2.next()) return rs2.getInt(1);
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    /**
      * Lấy recent orders (admin dashboard)
      */
     public List<Orders> getRecentOrders(int limit) {
@@ -392,12 +531,13 @@ public class OrderDAO extends DBConnection {
 
     // Overload for controllers using int orderId
     public Orders getOrderById(int orderId) {
+        final String orderStatusExpr = "COALESCE(o.status, o.order_status)";
         String sql = "SELECT " +
-                "o.order_id, o.order_number, o.buyer_id, o.seller_id, " +
+                "o.order_id, NULL AS order_number, o.buyer_id, o.seller_id, " +
                 "NULL AS product_id, NULL AS quantity, NULL AS unit_price, " +
-                "o.total_amount, o.currency, o.payment_method, NULL AS payment_status, " +
-                "o.status AS order_status, o.delivery_status, NULL AS transaction_id, NULL AS queue_status, " +
-                "NULL AS processed_at, o.created_at, o.updated_at, " +
+                "o.total_amount, o.currency, o.payment_method, COALESCE(o.payment_status, NULL) AS payment_status, " +
+                orderStatusExpr + " AS order_status, COALESCE(o.delivery_status, NULL) AS delivery_status, COALESCE(o.transaction_id, NULL) AS transaction_id, COALESCE(o.queue_status, NULL) AS queue_status, " +
+                "NULL AS processed_at, o.created_at, COALESCE(o.updated_at, o.created_at) AS updated_at, " +
                 "b.email AS buyer_email, b.full_name AS buyer_name, " +
                 "s.email AS seller_email, s.full_name AS seller_name, " +
                 "NULL AS product_name, NULL AS product_slug " +
@@ -405,12 +545,32 @@ public class OrderDAO extends DBConnection {
                 "LEFT JOIN users b ON o.buyer_id = b.user_id " +
                 "LEFT JOIN users s ON o.seller_id = s.user_id " +
                 "WHERE o.order_id = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, orderId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return extractOrderFromResultSet(rs);
+        try (Connection conn = DBConnection.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, orderId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return extractOrderFromResultSet(rs);
+                    }
+                }
+            } catch (SQLException primary) {
+                // Legacy fallback: schema with only 'status' and no payment/queue columns
+                String legacy = "SELECT " +
+                        "o.order_id, NULL AS order_number, o.buyer_id, o.seller_id, " +
+                        "NULL AS product_id, NULL AS quantity, NULL AS unit_price, " +
+                        "o.total_amount, o.currency, NULL AS payment_method, NULL AS payment_status, " +
+                        "o.status AS order_status, NULL AS delivery_status, NULL AS transaction_id, NULL AS queue_status, " +
+                        "NULL AS processed_at, o.created_at, NULL AS updated_at, " +
+                        "b.email AS buyer_email, b.full_name AS buyer_name, " +
+                        "s.email AS seller_email, s.full_name AS seller_name, " +
+                        "NULL AS product_name, NULL AS product_slug " +
+                        "FROM orders o " +
+                        "LEFT JOIN users b ON o.buyer_id = b.user_id " +
+                        "LEFT JOIN users s ON o.seller_id = s.user_id " +
+                        "WHERE o.order_id = ?";
+                try (PreparedStatement ps2 = conn.prepareStatement(legacy)) {
+                    ps2.setInt(1, orderId);
+                    try (ResultSet rs2 = ps2.executeQuery()) { if (rs2.next()) return extractOrderFromResultSet(rs2); }
                 }
             }
         } catch (SQLException e) {
@@ -550,26 +710,28 @@ public class OrderDAO extends DBConnection {
     public List<Orders> getAllOrders(String status, int page, int pageSize) {
         List<Orders> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder();
+        final String orderStatusExpr = "COALESCE(o.status, o.order_status)";
         sql.append("SELECT ")
-           .append("o.order_id, o.order_number, o.buyer_id, o.seller_id, ")
+           .append("o.order_id, NULL AS order_number, o.buyer_id, o.seller_id, ")
            .append("NULL AS product_id, NULL AS quantity, NULL AS unit_price, ")
-           .append("o.total_amount, o.currency, o.payment_method, NULL AS payment_status, ")
-           .append("o.status AS order_status, o.delivery_status, NULL AS transaction_id, NULL AS queue_status, ")
-           .append("NULL AS processed_at, o.created_at, o.updated_at, ")
+           .append("o.total_amount, o.currency, o.payment_method, COALESCE(o.payment_status, NULL) AS payment_status, ")
+           .append(orderStatusExpr + " AS order_status, COALESCE(o.delivery_status, NULL) AS delivery_status, COALESCE(o.transaction_id, NULL) AS transaction_id, COALESCE(o.queue_status, NULL) AS queue_status, ")
+           .append("NULL AS processed_at, o.created_at, COALESCE(o.updated_at, o.created_at) AS updated_at, ")
            .append("b.email AS buyer_email, b.full_name AS buyer_name, ")
            .append("s.email AS seller_email, s.full_name AS seller_name, ")
            .append("NULL AS product_name, NULL AS product_slug ")
            .append("FROM orders o ")
            .append("LEFT JOIN users b ON o.buyer_id = b.user_id ")
            .append("LEFT JOIN users s ON o.seller_id = s.user_id ");
-        if (status != null && !status.trim().isEmpty()) {
-            sql.append("WHERE LOWER(o.status) = LOWER(?) ");
+        if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
+            // Filter by either legacy 'status' or new 'order_status'
+            sql.append("WHERE LOWER(" + orderStatusExpr + ") = LOWER(?) ");
         }
         sql.append("ORDER BY o.created_at DESC LIMIT ? OFFSET ?");
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             int idx = 1;
-            if (status != null && !status.trim().isEmpty()) {
+            if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
                 ps.setString(idx++, status);
             }
             ps.setInt(idx++, pageSize);
@@ -579,27 +741,62 @@ public class OrderDAO extends DBConnection {
                     list.add(extractOrderFromResultSet(rs));
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException primary) {
+            // Legacy-safe fallback: select minimal guaranteed columns
+            try (Connection conn = DBConnection.getConnection()) {
+                StringBuilder legacy = new StringBuilder();
+                legacy.append("SELECT ")
+                      .append("o.order_id, NULL AS order_number, o.buyer_id, o.seller_id, ")
+                      .append("NULL AS product_id, NULL AS quantity, NULL AS unit_price, ")
+                      .append("o.total_amount, o.currency, NULL AS payment_method, NULL AS payment_status, ")
+                      .append("o.status AS order_status, NULL AS delivery_status, NULL AS transaction_id, NULL AS queue_status, ")
+                      .append("NULL AS processed_at, o.created_at, NULL AS updated_at, ")
+                      .append("b.email AS buyer_email, b.full_name AS buyer_name, ")
+                      .append("s.email AS seller_email, s.full_name AS seller_name, ")
+                      .append("NULL AS product_name, NULL AS product_slug ")
+                      .append("FROM orders o ")
+                      .append("LEFT JOIN users b ON o.buyer_id = b.user_id ")
+                      .append("LEFT JOIN users s ON o.seller_id = s.user_id ");
+                if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
+                    legacy.append("WHERE LOWER(o.status) = LOWER(?) ");
+                }
+                legacy.append("ORDER BY o.created_at DESC LIMIT ? OFFSET ?");
+                try (PreparedStatement ps2 = conn.prepareStatement(legacy.toString())) {
+                    int i = 1;
+                    if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
+                        ps2.setString(i++, status);
+                    }
+                    ps2.setInt(i++, pageSize);
+                    ps2.setInt(i, (page - 1) * pageSize);
+                    try (ResultSet rs = ps2.executeQuery()) { while (rs.next()) list.add(extractOrderFromResultSet(rs)); }
+                }
+            } catch (SQLException ignored) { ignored.printStackTrace(); }
         }
         return list;
     }
 
-public int getOrderCount(String status) {
+    public int getOrderCount(String status) {
+        // Count by combined legacy/new status column where possible
+        String orderStatusExpr = "COALESCE(status, order_status)";
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM orders");
-        if (status != null && !status.trim().isEmpty()) {
-            sql.append(" WHERE LOWER(status) = LOWER(?)");
+        if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
+            sql.append(" WHERE LOWER(" + orderStatusExpr + ") = LOWER(?)");
         }
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            if (status != null && !status.trim().isEmpty()) {
+            if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
                 ps.setString(1, status);
             }
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getInt(1);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException primary) {
+            // Fallback for very old schema: count all
+            try (Connection conn = DBConnection.getConnection();
+                 PreparedStatement ps2 = conn.prepareStatement("SELECT COUNT(*) FROM orders");
+                 ResultSet rs2 = ps2.executeQuery()) {
+                if (rs2.next()) return rs2.getInt(1);
+            } catch (SQLException ignored) { ignored.printStackTrace(); }
         }
         return 0;
     }
@@ -607,11 +804,12 @@ public int getOrderCount(String status) {
     public List<Orders> getOrdersBySeller(int sellerUserId, String status, int page, int pageSize) {
         List<Orders> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder();
+        final String orderStatusExpr = "COALESCE(o.status, o.order_status)";
         sql.append("SELECT ")
-           .append("o.order_id, o.order_number, o.buyer_id, o.seller_id, ")
+           .append("o.order_id, NULL AS order_number, o.buyer_id, o.seller_id, ")
            .append("NULL AS product_id, NULL AS quantity, NULL AS unit_price, ")
            .append("o.total_amount, o.currency, o.payment_method, NULL AS payment_status, ")
-           .append("o.status AS order_status, o.delivery_status, NULL AS transaction_id, NULL AS queue_status, ")
+           .append(orderStatusExpr + " AS order_status, o.delivery_status, NULL AS transaction_id, NULL AS queue_status, ")
            .append("NULL AS processed_at, o.created_at, o.updated_at, ")
            .append("b.email AS buyer_email, b.full_name AS buyer_name, ")
            .append("s.email AS seller_email, s.full_name AS seller_name, ")
@@ -620,15 +818,15 @@ public int getOrderCount(String status) {
            .append("LEFT JOIN users b ON o.buyer_id = b.user_id ")
            .append("LEFT JOIN users s ON o.seller_id = s.user_id ")
            .append("WHERE o.seller_id = ? ");
-        if (status != null && !status.trim().isEmpty()) {
-            sql.append("AND LOWER(o.status) = LOWER(?) ");
+        if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
+            sql.append("AND LOWER(" + orderStatusExpr + ") = LOWER(?) ");
         }
         sql.append("ORDER BY o.created_at DESC LIMIT ? OFFSET ?");
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             int idx = 1;
             ps.setInt(idx++, sellerUserId);
-            if (status != null && !status.trim().isEmpty()) {
+            if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
                 ps.setString(idx++, status);
             }
             ps.setInt(idx++, pageSize);
@@ -644,13 +842,14 @@ public int getOrderCount(String status) {
 
     public int getOrderCountBySeller(int sellerUserId, String status) {
         StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM orders WHERE seller_id = ?");
-        if (status != null && !status.trim().isEmpty()) {
-            sql.append(" AND LOWER(status) = LOWER(?)");
+        final String orderStatusExpr = "COALESCE(status, order_status)";
+        if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
+            sql.append(" AND LOWER(" + orderStatusExpr + ") = LOWER(?)");
         }
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             ps.setInt(1, sellerUserId);
-            if (status != null && !status.trim().isEmpty()) {
+            if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
                 ps.setString(2, status);
             }
             try (ResultSet rs = ps.executeQuery()) {
@@ -678,7 +877,7 @@ public int getOrderCount(String status) {
 
     public BigDecimal getRevenueBySeller(int sellerUserId, String status) {
         StringBuilder sql = new StringBuilder("SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE seller_id = ?");
-        if (status != null && !status.trim().isEmpty()) {
+        if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
             sql.append(" AND LOWER(status) = LOWER(?)");
         } else {
             sql.append(" AND status IN ('paid','delivered')");
@@ -686,7 +885,7 @@ public int getOrderCount(String status) {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             ps.setInt(1, sellerUserId);
-            if (status != null && !status.trim().isEmpty()) {
+            if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
                 ps.setString(2, status);
             }
             try (ResultSet rs = ps.executeQuery()) {

@@ -51,8 +51,17 @@ public class AdminOrdersController extends HttpServlet {
                 if (pageStr != null && !pageStr.trim().isEmpty()) page = Integer.parseInt(pageStr);
             } catch (NumberFormatException ignored) {}
 
-            List<Orders> orders = orderDAO.getAllOrders(status, page, pageSize);
-            int totalOrders = orderDAO.getOrderCount(status);
+            List<Orders> orders;
+            int totalOrders;
+            boolean showAll = (status == null || status.trim().isEmpty() || "all".equalsIgnoreCase(status));
+            if (showAll) {
+                // Show ALL orders regardless of status by default
+                orders = orderDAO.getAllOrders(null, page, pageSize);
+                totalOrders = orderDAO.getOrderCount(null);
+            } else {
+                orders = orderDAO.getAllOrders(status, page, pageSize);
+                totalOrders = orderDAO.getOrderCount(status);
+            }
             int totalPages = (int) Math.ceil((double) totalOrders / pageSize);
 
             request.setAttribute("orders", orders);
@@ -74,6 +83,16 @@ public class AdminOrdersController extends HttpServlet {
             String error = request.getParameter("error");
             if (success != null) request.setAttribute("success", success);
             if (error != null) request.setAttribute("error", error);
+
+            // Also expose recent paid orders as a fallback for dashboards with empty filters
+            if ((orders == null || orders.isEmpty()) && (status == null || status.trim().isEmpty())) {
+                orders = orderDAO.getAdminVisibleOrders(1, 20);
+            }
+            // Final fallback: show most recent orders regardless of status
+            if (orders == null || orders.isEmpty()) {
+                orders = orderDAO.getRecentOrders(20);
+            }
+            request.setAttribute("orders", orders);
 
             request.getRequestDispatcher("/views/admin/admin-orders.jsp").forward(request, response);
             return;

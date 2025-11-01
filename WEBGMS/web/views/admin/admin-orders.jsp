@@ -91,16 +91,32 @@
                         <tr>
                             <td>#${o.order_id}</td>
                             <td>
-                                <div>${o.buyer_id.full_name}</div>
-                                <div style="font-size:12px;color:#666">${o.buyer_id.email}</div>
+                                <c:choose>
+                                    <c:when test="${not empty o.buyer}">
+                                        <div>${o.buyer.full_name}</div>
+                                        <div style="font-size:12px;color:#666">${o.buyer.email}</div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div>User #${o.buyerId}</div>
+                                        <div style="font-size:12px;color:#666">--</div>
+                                    </c:otherwise>
+                                </c:choose>
                             </td>
                             <td>
-                                <div>${o.seller_id.full_name}</div>
-                                <div style="font-size:12px;color:#666">${o.seller_id.email}</div>
+                                <c:choose>
+                                    <c:when test="${not empty o.seller}">
+                                        <div>${o.seller.full_name}</div>
+                                        <div style="font-size:12px;color:#666">${o.seller.email}</div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div>User #${o.sellerId}</div>
+                                        <div style="font-size:12px;color:#666">--</div>
+                                    </c:otherwise>
+                                </c:choose>
                             </td>
                             <td class="price"><fmt:formatNumber value="${o.total_amount}" type="number" groupingUsed="true"/> ${o.currency}</td>
-                            <td><span class="status ${o.payment_status}">${o.payment_status}</span></td>
-                            <td><span class="status ${o.order_status}">${o.order_status}</span></td>
+                    <td><span class="status ${o.payment_status}">${o.payment_status != null ? o.payment_status : 'N/A'}</span></td>
+                            <td><span class="status ${o.order_status}">${o.order_status != null ? o.order_status : o.status}</span></td>
                             <td><fmt:formatDate value="${o.created_at}" pattern="dd/MM/yyyy HH:mm"/></td>
                             <td class="actions">
                                 <a class="btn btn-secondary" href="${pageContext.request.contextPath}/admin/orders/view?id=${o.order_id}">Xem</a>

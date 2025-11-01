@@ -90,16 +90,23 @@ public class CheckoutProcessController extends HttpServlet {
             
             // 5. Kiểm tra và lock digital products
             List<DigitalProduct> availableProducts = digitalProductDAO.getAvailableProducts(productId, quantity, conn);
-            
+
+            boolean allowWithoutDigital = false;
             if (availableProducts.size() < quantity) {
-                conn.rollback();
-                jsonResponse.addProperty("status", "OUT_OF_STOCK");
-                jsonResponse.addProperty("message", "Sản phẩm đã hết hàng! Còn lại: " + availableProducts.size());
-                response.getWriter().write(new Gson().toJson(jsonResponse));
-                return;
+                // Fallback: if product.quantity in Products table >= requested, allow purchase (for manual/physical delivery)
+                int fallbackQty = product.getQuantity();
+                if (fallbackQty >= quantity) {
+                    allowWithoutDigital = true; // proceed but skip digital code linking
+                } else {
+                    conn.rollback();
+                    jsonResponse.addProperty("status", "OUT_OF_STOCK");
+                    jsonResponse.addProperty("message", "Sản phẩm đã hết hàng! Còn lại: " + availableProducts.size());
+                    response.getWriter().write(new Gson().toJson(jsonResponse));
+                    return;
+                }
             }
             
-            // 6. Tạo cặp transaction ID (tránh trùng khóa PK)
+            // 7. Trừ tiền ví user
             long baseTxn = System.currentTimeMillis();
             long withdrawTxnId = baseTxn;      // for buyer withdraw
             long adminDepositTxnId = baseTxn + 1; // for admin credit
@@ -129,10 +136,12 @@ public class CheckoutProcessController extends HttpServlet {
                 return;
             }
             
-            // 9. Đánh dấu digital products là đã bán
-            for (DigitalProduct dp : availableProducts) {
-                digitalProductDAO.markAsSold(dp.getDigitalId(), Long.valueOf(user.getUser_id()), orderId, conn);
-                digitalProductDAO.linkDigitalProductToOrder(orderId, dp.getDigitalId(), conn);
+            // 9. Đánh dấu digital products là đã bán (nếu có)
+            if (!allowWithoutDigital) {
+                for (DigitalProduct dp : availableProducts) {
+                    digitalProductDAO.markAsSold(dp.getDigitalId(), Long.valueOf(user.getUser_id()), orderId, conn);
+                    digitalProductDAO.linkDigitalProductToOrder(orderId, dp.getDigitalId(), conn);
+                }
             }
             
             // 10. Chuyển tiền vào ví ADMIN ngay khi thanh toán thành công
@@ -222,52 +231,30 @@ public class CheckoutProcessController extends HttpServlet {
      * Trừ tiền từ ví user
      */
     private boolean withdrawFromWallet(Connection conn, int userId, double amount, long transactionId, String description) throws SQLException {
-        // Lấy wallet info
-        String sqlGetWallet = "SELECT wallet_id, balance FROM wallets WHERE user_id = ? FOR UPDATE";
-        long walletId = 0;
-        double oldBalance = 0;
-        
-        try (PreparedStatement ps = conn.prepareStatement(sqlGetWallet)) {
-            ps.setInt(1, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    walletId = rs.getLong("wallet_id");
-                    oldBalance = rs.getDouble("balance");
-                } else {
-                    return false; // Wallet không tồn tại
-                }
-            }
-        }
-        
-        // Kiểm tra số dư
-        if (oldBalance < amount) {
-            return false; // Không đủ tiền
-        }
-        
-        double newBalance = oldBalance - amount;
-        
-        // Update wallet
-        String sqlUpdate = "UPDATE wallets SET balance = ? WHERE wallet_id = ?";
+        // Thực hiện trừ tiền theo cách atomic để tránh lock chờ lâu
+        String sqlUpdate = "UPDATE wallets SET balance = balance - ? WHERE user_id = ? AND balance >= ?";
+        int affected;
         try (PreparedStatement ps = conn.prepareStatement(sqlUpdate)) {
-            ps.setDouble(1, newBalance);
-            ps.setLong(2, walletId);
-            ps.executeUpdate();
+            ps.setDouble(1, amount);
+            ps.setInt(2, userId);
+            ps.setDouble(3, amount);
+            affected = ps.executeUpdate();
         }
-        
-        // Insert transaction (simplified - chỉ các cột cần thiết)
-        // Dùng 'WITHDRAW' vì đây là trừ tiền (type ENUM chỉ có DEPOSIT, WITHDRAW, TRANSFER)
+        if (affected == 0) {
+            return false; // không đủ tiền hoặc không có ví
+        }
+
+        // Ghi nhận giao dịch rút tiền
         String sqlTrans = "INSERT INTO transactions " +
-                         "(transaction_id, user_id, type, amount, currency, status, note) " +
-                         "VALUES (?, ?, 'WITHDRAW', ?, 'VND', 'success', ?)";
-        
+                "(transaction_id, user_id, type, amount, currency, status, note) " +
+                "VALUES (?, ?, 'WITHDRAW', ?, 'VND', 'success', ?)";
         try (PreparedStatement ps = conn.prepareStatement(sqlTrans)) {
-            ps.setLong(1, transactionId);  // transaction_id là BIGINT
+            ps.setLong(1, transactionId);
             ps.setInt(2, userId);
             ps.setDouble(3, amount);
             ps.setString(4, "Mua sản phẩm: " + description);
             ps.executeUpdate();
         }
-        
         return true;
     }
 
@@ -275,35 +262,20 @@ public class CheckoutProcessController extends HttpServlet {
      * Cộng tiền vào ví (dùng chung cho ADMIN nhận tiền)
      */
     private boolean creditToWallet(Connection conn, int userId, double amount, long transactionId, String note) throws SQLException {
-        // Ensure wallet exists and lock
-        String sqlGet = "SELECT wallet_id, balance FROM wallets WHERE user_id = ? FOR UPDATE";
-        Long walletId = null; double oldBalance = 0;
-        try (PreparedStatement ps = conn.prepareStatement(sqlGet)) {
-            ps.setInt(1, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    walletId = rs.getLong("wallet_id");
-                    oldBalance = rs.getDouble("balance");
-                }
-            }
+        // Cộng tiền bằng một câu lệnh cập nhật; nếu chưa có ví thì tạo
+        int affected;
+        try (PreparedStatement ps = conn.prepareStatement("UPDATE wallets SET balance = balance + ? WHERE user_id = ?")) {
+            ps.setDouble(1, amount);
+            ps.setInt(2, userId);
+            affected = ps.executeUpdate();
         }
-        if (walletId == null) {
-            // create wallet
-            try (PreparedStatement ps = conn.prepareStatement("INSERT INTO wallets (user_id, balance, currency) VALUES (?, 0, 'VND')", Statement.RETURN_GENERATED_KEYS)) {
+        if (affected == 0) {
+            try (PreparedStatement ps = conn.prepareStatement("INSERT INTO wallets (user_id, balance, currency) VALUES (?, ?, 'VND')")) {
                 ps.setInt(1, userId);
+                ps.setDouble(2, amount);
                 ps.executeUpdate();
-                try (ResultSet ks = ps.getGeneratedKeys()) { if (ks.next()) walletId = ks.getLong(1); }
             }
-            oldBalance = 0;
         }
-
-        double newBalance = oldBalance + amount;
-        try (PreparedStatement ps = conn.prepareStatement("UPDATE wallets SET balance = ? WHERE wallet_id = ?")) {
-            ps.setDouble(1, newBalance);
-            ps.setLong(2, walletId);
-            ps.executeUpdate();
-        }
-
         try (PreparedStatement ps = conn.prepareStatement(
                 "INSERT INTO transactions (transaction_id, user_id, type, amount, currency, status, note) VALUES (?, ?, 'DEPOSIT', ?, 'VND', 'success', ?)")) {
             ps.setLong(1, transactionId);
@@ -317,7 +289,7 @@ public class CheckoutProcessController extends HttpServlet {
 
     // Helpers to record transfer linking buyer and admin
     private long getOrCreateWalletId(Connection conn, int userId) throws SQLException {
-        String q = "SELECT wallet_id FROM wallets WHERE user_id = ? FOR UPDATE";
+        String q = "SELECT wallet_id FROM wallets WHERE user_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(q)) {
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {

@@ -75,62 +75,68 @@
 
     <div class="card">
         <h3>Sản phẩm trong đơn</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Mã SP</th>
-                    <th>Tên sản phẩm</th>
-                    <th>Số lượng</th>
-                    <th>Đơn giá</th>
-                    <th>Tạm tính</th>
-                </tr>
-            </thead>
-            <tbody>
-                <c:forEach var="it" items="${orderItems}">
-                    <tr>
-                        <td>${it.productId.product_id}</td>
-                        <td>${it.productId.name}</td>
-                        <td>${it.quantity}</td>
-                        <td><fmt:formatNumber value="${it.priceAtPurchase}" type="number" groupingUsed="true"/></td>
-                        <td><fmt:formatNumber value="${it.subtotal}" type="number" groupingUsed="true"/></td>
-                    </tr>
-                </c:forEach>
-                <c:if test="${empty orderItems}">
-                    <tr><td colspan="5" style="text-align:center; color:#888;">Không có sản phẩm vật lý</td></tr>
-                </c:if>
-            </tbody>
-        </table>
-    </div>
 
-    <c:if test="${not empty digitalItems}">
-    <div class="card">
-        <h3>Sản phẩm số (Digital)</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Tên sản phẩm</th>
-                    <th>Mã/Code</th>
-                    <th>Serial</th>
-                    <th>Mật khẩu</th>
-                    <th>Hết hạn</th>
-                </tr>
-            </thead>
-            <tbody>
-                <c:forEach var="di" items="${digitalItems}" varStatus="s">
+        <!-- Bảng sản phẩm vật lý (nếu có) -->
+        <c:if test="${not empty orderItems}">
+            <table>
+                <thead>
                     <tr>
-                        <td>${s.index+1}</td>
-                        <td>${di.productName}</td>
-                        <td>${di.code}</td>
-                        <td>${empty di.serial ? '-' : di.serial}</td>
-                        <td>${empty di.password ? '-' : di.password}</td>
-                        <td><c:out value="${di.expiresAt}"/></td>
+                        <th>Mã SP</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Tạm tính</th>
                     </tr>
-                </c:forEach>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <c:forEach var="it" items="${orderItems}">
+                        <tr>
+                            <td>${it.productId.product_id}</td>
+                            <td>${it.productId.name}</td>
+                            <td>${it.quantity}</td>
+                            <td><fmt:formatNumber value="${it.priceAtPurchase}" type="number" groupingUsed="true"/></td>
+                            <td><fmt:formatNumber value="${it.subtotal}" type="number" groupingUsed="true"/></td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </c:if>
+
+        <!-- Bảng sản phẩm số (Digital) hiển thị chung trong cùng thẻ -->
+        <c:if test="${not empty digitalItems}">
+            <div style="margin-top:16px"></div>
+            <h3 style="margin:12px 0 6px 0; font-size:18px;">Sản phẩm số (Digital)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Mã/Code</th>
+                        <th>Serial</th>
+                        <th>Mật khẩu</th>
+                        <th>Hết hạn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach var="di" items="${digitalItems}" varStatus="s">
+                        <tr>
+                            <td>${s.index+1}</td>
+                            <td>${di.productName}</td>
+                            <td>${di.code}</td>
+                            <td>${empty di.serial ? '-' : di.serial}</td>
+                            <td>${empty di.password ? '-' : di.password}</td>
+                            <td><c:out value="${di.expiresAt}"/></td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </c:if>
+
+        <!-- Nếu hoàn toàn không có sản phẩm -->
+        <c:if test="${empty orderItems and empty digitalItems}">
+            <div style="padding:12px; text-align:center; color:#888;">Không có sản phẩm trong đơn.</div>
+        </c:if>
     </div>
-    </c:if>
 </div>
 
 <!-- Modal cập nhật trạng thái -->
