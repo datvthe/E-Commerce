@@ -1,0 +1,223 @@
+╔═══════════════════════════════════════════════════════════════╗
+║     TÓM TẮT USE CASE - HỆ THỐNG E-COMMERCE WEBGMS             ║
+╚═══════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════
+  📋 DANH SÁCH ACTORS
+═══════════════════════════════════════════════════════════════
+
+1. 👤 GUEST (Khách vãng lai)
+   - Chưa đăng nhập
+   - 8 use cases
+
+2. 🛒 CUSTOMER (Khách hàng)
+   - Đã đăng nhập
+   - Kế thừa Guest + 15 use cases riêng
+
+3. 🏪 SELLER (Người bán)
+   - Đã đăng ký seller
+   - Kế thừa Customer + 18 use cases riêng
+
+4. 👨‍💼 ADMIN (Quản trị viên)
+   - Toàn quyền
+   - 19 use cases
+
+5. 🛡️ MODERATOR (Kiểm duyệt)
+   - Kiểm duyệt nội dung
+   - 9 use cases
+
+═══════════════════════════════════════════════════════════════
+  📊 THỐNG KÊ USE CASES
+═══════════════════════════════════════════════════════════════
+
+┌────────────┬────────────────┬──────────────────────────────┐
+│ Actor      │ Số Use Cases   │ Kế thừa từ                   │
+├────────────┼────────────────┼──────────────────────────────┤
+│ Guest      │ 8              │ -                            │
+│ Customer   │ 23 (8+15)      │ Guest                        │
+│ Seller     │ 41 (23+18)     │ Customer                     │
+│ Admin      │ 19             │ -                            │
+│ Moderator  │ 9              │ -                            │
+├────────────┼────────────────┼──────────────────────────────┤
+│ TỔNG       │ 100+ use cases │                              │
+└────────────┴────────────────┴──────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════
+  🎯 USE CASES QUAN TRỌNG NHẤT
+═══════════════════════════════════════════════════════════════
+
+TOP 10 USE CASES CORE:
+
+1. UC-C004: Đặt hàng
+   - Actor: Customer
+   - Include: Đăng nhập, Xác nhận địa chỉ
+   - Priority: CRITICAL
+
+2. UC-C005: Thanh toán
+   - Actor: Customer
+   - Include: Đặt hàng
+   - Priority: CRITICAL
+
+3. UC-S003: Thêm sản phẩm mới
+   - Actor: Seller
+   - Include: Upload ảnh
+   - Priority: HIGH
+
+4. UC-S008: Xác nhận đơn hàng
+   - Actor: Seller
+   - Priority: HIGH
+
+5. UC-A002: Duyệt đăng ký seller
+   - Actor: Admin
+   - Priority: HIGH
+
+6. UC-C009: Đánh giá sản phẩm
+   - Actor: Customer
+   - Priority: MEDIUM
+
+7. UC-S013: Rút tiền
+   - Actor: Seller
+   - Include: Xem ví
+   - Priority: HIGH
+
+8. UC-A011: Duyệt yêu cầu rút tiền
+   - Actor: Admin
+   - Priority: HIGH
+
+9. UC-M003: Xử lý báo cáo vi phạm
+   - Actor: Moderator
+   - Priority: MEDIUM
+
+10. UC-G001: Xem danh sách sản phẩm
+    - Actor: Guest
+    - Priority: CRITICAL
+
+═══════════════════════════════════════════════════════════════
+  🔗 QUAN HỆ GIỮA ACTORS
+═══════════════════════════════════════════════════════════════
+
+Kế thừa (Generalization):
+
+        Guest
+          △
+          │
+      Customer  ◄────── "có thể mua hàng"
+          △
+          │
+       Seller   ◄────── "có thể bán hàng"
+
+
+      Admin    ◄────── Toàn quyền
+      
+   Moderator   ◄────── Một số quyền admin
+
+═══════════════════════════════════════════════════════════════
+  📁 CÁC FILE LIÊN QUAN
+═══════════════════════════════════════════════════════════════
+
+1. USE_CASE_DIAGRAM_GUIDE.md
+   → Hướng dẫn chi tiết đầy đủ
+   → Mô tả từng use case
+   → Cách vẽ diagram
+
+2. use_case_diagrams.plantuml
+   → Code PlantUML để tự động tạo diagram
+   → Có thể paste vào: https://www.plantuml.com/plantuml/
+   → Hoặc dùng extension trong VS Code
+
+3. USE_CASE_SUMMARY.txt
+   → File này - Tóm tắt nhanh
+
+═══════════════════════════════════════════════════════════════
+  🎨 CÁCH SỬ DỤNG FILE PLANTUML
+═══════════════════════════════════════════════════════════════
+
+OPTION 1: Online
+  1. Mở: https://www.plantuml.com/plantuml/
+  2. Copy code từ use_case_diagrams.plantuml
+  3. Paste vào
+  4. Xem diagram tự động generate
+  5. Download ảnh PNG/SVG
+
+OPTION 2: VS Code
+  1. Cài extension: "PlantUML"
+  2. Mở file use_case_diagrams.plantuml
+  3. Press Alt+D (preview diagram)
+  4. Export PNG/SVG
+
+OPTION 3: IntelliJ/PyCharm
+  1. Cài plugin: "PlantUML Integration"
+  2. Mở file .plantuml
+  3. View diagram trong editor
+
+═══════════════════════════════════════════════════════════════
+  📝 CÁCH LÀM BÀI TẬP
+═══════════════════════════════════════════════════════════════
+
+BƯỚC 1: Đọc hướng dẫn
+  → Đọc USE_CASE_DIAGRAM_GUIDE.md
+  → Hiểu các khái niệm: Actor, Use Case, Include, Extend
+
+BƯỚC 2: Chọn tool vẽ
+  → Draw.io (khuyến nghị - dễ dùng)
+  → Lucidchart
+  → Visual Paradigm
+  → PlantUML (nếu thích code)
+
+BƯỚC 3: Vẽ từng actor
+  → Bắt đầu với Guest (đơn giản nhất)
+  → Sau đó Customer
+  → Rồi Seller
+  → Cuối cùng Admin và Moderator
+
+BƯỚC 4: Vẽ diagram tổng quan
+  → Tất cả actors trong 1 diagram
+  → Nhóm use cases theo chức năng
+  → Thể hiện quan hệ kế thừa
+
+BƯỚC 5: Mô tả chi tiết
+  → Chọn 5-10 use case quan trọng
+  → Viết mô tả chi tiết theo template
+  → Bao gồm: Main flow, Alternative flow, Exception flow
+
+═══════════════════════════════════════════════════════════════
+  ✅ CHECKLIST NỘP BÀI
+═══════════════════════════════════════════════════════════════
+
+□ Diagram cho Guest (8 use cases)
+□ Diagram cho Customer (23 use cases)
+□ Diagram cho Seller (41 use cases)
+□ Diagram cho Admin (19 use cases)
+□ Diagram cho Moderator (9 use cases)
+□ Diagram tổng quan (tất cả actors)
+□ Mô tả chi tiết 5-10 use case quan trọng
+□ Thể hiện quan hệ kế thừa giữa actors
+□ Thể hiện quan hệ include/extend giữa use cases
+□ File PDF hoặc ảnh PNG chất lượng cao
+
+═══════════════════════════════════════════════════════════════
+  💡 TIPS VẼ DIAGRAM ĐẸP
+═══════════════════════════════════════════════════════════════
+
+✅ NÊN:
+  - Actors ở bên ngoài system boundary
+  - Use cases ngắn gọn, bắt đầu bằng động từ
+  - Nhóm use cases liên quan gần nhau
+  - Dùng màu sắc phân biệt các nhóm chức năng
+  - Layout rõ ràng, dễ đọc
+
+❌ KHÔNG:
+  - Quá nhiều use case trong 1 diagram
+  - Đường nối chéo nhau rối mắt
+  - Font chữ quá nhỏ
+  - Use case mô tả quá chi tiết kỹ thuật
+  - Include/Extend lạm dụng
+
+═══════════════════════════════════════════════════════════════
+Tạo ngày: 2025-10-29
+Hệ thống: E-Commerce WEBGMS
+Tổng số use cases: 100+
+═══════════════════════════════════════════════════════════════
+
+
+

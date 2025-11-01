@@ -40,7 +40,11 @@
 
 <div class="main">
     <div class="card">
-        <a href="${pageContext.request.contextPath}/seller/products" style="color:#ff6600;text-decoration:none;">← Quay lại danh sách</a>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <a href="${pageContext.request.contextPath}/seller/products" style="color:#ff6600;text-decoration:none;">
+                <i class="bi bi-arrow-left"></i> Quay lại danh sách
+            </a>
+        </div>
         <h1>👁️ Chi tiết sản phẩm</h1>
 
         <div class="grid">

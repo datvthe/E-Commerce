@@ -17,7 +17,7 @@
                 background-color: #f8f9fa;
             }
             .profile-header {
-                background: linear-gradient(135deg, #5b46f1, #8c52ff);
+                background: linear-gradient(135deg, #ff6600, #ff7b00);
                 color: white;
                 padding: 30px 20px;
                 border-radius: 10px 10px 0 0;
@@ -40,29 +40,35 @@
                 color: #444;
             }
             .profile-stat h4 {
-                color: #6c63ff;
+                color: #ff6600;
                 font-weight: 600;
             }
             .nav-tabs .nav-link.active {
-                background-color: #6c63ff !important;
+                background-color: #ff6600 !important;
                 color: white !important;
             }
             .nav-tabs .nav-link {
-                color: #6c63ff;
+                color: #ff6600;
                 border-radius: 10px 10px 0 0;
+            }
+            .form-control:focus, .form-select:focus {
+                border-color: #ff6600;
+                box-shadow: 0 0 0 0.2rem rgba(255, 102, 0, 0.25);
             }
             .form-control, .form-select {
                 border-radius: 10px;
                 box-shadow: none;
             }
             .btn-primary {
-                background: linear-gradient(135deg, #6c63ff, #8c52ff);
+                background: linear-gradient(135deg, #ff6600, #ff7b00);
                 border: none;
                 border-radius: 8px;
                 padding: 10px 20px;
             }
             .btn-primary:hover {
-                background: linear-gradient(135deg, #5b46f1, #7645f2);
+                background: linear-gradient(135deg, #e65c00, #ff6b00);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(255, 102, 0, 0.3);
             }
             .main-container {
                 margin-top: 30px;
@@ -76,7 +82,7 @@
         <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
             <!-- ✅ Thành công -->
             <div id="successToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true"
-                 style="background-color: #6c63ff;" data-bs-delay="3000">
+                 style="background-color: #ff6600;" data-bs-delay="3000">
                 <div class="d-flex">
                     <div class="toast-body">
                         <i class="fa fa-check-circle me-2"></i> Đổi mật khẩu thành công!
@@ -152,8 +158,8 @@
         <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
             <div class="container">
                 <a href="<%= request.getContextPath() %>/home" class="navbar-brand p-0">
-                    <h1 class="display-5 fw-bold m-0" style="color: #6c63ff;">
-                        <i class="fas fa-shopping-bag me-2" style="color: #6c63ff;"></i>Gicungco
+                    <h1 class="display-5 fw-bold m-0" style="color: #ff6600;">
+                        <i class="fas fa-shopping-bag me-2" style="color: #ff6600;"></i>Gicungco
                     </h1>
                 </a>
                 <div class="collapse navbar-collapse">
@@ -217,6 +223,9 @@
                             </c:choose>
 
                         </li>
+
+                        <li><a class="btn btn-outline-warning mx-2" href="${pageContext.request.contextPath}/wishlist"><i class="fa fa-heart"></i> Yêu thích</a></li>
+
                     </ul>
                 </div>
             </div>
@@ -276,7 +285,7 @@
                                 <h4>${activeProducts != null ? activeProducts : 0}</h4><p>Số gian hàng</p>
                             </div>
                             <div class="col-6">
-                                <h4 style="color:#6c63ff;">
+                                <h4 style="color:#ff6600;">
                                     <fmt:formatNumber value="${walletBalance}" type="number"/>đ
                                 </h4>
                                 <p>Số dư</p>

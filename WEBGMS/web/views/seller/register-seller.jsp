@@ -99,7 +99,41 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label>Ngân hàng</label>
-                            <input type="text" name="bankName" class="form-control">
+                            <select name="bankName" class="form-control">
+                                <option value="">-- Chọn ngân hàng --</option>
+                                <option value="Vietcombank">Vietcombank - Ngân hàng Ngoại thương Việt Nam</option>
+                                <option value="BIDV">BIDV - Ngân hàng Đầu tư và Phát triển Việt Nam</option>
+                                <option value="Vietinbank">Vietinbank - Ngân hàng Công thương Việt Nam</option>
+                                <option value="Agribank">Agribank - Ngân hàng Nông nghiệp và Phát triển Nông thôn</option>
+                                <option value="Techcombank">Techcombank - Ngân hàng Kỹ thương Việt Nam</option>
+                                <option value="ACB">ACB - Ngân hàng Á Châu</option>
+                                <option value="MBBank">MBBank - Ngân hàng Quân đội</option>
+                                <option value="VPBank">VPBank - Ngân hàng Việt Nam Thịnh Vượng</option>
+                                <option value="TPBank">TPBank - Ngân hàng Tiên Phong</option>
+                                <option value="Sacombank">Sacombank - Ngân hàng TMCP Sài Gòn Thương Tín</option>
+                                <option value="VIB">VIB - Ngân hàng Quốc tế</option>
+                                <option value="SHB">SHB - Ngân hàng Sài Gòn - Hà Nội</option>
+                                <option value="HDBank">HDBank - Ngân hàng Phát triển Thành phố Hồ Chí Minh</option>
+                                <option value="Eximbank">Eximbank - Ngân hàng Xuất Nhập khẩu Việt Nam</option>
+                                <option value="MSB">MSB - Ngân hàng Hàng Hải</option>
+                                <option value="SeABank">SeABank - Ngân hàng Đông Nam Á</option>
+                                <option value="PVcomBank">PVcomBank - Ngân hàng Đại Chúng</option>
+                                <option value="OCB">OCB - Ngân hàng Phương Đông</option>
+                                <option value="NCB">NCB - Ngân hàng Quốc Dân</option>
+                                <option value="NamABank">NamABank - Ngân hàng Nam Á</option>
+                                <option value="ABBank">ABBank - Ngân hàng An Bình</option>
+                                <option value="VietABank">VietABank - Ngân hàng Việt Á</option>
+                                <option value="BacABank">BacABank - Ngân hàng Bắc Á</option>
+                                <option value="PGBank">PGBank - Ngân hàng Xăng dầu Petrolimex</option>
+                                <option value="PublicBank">PublicBank - Ngân hàng Đại chúng</option>
+                                <option value="KienLongBank">KienLongBank - Ngân hàng Kiên Long</option>
+                                <option value="LPBank">LPBank - Ngân hàng Lào - Việt</option>
+                                <option value="HSBC">HSBC - Ngân hàng TNHH MTV HSBC</option>
+                                <option value="Standard Chartered">Standard Chartered - Ngân hàng TNHH Standard Chartered</option>
+                                <option value="HongLeong">HongLeong Bank - Ngân hàng TNHH MTV Hong Leong Việt Nam</option>
+                                <option value="Woori">Woori Bank - Ngân hàng TNHH MTV Woori Việt Nam</option>
+                                <option value="Shinhan">Shinhan Bank - Ngân hàng TNHH MTV Shinhan Việt Nam</option>
+                            </select>
                         </div>
                         <div class="col-md-4">
                             <label>Số tài khoản</label>

@@ -118,7 +118,12 @@
                                 <a href="${orderPath}" class="${fn:startsWith(uri, orderPath) ? 'active' : ''}"> Quản lý đơn hàng </a>
                             </li>
                             <li>
-                                <a href="${cmsPagePath}" class="${fn:startsWith(uri, cmsPagePath) ? 'active' : ''}"> Quản lý trang tĩnh </a>
+
+                                <a href="<%= request.getContextPath() %>/admin/withdrawals"> Quản lý rút tiền </a>
+                            </li>
+                            <li>
+                                <a href="<%= request.getContextPath() %>/admin/cms/pages"> Quản lý trang tĩnh </a>
+
                             </li>
                             <li>
                                 <a href="${cmsPostPath}" class="${fn:startsWith(uri, cmsPostPath) ? 'active' : ''}"> Quản lý bài viết </a>

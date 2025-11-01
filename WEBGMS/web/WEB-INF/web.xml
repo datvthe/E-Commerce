@@ -27,14 +27,25 @@
 
 
     <servlet>
-    <servlet-name>RegisterSellerController</servlet-name>
-    <servlet-class>controller.seller.RegisterSellerController</servlet-class>
-</servlet>
+        <servlet-name>RegisterSellerController</servlet-name>
+        <servlet-class>controller.seller.RegisterSellerController</servlet-class>
+    </servlet>
 
-<servlet-mapping>
-    <servlet-name>RegisterSellerController</servlet-name>
-    <url-pattern>/seller/register</url-pattern>
-</servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RegisterSellerController</servlet-name>
+        <url-pattern>/seller/register</url-pattern>
+    </servlet-mapping>
+
+    <!-- Seller Notifications - Đơn giản -->
+    <servlet>
+        <servlet-name>SellerNotificationController</servlet-name>
+        <servlet-class>controller.seller.SellerNotificationController</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>SellerNotificationController</servlet-name>
+        <url-pattern>/seller/notifications</url-pattern>
+    </servlet-mapping>
 
     
     <!-- Explicit mapping to ensure /product/* resolves even if annotation scanning is off -->

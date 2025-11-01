@@ -187,7 +187,41 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Ngân hàng</label>
-                            <input type="text" name="bankName" class="form-control" value="${seller.bankName}" readonly>
+                            <select name="bankName" class="form-control" required>
+                                <option value="">-- Chọn ngân hàng --</option>
+                                <option value="Vietcombank" ${seller.bankName == 'Vietcombank' ? 'selected' : ''}>Vietcombank - Ngân hàng Ngoại thương Việt Nam</option>
+                                <option value="BIDV" ${seller.bankName == 'BIDV' ? 'selected' : ''}>BIDV - Ngân hàng Đầu tư và Phát triển Việt Nam</option>
+                                <option value="Vietinbank" ${seller.bankName == 'Vietinbank' ? 'selected' : ''}>Vietinbank - Ngân hàng Công thương Việt Nam</option>
+                                <option value="Agribank" ${seller.bankName == 'Agribank' ? 'selected' : ''}>Agribank - Ngân hàng Nông nghiệp và Phát triển Nông thôn</option>
+                                <option value="Techcombank" ${seller.bankName == 'Techcombank' ? 'selected' : ''}>Techcombank - Ngân hàng Kỹ thương Việt Nam</option>
+                                <option value="ACB" ${seller.bankName == 'ACB' ? 'selected' : ''}>ACB - Ngân hàng Á Châu</option>
+                                <option value="MBBank" ${seller.bankName == 'MBBank' ? 'selected' : ''}>MBBank - Ngân hàng Quân đội</option>
+                                <option value="VPBank" ${seller.bankName == 'VPBank' ? 'selected' : ''}>VPBank - Ngân hàng Việt Nam Thịnh Vượng</option>
+                                <option value="TPBank" ${seller.bankName == 'TPBank' ? 'selected' : ''}>TPBank - Ngân hàng Tiên Phong</option>
+                                <option value="Sacombank" ${seller.bankName == 'Sacombank' ? 'selected' : ''}>Sacombank - Ngân hàng TMCP Sài Gòn Thương Tín</option>
+                                <option value="VIB" ${seller.bankName == 'VIB' ? 'selected' : ''}>VIB - Ngân hàng Quốc tế</option>
+                                <option value="SHB" ${seller.bankName == 'SHB' ? 'selected' : ''}>SHB - Ngân hàng Sài Gòn - Hà Nội</option>
+                                <option value="HDBank" ${seller.bankName == 'HDBank' ? 'selected' : ''}>HDBank - Ngân hàng Phát triển Thành phố Hồ Chí Minh</option>
+                                <option value="Eximbank" ${seller.bankName == 'Eximbank' ? 'selected' : ''}>Eximbank - Ngân hàng Xuất Nhập khẩu Việt Nam</option>
+                                <option value="MSB" ${seller.bankName == 'MSB' ? 'selected' : ''}>MSB - Ngân hàng Hàng Hải</option>
+                                <option value="SeABank" ${seller.bankName == 'SeABank' ? 'selected' : ''}>SeABank - Ngân hàng Đông Nam Á</option>
+                                <option value="PVcomBank" ${seller.bankName == 'PVcomBank' ? 'selected' : ''}>PVcomBank - Ngân hàng Đại Chúng</option>
+                                <option value="OCB" ${seller.bankName == 'OCB' ? 'selected' : ''}>OCB - Ngân hàng Phương Đông</option>
+                                <option value="NCB" ${seller.bankName == 'NCB' ? 'selected' : ''}>NCB - Ngân hàng Quốc Dân</option>
+                                <option value="NamABank" ${seller.bankName == 'NamABank' ? 'selected' : ''}>NamABank - Ngân hàng Nam Á</option>
+                                <option value="ABBank" ${seller.bankName == 'ABBank' ? 'selected' : ''}>ABBank - Ngân hàng An Bình</option>
+                                <option value="VietABank" ${seller.bankName == 'VietABank' ? 'selected' : ''}>VietABank - Ngân hàng Việt Á</option>
+                                <option value="BacABank" ${seller.bankName == 'BacABank' ? 'selected' : ''}>BacABank - Ngân hàng Bắc Á</option>
+                                <option value="PGBank" ${seller.bankName == 'PGBank' ? 'selected' : ''}>PGBank - Ngân hàng Xăng dầu Petrolimex</option>
+                                <option value="PublicBank" ${seller.bankName == 'PublicBank' ? 'selected' : ''}>PublicBank - Ngân hàng Đại chúng</option>
+                                <option value="KienLongBank" ${seller.bankName == 'KienLongBank' ? 'selected' : ''}>KienLongBank - Ngân hàng Kiên Long</option>
+                                <option value="LPBank" ${seller.bankName == 'LPBank' ? 'selected' : ''}>LPBank - Ngân hàng Lào - Việt</option>
+                                <option value="HSBC" ${seller.bankName == 'HSBC' ? 'selected' : ''}>HSBC - Ngân hàng TNHH MTV HSBC</option>
+                                <option value="Standard Chartered" ${seller.bankName == 'Standard Chartered' ? 'selected' : ''}>Standard Chartered - Ngân hàng TNHH Standard Chartered</option>
+                                <option value="HongLeong" ${seller.bankName == 'HongLeong' ? 'selected' : ''}>HongLeong Bank - Ngân hàng TNHH MTV Hong Leong Việt Nam</option>
+                                <option value="Woori" ${seller.bankName == 'Woori' ? 'selected' : ''}>Woori Bank - Ngân hàng TNHH MTV Woori Việt Nam</option>
+                                <option value="Shinhan" ${seller.bankName == 'Shinhan' ? 'selected' : ''}>Shinhan Bank - Ngân hàng TNHH MTV Shinhan Việt Nam</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Số tài khoản</label>

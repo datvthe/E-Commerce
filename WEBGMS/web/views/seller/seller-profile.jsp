@@ -32,8 +32,8 @@
         .card {
             background: white;
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
             max-width: 800px;
             margin: 0 auto;
         }
@@ -67,18 +67,18 @@
         input, textarea, select {
             width: 100%;
             padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
             font-size: 14px;
             box-sizing: border-box;
             font-family: inherit;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
         }
 
         input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: #ff6600;
-            box-shadow: 0 0 0 2px rgba(255,102,0,0.15);
+            box-shadow: 0 0 0 3px rgba(255,102,0,0.15);
         }
 
         textarea {
@@ -87,19 +87,23 @@
         }
 
         .btn {
-            background: #ff6600;
+            background: linear-gradient(135deg, #ff6600 0%, #ff7b00 100%);
             color: white;
             padding: 12px 30px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
             font-size: 15px;
-            transition: background 0.3s;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn:hover {
-            background: #e65c00;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 102, 0, 0.3);
         }
 
         .btn-secondary {
@@ -107,12 +111,20 @@
             margin-right: 10px;
             color: white;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s;
         }
 
         .btn-secondary:hover {
             background: #5a6268;
             color: white;
+            transform: translateY(-2px);
         }
 
         .alert {
@@ -147,25 +159,33 @@
             font-size: 18px;
             font-weight: 600;
             margin: 30px 0 15px 0;
-            padding-bottom: 8px;
+            padding-bottom: 10px;
             border-bottom: 2px solid #ff6600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .back-link {
-            display: inline-block;
-            padding: 8px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
             color: #ff6600;
             text-decoration: none;
-            font-weight: 500;
-            border: 1px solid #ff6600;
-            border-radius: 6px;
+            font-weight: 600;
+            border: 2px solid #ff6600;
+            border-radius: 8px;
             transition: all 0.3s;
+            font-size: 14px;
         }
 
         .back-link:hover {
             background-color: #ff6600;
             color: white;
             text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 102, 0, 0.3);
         }
     </style>
 </head>
@@ -178,15 +198,6 @@
 
     <div class="main">
         <div class="card">
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <a href="${pageContext.request.contextPath}/seller/dashboard" class="back-link">
-                    <i class="bi bi-house"></i> Trang chủ
-                </a>
-                <a href="${pageContext.request.contextPath}/seller/profile" class="back-link">
-                    <i class="bi bi-arrow-clockwise"></i> Làm mới trang
-                </a>
-            </div>
-            
             <h1><i class="bi bi-person-gear"></i> Chỉnh sửa thông tin shop</h1>
             <p class="subtitle">Cập nhật thông tin cá nhân và cửa hàng của bạn.</p>
 
@@ -269,8 +280,41 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="bankName">Tên ngân hàng</label>
-                        <input type="text" id="bankName" name="bankName" 
-                               value="${seller.bankName}" placeholder="VD: Vietcombank, Techcombank...">
+                        <select id="bankName" name="bankName">
+                            <option value="">-- Chọn ngân hàng --</option>
+                            <option value="Vietcombank" ${seller.bankName == 'Vietcombank' ? 'selected' : ''}>Vietcombank - Ngân hàng Ngoại thương Việt Nam</option>
+                            <option value="BIDV" ${seller.bankName == 'BIDV' ? 'selected' : ''}>BIDV - Ngân hàng Đầu tư và Phát triển Việt Nam</option>
+                            <option value="Vietinbank" ${seller.bankName == 'Vietinbank' ? 'selected' : ''}>Vietinbank - Ngân hàng Công thương Việt Nam</option>
+                            <option value="Agribank" ${seller.bankName == 'Agribank' ? 'selected' : ''}>Agribank - Ngân hàng Nông nghiệp và Phát triển Nông thôn</option>
+                            <option value="Techcombank" ${seller.bankName == 'Techcombank' ? 'selected' : ''}>Techcombank - Ngân hàng Kỹ thương Việt Nam</option>
+                            <option value="ACB" ${seller.bankName == 'ACB' ? 'selected' : ''}>ACB - Ngân hàng Á Châu</option>
+                            <option value="MBBank" ${seller.bankName == 'MBBank' ? 'selected' : ''}>MBBank - Ngân hàng Quân đội</option>
+                            <option value="VPBank" ${seller.bankName == 'VPBank' ? 'selected' : ''}>VPBank - Ngân hàng Việt Nam Thịnh Vượng</option>
+                            <option value="TPBank" ${seller.bankName == 'TPBank' ? 'selected' : ''}>TPBank - Ngân hàng Tiên Phong</option>
+                            <option value="Sacombank" ${seller.bankName == 'Sacombank' ? 'selected' : ''}>Sacombank - Ngân hàng TMCP Sài Gòn Thương Tín</option>
+                            <option value="VIB" ${seller.bankName == 'VIB' ? 'selected' : ''}>VIB - Ngân hàng Quốc tế</option>
+                            <option value="SHB" ${seller.bankName == 'SHB' ? 'selected' : ''}>SHB - Ngân hàng Sài Gòn - Hà Nội</option>
+                            <option value="HDBank" ${seller.bankName == 'HDBank' ? 'selected' : ''}>HDBank - Ngân hàng Phát triển Thành phố Hồ Chí Minh</option>
+                            <option value="Eximbank" ${seller.bankName == 'Eximbank' ? 'selected' : ''}>Eximbank - Ngân hàng Xuất Nhập khẩu Việt Nam</option>
+                            <option value="MSB" ${seller.bankName == 'MSB' ? 'selected' : ''}>MSB - Ngân hàng Hàng Hải</option>
+                            <option value="SeABank" ${seller.bankName == 'SeABank' ? 'selected' : ''}>SeABank - Ngân hàng Đông Nam Á</option>
+                            <option value="PVcomBank" ${seller.bankName == 'PVcomBank' ? 'selected' : ''}>PVcomBank - Ngân hàng Đại Chúng</option>
+                            <option value="OCB" ${seller.bankName == 'OCB' ? 'selected' : ''}>OCB - Ngân hàng Phương Đông</option>
+                            <option value="NCB" ${seller.bankName == 'NCB' ? 'selected' : ''}>NCB - Ngân hàng Quốc Dân</option>
+                            <option value="NamABank" ${seller.bankName == 'NamABank' ? 'selected' : ''}>NamABank - Ngân hàng Nam Á</option>
+                            <option value="ABBank" ${seller.bankName == 'ABBank' ? 'selected' : ''}>ABBank - Ngân hàng An Bình</option>
+                            <option value="VietABank" ${seller.bankName == 'VietABank' ? 'selected' : ''}>VietABank - Ngân hàng Việt Á</option>
+                            <option value="BacABank" ${seller.bankName == 'BacABank' ? 'selected' : ''}>BacABank - Ngân hàng Bắc Á</option>
+                            <option value="PGBank" ${seller.bankName == 'PGBank' ? 'selected' : ''}>PGBank - Ngân hàng Xăng dầu Petrolimex</option>
+                            <option value="PublicBank" ${seller.bankName == 'PublicBank' ? 'selected' : ''}>PublicBank - Ngân hàng Đại chúng</option>
+                            <option value="KienLongBank" ${seller.bankName == 'KienLongBank' ? 'selected' : ''}>KienLongBank - Ngân hàng Kiên Long</option>
+                            <option value="LPBank" ${seller.bankName == 'LPBank' ? 'selected' : ''}>LPBank - Ngân hàng Lào - Việt</option>
+                            <option value="HSBC" ${seller.bankName == 'HSBC' ? 'selected' : ''}>HSBC - Ngân hàng TNHH MTV HSBC</option>
+                            <option value="Standard Chartered" ${seller.bankName == 'Standard Chartered' ? 'selected' : ''}>Standard Chartered - Ngân hàng TNHH Standard Chartered</option>
+                            <option value="HongLeong" ${seller.bankName == 'HongLeong' ? 'selected' : ''}>HongLeong Bank - Ngân hàng TNHH MTV Hong Leong Việt Nam</option>
+                            <option value="Woori" ${seller.bankName == 'Woori' ? 'selected' : ''}>Woori Bank - Ngân hàng TNHH MTV Woori Việt Nam</option>
+                            <option value="Shinhan" ${seller.bankName == 'Shinhan' ? 'selected' : ''}>Shinhan Bank - Ngân hàng TNHH MTV Shinhan Việt Nam</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="bankAccount">Số tài khoản</label>
@@ -286,9 +330,9 @@
                 </div>
 
                 <!-- Buttons -->
-                <div style="margin-top: 30px; text-align: center;">
-                    <a href="${pageContext.request.contextPath}/seller/dashboard" class="btn btn-secondary">
-                        <i class="bi bi-house"></i> Trang chủ
+                <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: flex-end;">
+                    <a href="${pageContext.request.contextPath}/seller/profile" class="btn btn-secondary">
+                        <i class="bi bi-arrow-clockwise"></i> Làm mới trang
                     </a>
                     <button type="button" class="btn btn-secondary" onclick="history.back()">
                         <i class="bi bi-arrow-left"></i> Quay lại

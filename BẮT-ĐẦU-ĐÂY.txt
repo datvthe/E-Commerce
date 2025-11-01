@@ -1,0 +1,144 @@
+╔═══════════════════════════════════════════════════════════════╗
+║                                                                 ║
+║         HƯỚNG DẪN CHẠY PROJECT WEBGMS - BẮT ĐẦU ĐÂY          ║
+║                                                                 ║
+╚═══════════════════════════════════════════════════════════════╝
+
+📌 VẤN ĐỀ: Project không chạy được!
+
+✅ ĐÃ PHÁT HIỆN:
+   • Java 17        ✅ Đã cài đặt và hoạt động
+   • MySQL 9.4      ✅ Đang chạy
+   • Tomcat 10.1    ❌ ĐANG DỪNG (đây là lý do chính!)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 CÁCH CHẠY PROJECT (CHỌN 1 TRONG CÁC CÁCH SAU):
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 CÁCH 1: SỬ DỤNG NETBEANS (DỄ NHẤT - KHUYẾN NGHỊ)
+───────────────────────────────────────────────────
+
+   1. Mở NetBeans IDE
+   2. File → Open Project
+   3. Chọn thư mục: C:\Users\ASUS\Documents\E-Commerce\WEBGMS
+   4. Nhấn F6 (hoặc click chuột phải → Run)
+   5. Đợi project build và deploy
+   6. Trình duyệt sẽ tự động mở!
+
+   🌐 URL: http://localhost:9999/WEBGMS/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 CÁCH 2: KHỞI ĐỘNG TOMCAT THỦ CÔNG
+───────────────────────────────────────────────────
+
+   1. Double-click file: WEBGMS\KHỞI-ĐỘNG-TOMCAT.bat
+   2. Cho phép chạy với quyền Administrator
+   3. Chờ script hoàn tất
+   4. Mở trình duyệt và truy cập: http://localhost:9999/WEBGMS/
+
+   📁 File đã được tạo sẵn trong thư mục WEBGMS!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 CÁCH 3: SỬ DỤNG POWERSHELL (CHO NGƯỜI HIỂU TECH)
+───────────────────────────────────────────────────
+
+   1. Nhấn chuột phải vào PowerShell
+   2. Chọn "Run as Administrator"
+   3. Chạy lệnh:
+      Start-Service -Name "Tomcat10"
+   4. Kiểm tra:
+      netstat -an | findstr "9999"
+   5. Mở trình duyệt: http://localhost:9999/WEBGMS/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️  LƯU Ý QUAN TRỌNG:
+
+   🔴 PORT: Project chạy trên port 9999, KHÔNG PHẢI 8080!
+   
+   ✅ URL đúng:  http://localhost:9999/WEBGMS/
+   ❌ URL sai:   http://localhost:8080/WEBGMS/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 TÀI LIỆU CHI TIẾT:
+
+   Nếu gặp lỗi hoặc muốn hiểu rõ hơn, đọc file:
+   📄 HƯỚNG_DẪN_KHẮC_PHỤC_LỖI.md
+
+   File này có:
+   • Giải thích chi tiết tất cả vấn đề
+   • Hướng dẫn từng bước
+   • Cách kiểm tra và sửa lỗi
+   • Checklist đầy đủ
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔍 KIỂM TRA NHANH:
+
+   ✓ MySQL đang chạy?
+     PowerShell: Get-Service -Name *mysql*
+     
+   ✓ Tomcat đang chạy?
+     PowerShell: Get-Service -Name Tomcat10
+     
+   ✓ Port 9999 đang mở?
+     PowerShell: netstat -an | findstr "9999"
+     
+   ✓ Database tồn tại?
+     Mở MySQL Workbench và kiểm tra database "gicungco"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🆘 NẾU VẪN KHÔNG CHẠY ĐƯỢC:
+
+   1. Đảm bảo MySQL đang chạy
+   2. Kiểm tra database "gicungco" đã được import chưa
+   3. Restart máy tính (đôi khi cần thiết!)
+   4. Thử lại Cách 1 (NetBeans)
+   5. Xem log Tomcat:
+      C:\Program Files\Apache Software Foundation\Tomcat 10.1\logs\
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📱 CÁC URL QUAN TRỌNG:
+
+   🏠 Trang chủ:    http://localhost:9999/WEBGMS/
+   🏠 Home:         http://localhost:9999/WEBGMS/home
+   👤 Đăng nhập:    http://localhost:9999/WEBGMS/login
+   📝 Đăng ký:      http://localhost:9999/WEBGMS/register
+   👨‍💼 Admin:        http://localhost:9999/WEBGMS/admin/
+   🏪 Seller:       http://localhost:9999/WEBGMS/seller/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 TÓM TẮT NHANH NHẤT:
+
+   1. Mở NetBeans
+   2. Mở project WEBGMS
+   3. Nhấn F6
+   4. Xong! ✨
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 TIPS:
+
+   • Nếu NetBeans báo lỗi thiếu thư viện, hãy "Clean and Build"
+   • Nếu Tomcat không tắt được, restart máy tính
+   • Kiểm tra firewall có block port 9999 không
+   • Đảm bảo không có ứng dụng khác dùng port 9999
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+                        Chúc bạn thành công! 🚀
+
+╚═══════════════════════════════════════════════════════════════╝
+
+Tài liệu này được tạo tự động sau khi phân tích project của bạn.
+Nếu có thắc mắc, hãy đọc file HƯỚNG_DẪN_KHẮC_PHỤC_LỖI.md
+
+

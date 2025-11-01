@@ -1,0 +1,100 @@
+╔═══════════════════════════════════════════════════════════╗
+║          BẮT ĐẦU TEST NOTIFICATIONS NGAY!                 ║
+╚═══════════════════════════════════════════════════════════╝
+
+📋 CÁC FILE BẠN CẦN DÙNG:
+
+1. SETUP_NOTIFICATIONS.sql         ⭐ BẮT ĐẦU TỪ ĐÂY
+   → Tìm user_id của bạn
+   → Tạo bảng + thêm data mẫu
+   → Chạy file này trong MySQL
+
+2. TEST_NOTIFICATIONS_STEP_BY_STEP.txt
+   → Hướng dẫn chi tiết từng bước
+   → Đọc nếu gặp vấn đề
+
+3. quick-test.bat
+   → Checklist nhanh
+   → Để theo dõi tiến độ
+
+═══════════════════════════════════════════════════════════
+
+🚀 5 BƯỚC NHANH NHẤT:
+
+1️⃣  MỞ MYSQL
+    → Mở file: SETUP_NOTIFICATIONS.sql
+    → Làm theo hướng dẫn trong file
+    → Chạy TOÀN BỘ SQL
+
+2️⃣  BUILD
+    → NetBeans: Right-click WEBGMS → Clean and Build
+    → Đợi "BUILD SUCCESSFUL"
+
+3️⃣  RESTART
+    → Stop Tomcat → Đợi 5s → Start
+
+4️⃣  LOGIN
+    → http://localhost:9999/WEBGMS/login
+
+5️⃣  TEST
+    → http://localhost:9999/WEBGMS/seller/notifications
+
+═══════════════════════════════════════════════════════════
+
+✅ KẾT QUẢ MONG ĐỢI:
+
+Khi truy cập /seller/notifications:
+  ✅ Trang hiển thị đẹp
+  ✅ Có 3 thông báo mẫu
+  ✅ Stats: Tổng 3, Chưa đọc 3
+  ✅ Đánh dấu đã đọc được
+  ✅ Xóa được
+
+═══════════════════════════════════════════════════════════
+
+❌ NẾU GẶP LỖI:
+
+404 NOT FOUND:
+  → Chưa build/restart đúng cách
+  
+500 ERROR:
+  → Chưa chạy SQL
+  → user_id không đúng
+  
+KHÔNG CÓ DATA:
+  → Kiểm tra SQL: SELECT * FROM gicungco_notifications;
+
+═══════════════════════════════════════════════════════════
+
+📞 BÁO CÁO KẾT QUẢ:
+
+Sau khi test, cho tôi biết:
+  □ Dashboard có OK không?
+  □ Notifications có hiển thị không?
+  □ Có bao nhiêu thông báo?
+  □ Các chức năng hoạt động chưa?
+
+Hoặc nếu lỗi:
+  □ Lỗi gì? (404, 500, ...)
+  □ Screenshot
+  □ Log trong NetBeans
+
+═══════════════════════════════════════════════════════════
+
+QUAN TRỌNG ⚠️
+
+TEST SELLER DASHBOARD TRƯỚC:
+  → http://localhost:9999/WEBGMS/seller/dashboard
+  → Phải hoạt động bình thường
+  → Nếu dashboard bị lỗi → DỪNG LẠI, báo tôi
+
+═══════════════════════════════════════════════════════════
+
+Chúc thành công! 🎉
+Bắt đầu từ file SETUP_NOTIFICATIONS.sql nhé!
+
+═══════════════════════════════════════════════════════════
+
+
+
+

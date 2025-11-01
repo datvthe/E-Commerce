@@ -1,0 +1,124 @@
+╔═══════════════════════════════════════════════════════════╗
+║           ✅ ĐÃ SỬA XONG LỖI SELLER DASHBOARD             ║
+╚═══════════════════════════════════════════════════════════╝
+
+VẤN ĐỀ:
+───────────────────────────────────────────────────────────
+NotificationDAO tôi viết SAI:
+  ❌ Dùng: extends DBContext (KHÔNG TỒN TẠI)
+  ❌ Dùng: connection.prepareStatement()
+  
+→ Gây lỗi compilation
+→ Toàn bộ project không build được
+→ Seller Dashboard không hoạt động
+
+ĐÃ SỬA:
+───────────────────────────────────────────────────────────
+NotificationDAO BÂY GIỜ ĐÚNG:
+  ✅ Dùng: DBConnection.getConnection()
+  ✅ Dùng: try-with-resources
+  ✅ Giống y hệt SellerDAO, UsersDAO, ...
+
+═══════════════════════════════════════════════════════════
+
+  🚀 BÂY GIỜ BẠN CẦN LÀM
+
+═══════════════════════════════════════════════════════════
+
+BƯỚC 1: CLEAN AND BUILD
+────────────────────────────────────────────────────────────
+Trong NetBeans:
+  Right-click project WEBGMS
+  → Clean and Build
+  
+Đợi thấy: "BUILD SUCCESSFUL"
+
+BƯỚC 2: RESTART TOMCAT
+────────────────────────────────────────────────────────────
+  1. Stop Tomcat
+  2. Đợi 5 giây
+  3. Start lại
+
+BƯỚC 3: TEST SELLER DASHBOARD
+────────────────────────────────────────────────────────────
+Truy cập:
+  http://localhost:9999/WEBGMS/seller/dashboard
+
+KẾT QUẢ MONG ĐỢI:
+  ✅ Dashboard hiển thị bình thường
+  ✅ Không còn lỗi
+  ✅ Mọi thứ hoạt động như trước
+
+═══════════════════════════════════════════════════════════
+
+  📋 SAU KHI DASHBOARD OK
+
+═══════════════════════════════════════════════════════════
+
+NẾU MUỐN TEST NOTIFICATIONS:
+────────────────────────────────────────────────────────────
+1. Chạy SQL trước:
+   create_notifications_table.sql
+
+2. Truy cập:
+   http://localhost:9999/WEBGMS/seller/notifications
+
+3. Kết quả mong đợi:
+   ✅ Hiển thị trang notifications
+   ✅ Có 3 thông báo mẫu
+   ✅ Có thể đánh dấu đã đọc, xóa
+
+═══════════════════════════════════════════════════════════
+
+  🔍 NẾU VẪN BỊ LỖI
+
+═══════════════════════════════════════════════════════════
+
+1. Build không successful?
+   → Xem console NetBeans
+   → Copy lỗi cho tôi
+
+2. Dashboard vẫn không vào được?
+   → Kiểm tra đã đăng nhập chưa
+   → Kiểm tra có seller record chưa
+
+3. Tomcat không start?
+   → Xem log trong console
+   → Có thể port 9999 bị chiếm
+
+═══════════════════════════════════════════════════════════
+
+  📝 TÓM TẮT
+
+═══════════════════════════════════════════════════════════
+
+VẤN ĐỀ GỐC:
+  ❌ NotificationDAO extends DBContext (sai)
+
+ĐÃ SỬA:
+  ✅ NotificationDAO dùng DBConnection.getConnection()
+  ✅ Đã clean build
+  ✅ Code giống các DAO khác 100%
+
+CẦN LÀM:
+  1. Clean and Build
+  2. Restart Tomcat
+  3. Test Dashboard
+  4. (Optional) Test Notifications
+
+FILES ĐÃ TẠO:
+  ✅ Notification.java - Model
+  ✅ NotificationDAO.java - DAO (đã sửa)
+  ✅ SellerNotificationController.java - Controller
+  ✅ seller-notifications.jsp - View
+  ✅ create_notifications_table.sql - Database
+  ✅ web.xml - Config (đã update)
+
+═══════════════════════════════════════════════════════════
+Trạng thái: ✅ ĐÃ SỬA XONG - CHỜ BUILD VÀ TEST
+Ngày: 2025-10-29
+═══════════════════════════════════════════════════════════
+
+
+
+

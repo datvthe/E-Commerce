@@ -400,6 +400,18 @@ public class ProductDAO extends DBConnection {
         String sql = "INSERT INTO Products (seller_id, name, slug, description, price, currency, status, category_id, quantity, created_at) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            
+            if (conn == null) {
+                System.err.println("ERROR: Cannot get database connection in insertProductReturningId!");
+                return -1;
+            }
+            
+            // Validate seller
+            if (p.getSeller_id() == null || p.getSeller_id().getUser_id() <= 0) {
+                System.err.println("ERROR: Invalid seller_id in insertProductReturningId!");
+                return -1;
+            }
+            
             ps.setInt(1, p.getSeller_id().getUser_id());
             ps.setString(2, p.getName());
             ps.setString(3, slugify(p.getName()));
@@ -407,14 +419,38 @@ public class ProductDAO extends DBConnection {
             ps.setBigDecimal(5, p.getPrice());
             ps.setString(6, p.getCurrency() == null ? "VND" : p.getCurrency());
             ps.setString(7, p.getStatus() == null ? "active" : p.getStatus());
-            ps.setLong(8, p.getCategory_id() == null ? 0 : p.getCategory_id().getCategory_id());
+            
+            // Handle category_id - set NULL if not provided or invalid
+            if (p.getCategory_id() != null && p.getCategory_id().getCategory_id() > 0) {
+                ps.setLong(8, p.getCategory_id().getCategory_id());
+            } else {
+                ps.setNull(8, java.sql.Types.BIGINT);
+            }
+            
             ps.setInt(9, p.getQuantity());
+            
+            System.out.println("Inserting product: " + p.getName() + ", seller_id: " + p.getSeller_id().getUser_id());
             int affected = ps.executeUpdate();
+            
             if (affected > 0) {
                 ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) return rs.getLong(1);
+                if (rs.next()) {
+                    long productId = rs.getLong(1);
+                    System.out.println("Product inserted successfully with ID: " + productId);
+                    return productId;
+                } else {
+                    System.err.println("ERROR: No generated keys returned after insert!");
+                }
+            } else {
+                System.err.println("ERROR: No rows affected by insert!");
             }
+        } catch (SQLException e) {
+            System.err.println("SQLException in insertProductReturningId: " + e.getMessage());
+            System.err.println("SQL State: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            e.printStackTrace();
         } catch (Exception e) {
+            System.err.println("Exception in insertProductReturningId: " + e.getMessage());
             e.printStackTrace();
         }
         return -1;

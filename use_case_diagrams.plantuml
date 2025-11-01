@@ -1,0 +1,225 @@
+@startuml Guest_Use_Cases
+title Use Case Diagram - GUEST
+
+left to right direction
+
+actor Guest as g
+
+rectangle "E-Commerce System" {
+  usecase "Xem danh sách sản phẩm" as UC1
+  usecase "Tìm kiếm sản phẩm" as UC2
+  usecase "Xem chi tiết sản phẩm" as UC3
+  usecase "Xem danh mục" as UC4
+  usecase "Đăng ký tài khoản" as UC5
+  usecase "Đăng nhập" as UC6
+  usecase "Quên mật khẩu" as UC7
+}
+
+g --> UC1
+g --> UC2
+g --> UC3
+g --> UC4
+g --> UC5
+g --> UC6
+g --> UC7
+
+@enduml
+
+@startuml Customer_Use_Cases
+title Use Case Diagram - CUSTOMER
+
+left to right direction
+
+actor Guest as g
+actor Customer as c
+
+rectangle "E-Commerce System" {
+  usecase "Xem sản phẩm" as UC1
+  usecase "Thêm vào giỏ hàng" as UC2
+  usecase "Xem giỏ hàng" as UC3
+  usecase "Đặt hàng" as UC4
+  usecase "Thanh toán" as UC5
+  usecase "Xem lịch sử đơn hàng" as UC6
+  usecase "Theo dõi đơn hàng" as UC7
+  usecase "Hủy đơn hàng" as UC8
+  usecase "Đánh giá sản phẩm" as UC9
+  usecase "Thêm vào wishlist" as UC10
+  usecase "Chat với seller" as UC11
+  usecase "Đăng nhập" as UC12
+  usecase "Xác nhận địa chỉ" as UC13
+}
+
+c --|> g : extends
+
+c --> UC2
+c --> UC3
+c --> UC4
+c --> UC5
+c --> UC6
+c --> UC7
+c --> UC8
+c --> UC9
+c --> UC10
+c --> UC11
+
+UC4 ..> UC12 : <<include>>
+UC4 ..> UC13 : <<include>>
+UC5 ..> UC4 : <<include>>
+
+@enduml
+
+@startuml Seller_Use_Cases
+title Use Case Diagram - SELLER
+
+left to right direction
+
+actor Customer as c
+actor Seller as s
+
+rectangle "Seller Management System" {
+  usecase "Đăng ký làm seller" as UC1
+  usecase "Quản lý shop" as UC2
+  usecase "Thêm sản phẩm mới" as UC3
+  usecase "Sửa sản phẩm" as UC4
+  usecase "Xóa sản phẩm" as UC5
+  usecase "Quản lý kho" as UC6
+  usecase "Xem đơn hàng" as UC7
+  usecase "Xác nhận đơn hàng" as UC8
+  usecase "Cập nhật trạng thái" as UC9
+  usecase "Xem thống kê" as UC10
+  usecase "Rút tiền" as UC11
+  usecase "Trả lời đánh giá" as UC12
+  usecase "Upload ảnh" as UC13
+  usecase "Xem ví" as UC14
+  usecase "Yêu cầu đóng shop" as UC15
+}
+
+s --|> c : extends
+
+s --> UC1
+s --> UC2
+s --> UC3
+s --> UC4
+s --> UC5
+s --> UC6
+s --> UC7
+s --> UC8
+s --> UC9
+s --> UC10
+s --> UC11
+s --> UC12
+s --> UC15
+
+UC3 ..> UC13 : <<include>>
+UC11 ..> UC14 : <<include>>
+
+@enduml
+
+@startuml Admin_Use_Cases
+title Use Case Diagram - ADMIN
+
+left to right direction
+
+actor Admin as a
+
+rectangle "Admin Management System" {
+  usecase "Quản lý người dùng" as UC1
+  usecase "Duyệt đăng ký seller" as UC2
+  usecase "Khóa/Mở khóa tài khoản" as UC3
+  usecase "Quản lý sản phẩm" as UC4
+  usecase "Xóa sản phẩm vi phạm" as UC5
+  usecase "Quản lý đơn hàng" as UC6
+  usecase "Xem thống kê tổng quan" as UC7
+  usecase "Duyệt rút tiền" as UC8
+  usecase "Quản lý danh mục" as UC9
+  usecase "Duyệt đóng shop" as UC10
+  usecase "Quản lý hoa hồng" as UC11
+  usecase "Cấu hình hệ thống" as UC12
+  usecase "Xem log" as UC13
+}
+
+a --> UC1
+a --> UC2
+a --> UC3
+a --> UC4
+a --> UC5
+a --> UC6
+a --> UC7
+a --> UC8
+a --> UC9
+a --> UC10
+a --> UC11
+a --> UC12
+a --> UC13
+
+@enduml
+
+@startuml All_Actors
+title Use Case Diagram - TỔNG QUAN TẤT CẢ ACTORS
+
+left to right direction
+
+actor Guest as g
+actor Customer as c
+actor Seller as s
+actor Moderator as m
+actor Admin as a
+
+rectangle "E-Commerce System (WEBGMS)" {
+  
+  package "Public Features" {
+    usecase "Xem sản phẩm" as UC_Public1
+    usecase "Tìm kiếm" as UC_Public2
+    usecase "Đăng ký" as UC_Public3
+  }
+  
+  package "Customer Features" {
+    usecase "Mua hàng" as UC_Cust1
+    usecase "Đánh giá" as UC_Cust2
+    usecase "Wishlist" as UC_Cust3
+  }
+  
+  package "Seller Features" {
+    usecase "Bán hàng" as UC_Sell1
+    usecase "Quản lý shop" as UC_Sell2
+    usecase "Rút tiền" as UC_Sell3
+  }
+  
+  package "Moderation" {
+    usecase "Kiểm duyệt" as UC_Mod1
+    usecase "Xử lý báo cáo" as UC_Mod2
+  }
+  
+  package "Administration" {
+    usecase "Quản lý toàn bộ" as UC_Admin1
+    usecase "Duyệt seller" as UC_Admin2
+    usecase "Thống kê" as UC_Admin3
+  }
+}
+
+c --|> g : extends
+s --|> c : extends
+
+g --> UC_Public1
+g --> UC_Public2
+g --> UC_Public3
+
+c --> UC_Cust1
+c --> UC_Cust2
+c --> UC_Cust3
+
+s --> UC_Sell1
+s --> UC_Sell2
+s --> UC_Sell3
+
+m --> UC_Mod1
+m --> UC_Mod2
+
+a --> UC_Admin1
+a --> UC_Admin2
+a --> UC_Admin3
+
+@enduml
+
+
+
