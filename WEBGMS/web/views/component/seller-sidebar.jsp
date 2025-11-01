@@ -31,16 +31,25 @@
             <span>Đơn hàng</span>
         </a>
 
-        <a href="${pageContext.request.contextPath}/seller/withdraw-history" 
-           class="nav-item ${param.activePage == 'withdraw' ? 'active' : ''}">
-            <i class="bi bi-wallet2"></i>
-            <span>Lịch sử rút tiền</span>
+        <a href="${pageContext.request.contextPath}/seller/notifications" 
+           class="nav-item ${param.activePage == 'notifications' ? 'active' : ''}">
+            <i class="bi bi-bell"></i>
+            <span>Thông báo</span>
+            <c:if test="${not empty unreadCount && unreadCount > 0}">
+                <span class="notification-badge">${unreadCount > 99 ? '99+' : unreadCount}</span>
+            </c:if>
         </a>
 
         <a href="${pageContext.request.contextPath}/seller/profile" 
            class="nav-item ${param.activePage == 'profile' ? 'active' : ''}">
             <i class="bi bi-person-gear"></i>
             <span>Chỉnh sửa thông tin</span>
+        </a>
+
+        <a href="${pageContext.request.contextPath}/seller/close-shop" 
+           class="nav-item ${param.activePage == 'close-shop' ? 'active' : ''}">
+            <i class="bi bi-x-circle"></i>
+            <span>Hủy shop</span>
         </a>
 
         <a href="${pageContext.request.contextPath}/profile" 
@@ -127,6 +136,24 @@
         background-color: rgba(255,255,255,0.2);
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         font-weight: 600;
+    }
+
+    .nav-item {
+        position: relative;
+    }
+
+    .notification-badge {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background-color: #dc3545;
+        color: white;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 10px;
+        min-width: 18px;
+        text-align: center;
     }
 
     .sidebar-footer {

@@ -322,6 +322,17 @@
                 ${error}
             </div>
         </c:if>
+        <c:if test="${not empty param.error}">
+            <div style="background:#ffefef;border:1px solid #f1c0c0;color:#b71c1c;padding:12px 14px;border-radius:8px;margin-bottom:15px;">
+                <i class="bi bi-exclamation-triangle"></i>
+                <c:choose>
+                    <c:when test="${param.error == 'missing_product_id'}">❌ Thiếu ID sản phẩm. Vui lòng thử lại.</c:when>
+                    <c:when test="${param.error == 'invalid_product_id'}">❌ ID sản phẩm không hợp lệ.</c:when>
+                    <c:when test="${param.error == 'server_error'}">❌ Có lỗi xảy ra từ server.</c:when>
+                    <c:otherwise>❌ Lỗi: ${param.error}</c:otherwise>
+                </c:choose>
+            </div>
+        </c:if>
 
         <!-- Bộ lọc & tìm kiếm -->
         <form method="get" action="${pageContext.request.contextPath}/seller/products" 

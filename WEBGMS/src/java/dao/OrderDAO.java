@@ -896,4 +896,39 @@ public class OrderDAO extends DBConnection {
         }
         return BigDecimal.ZERO;
     }
+    
+    /**
+     * Đếm tổng số đơn hàng của seller
+     */
+    public int countOrdersBySeller(Long sellerId) {
+        String sql = "SELECT COUNT(*) FROM gicungco_orders WHERE seller_id = ?";
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, sellerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    /**
+     * Đếm số đơn hàng đang chờ xử lý của seller
+     */
+    public int countPendingOrdersBySeller(Long sellerId) {
+        String sql = "SELECT COUNT(*) FROM gicungco_orders " +
+                    "WHERE seller_id = ? AND status IN ('pending', 'processing')";
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, sellerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }

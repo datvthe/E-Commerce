@@ -1,0 +1,189 @@
+╔════════════════════════════════════════════════════════════╗
+║     TEST NOTIFICATIONS - TỪNG BƯỚC CHI TIẾT                ║
+╚════════════════════════════════════════════════════════════╝
+
+BƯỚC 1: CHẠY SQL TẠO BẢNG
+═══════════════════════════════════════════════════════════
+
+1. Mở MySQL Workbench (hoặc phpMyAdmin)
+
+2. Chọn database: gicungco
+
+3. Mở file: create_notifications_table.sql
+
+4. Copy TOÀN BỘ nội dung và paste vào query window
+
+5. Click Execute (hoặc Ctrl+Enter)
+
+6. Kiểm tra kết quả:
+   ✅ Bảng gicungco_notifications được tạo
+   ✅ Có 3 dòng data mẫu
+   ✅ Query cuối hiển thị 3 notifications
+
+⚠️  LƯU Ý:
+   - Nếu user_id của bạn KHÔNG PHẢI là 1:
+     Sửa trong SQL: (1, ...) → (YOUR_USER_ID, ...)
+     
+   - Để tìm user_id của bạn:
+     SELECT user_id, email FROM gicungco_users 
+     WHERE email = 'your_email@example.com';
+
+─────────────────────────────────────────────────────────────
+
+BƯỚC 2: CLEAN AND BUILD PROJECT
+═══════════════════════════════════════════════════════════
+
+1. Mở NetBeans
+
+2. Right-click vào project WEBGMS
+
+3. Chọn "Clean and Build"
+
+4. Đợi đến khi thấy:
+   ✅ "BUILD SUCCESSFUL"
+   ✅ Không có lỗi màu đỏ
+
+⚠️  NẾU BUILD FAILED:
+   - Xem console errors
+   - Thường do thiếu library
+   - Hoặc syntax error
+   - Copy lỗi cho tôi xem
+
+─────────────────────────────────────────────────────────────
+
+BƯỚC 3: RESTART TOMCAT
+═══════════════════════════════════════════════════════════
+
+1. Trong NetBeans, tab "Services" (Ctrl+5)
+
+2. Mở "Servers" → "Apache Tomcat"
+
+3. Right-click → "Stop"
+   Đợi đến khi thấy "Server stopped"
+
+4. Đợi 5 giây
+
+5. Right-click → "Start"
+   Đợi đến khi thấy "Server startup in XXX ms"
+
+⚠️  NẾU TOMCAT KHÔNG START:
+   - Port 9999 có thể bị chiếm
+   - Xem log errors trong console
+   - Thử restart lại
+
+─────────────────────────────────────────────────────────────
+
+BƯỚC 4: ĐĂNG NHẬP
+═══════════════════════════════════════════════════════════
+
+1. Mở browser
+
+2. Truy cập:
+   http://localhost:9999/WEBGMS/login
+
+3. Đăng nhập với tài khoản BẤT KỲ
+   (user_id phải khớp với SQL ở bước 1)
+
+4. Sau khi login, kiểm tra seller dashboard:
+   http://localhost:9999/WEBGMS/seller/dashboard
+   
+   ✅ Dashboard phải hiển thị bình thường
+
+─────────────────────────────────────────────────────────────
+
+BƯỚC 5: TEST NOTIFICATIONS
+═══════════════════════════════════════════════════════════
+
+1. Truy cập:
+   http://localhost:9999/WEBGMS/seller/notifications
+
+2. KẾT QUẢ MONG ĐỢI:
+   ✅ Trang notifications hiển thị
+   ✅ Thấy 3 thông báo:
+      - "Chào mừng!"
+      - "Đơn hàng mới"
+      - "Thanh toán"
+   ✅ Stats hiển thị: Tổng: 3, Chưa đọc: 3
+   ✅ Giao diện đẹp, responsive
+
+3. TEST CHỨC NĂNG:
+
+   a) Đánh dấu 1 thông báo đã đọc:
+      - Click nút ✓ bên cạnh notification
+      - Trang reload
+      - Stats thay đổi: Chưa đọc: 2
+      - Thông báo không còn background màu vàng
+
+   b) Đánh dấu tất cả đã đọc:
+      - Click "Đánh dấu tất cả đã đọc"
+      - Stats: Chưa đọc: 0
+      - Tất cả notifications không còn màu vàng
+
+   c) Xóa 1 thông báo:
+      - Click nút 🗑️ (trash)
+      - Confirm "OK"
+      - Thông báo biến mất
+      - Stats: Tổng: 2
+
+─────────────────────────────────────────────────────────────
+
+CHECKLIST ĐỂ BÁO CÁO KẾT QUẢ
+═══════════════════════════════════════════════════════════
+
+□ SQL đã chạy thành công
+□ Build successful (không có lỗi)
+□ Tomcat start thành công
+□ Dashboard vẫn hoạt động tốt
+□ /seller/notifications hiển thị được
+□ Có 3 thông báo mẫu
+□ Đánh dấu đã đọc hoạt động
+□ Xóa thông báo hoạt động
+□ Giao diện đẹp, không bị lỗi
+
+─────────────────────────────────────────────────────────────
+
+NẾU GẶP LỖI
+═══════════════════════════════════════════════════════════
+
+LỖI 404 NOT FOUND:
+  → Build chưa thành công
+  → Tomcat chưa restart
+  → web.xml chưa có mapping
+
+LỖI 500 INTERNAL SERVER ERROR:
+  → Chưa chạy SQL (bảng chưa tồn tại)
+  → user_id không khớp
+  → Xem log trong NetBeans console
+
+TRANG TRẮNG / KHÔNG CÓ DỮ LIỆU:
+  → SQL chưa INSERT data
+  → user_id không khớp
+  → Kiểm tra: SELECT * FROM gicungco_notifications;
+
+BUILD FAILED:
+  → NotificationDAO có lỗi
+  → Thiếu library
+  → Copy lỗi cho tôi
+
+─────────────────────────────────────────────────────────────
+
+SAU KHI TEST THÀNH CÔNG
+═══════════════════════════════════════════════════════════
+
+Nếu tất cả hoạt động tốt:
+  ✅ Notifications DONE!
+  ✅ Seller Dashboard vẫn OK!
+  ✅ Có thể làm tiếp Close Shop (nếu cần)
+
+Nếu có lỗi:
+  ❌ Chụp màn hình
+  ❌ Copy log lỗi
+  ❌ Cho tôi biết để sửa
+
+═══════════════════════════════════════════════════════════
+Chúc may mắn! 🚀
+═══════════════════════════════════════════════════════════
+
+
+
+

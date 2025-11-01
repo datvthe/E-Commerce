@@ -10,7 +10,9 @@ import jakarta.servlet.http.*;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import model.product.ProductCategories;
 import model.product.ProductImages;
@@ -118,10 +120,27 @@ public class SellerProductsController extends HttpServlet {
 
         // 🟧 Trang thêm sản phẩm
         if ("/seller/products/add".equals(path)) {
-            ProductCategoriesDAO cateDAO = new ProductCategoriesDAO();
-            List<ProductCategories> categories = cateDAO.getAllCategories();
-            request.setAttribute("categories", categories);
-            request.getRequestDispatcher("/views/seller/seller-add-product.jsp").forward(request, response);
+            try {
+                ProductCategoriesDAO cateDAO = new ProductCategoriesDAO();
+                List<ProductCategories> categories = cateDAO.getAllCategories();
+                
+                if (categories == null) {
+                    categories = new ArrayList<>();
+                    System.err.println("WARNING: Categories list is null, using empty list");
+                }
+                
+                request.setAttribute("categories", categories);
+                request.getRequestDispatcher("/views/seller/seller-add-product.jsp").forward(request, response);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.err.println("ERROR loading add product page: " + e.getMessage());
+                request.setAttribute("error", "❌ Có lỗi xảy ra khi tải trang thêm sản phẩm: " + e.getMessage());
+                try {
+                    request.getRequestDispatcher("/views/seller/seller-products.jsp").forward(request, response);
+                } catch (Exception ex) {
+                    response.sendRedirect(request.getContextPath() + "/seller/products?error=page_load_failed");
+                }
+            }
             return;
         }
 
@@ -280,10 +299,54 @@ public class SellerProductsController extends HttpServlet {
                 ProductImageDAO imageDAO = new ProductImageDAO();
                 imageDAO.insertProductImage(img);
                 response.sendRedirect(request.getContextPath() + "/seller/products/view?id=" + newProductId + "&success=added");
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                System.err.println("NumberFormatException in add product: " + e.getMessage());
+                request.setAttribute("error", "❌ Dữ liệu nhập vào không hợp lệ! Vui lòng kiểm tra lại các trường số.");
+                try {
+                    ProductCategoriesDAO cateDAO = new ProductCategoriesDAO();
+                    request.setAttribute("categories", cateDAO.getAllCategories());
+                    request.getRequestDispatcher("/views/seller/seller-add-product.jsp").forward(request, response);
+                } catch (Exception ex) {
+                    response.sendRedirect(request.getContextPath() + "/seller/products?error=invalid_data");
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+                System.err.println("NullPointerException in add product: " + e.getMessage());
+                request.setAttribute("error", "❌ Thiếu thông tin bắt buộc! Vui lòng điền đầy đủ các trường.");
+                try {
+                    ProductCategoriesDAO cateDAO = new ProductCategoriesDAO();
+                    request.setAttribute("categories", cateDAO.getAllCategories());
+                    request.getRequestDispatcher("/views/seller/seller-add-product.jsp").forward(request, response);
+                } catch (Exception ex) {
+                    response.sendRedirect(request.getContextPath() + "/seller/products?error=missing_data");
+                }
             } catch (Exception e) {
                 e.printStackTrace();
-                request.setAttribute("error", "❌ Có lỗi xảy ra khi thêm sản phẩm. Vui lòng thử lại!");
-                request.getRequestDispatcher("/views/seller/seller-add-product.jsp").forward(request, response);
+                System.err.println("Exception in add product: " + e.getMessage());
+                System.err.println("Exception type: " + e.getClass().getName());
+                
+                // Check if it's a SQLException or has SQLException as cause
+                String errorMsg = "❌ Có lỗi xảy ra khi thêm sản phẩm: " + e.getMessage();
+                if (e instanceof java.sql.SQLException) {
+                    java.sql.SQLException sqlEx = (java.sql.SQLException) e;
+                    System.err.println("SQLException - SQL State: " + sqlEx.getSQLState());
+                    errorMsg = "❌ Lỗi database: " + sqlEx.getMessage();
+                } else if (e.getCause() instanceof java.sql.SQLException) {
+                    java.sql.SQLException sqlEx = (java.sql.SQLException) e.getCause();
+                    System.err.println("SQLException (as cause) - SQL State: " + sqlEx.getSQLState());
+                    errorMsg = "❌ Lỗi database: " + sqlEx.getMessage();
+                }
+                
+                request.setAttribute("error", errorMsg);
+                try {
+                    ProductCategoriesDAO cateDAO = new ProductCategoriesDAO();
+                    request.setAttribute("categories", cateDAO.getAllCategories());
+                    request.getRequestDispatcher("/views/seller/seller-add-product.jsp").forward(request, response);
+                } catch (Exception ex) {
+                    System.err.println("Failed to forward to add product page: " + ex.getMessage());
+                    response.sendRedirect(request.getContextPath() + "/seller/products?error=add_failed");
+                }
             }
         }
 

@@ -306,9 +306,14 @@
                 </label>
                 <select name="category_id" id="productCategory" required>
                     <option value="">-- Chọn danh mục phù hợp --</option>
-                    <c:forEach var="c" items="${categories}">
-                        <option value="${c.category_id}">${c.name}</option>
-                    </c:forEach>
+                    <c:if test="${not empty categories}">
+                        <c:forEach var="c" items="${categories}">
+                            <option value="${c.category_id}">${c.name}</option>
+                        </c:forEach>
+                    </c:if>
+                    <c:if test="${empty categories}">
+                        <option value="" disabled>Không có danh mục nào (Vui lòng liên hệ admin)</option>
+                    </c:if>
                 </select>
                 <small style="color:#666;font-size:12px;display:block;margin-top:5px;">
                     Chọn danh mục phù hợp để khách hàng dễ tìm thấy

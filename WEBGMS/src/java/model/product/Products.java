@@ -197,6 +197,7 @@ public class Products {
     public Timestamp getDeletedAt() { return deleted_at; }
     public void setDeletedAt(Timestamp deletedAt) { this.deleted_at = deletedAt; }
 
+
     public List<ProductImages> getProductImages() {
         return productImages;
     }
