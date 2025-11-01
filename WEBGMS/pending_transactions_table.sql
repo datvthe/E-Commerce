@@ -9,8 +9,8 @@ USE gicungco;
 CREATE TABLE IF NOT EXISTS `pending_transactions` (
   `pending_id` BIGINT NOT NULL AUTO_INCREMENT,
   `order_id` BIGINT NOT NULL COMMENT 'ID đơn hàng',
-  `buyer_id` INT NOT NULL COMMENT 'Người mua',
-  `seller_id` INT NOT NULL COMMENT 'Người bán',
+  `buyer_id` BIGINT NOT NULL COMMENT 'Người mua',
+  `seller_id` BIGINT NOT NULL COMMENT 'Người bán',
   `total_amount` DECIMAL(15,2) NOT NULL COMMENT 'Tổng tiền',
   `seller_amount` DECIMAL(15,2) NOT NULL COMMENT 'Tiền seller nhận (95%)',
   `platform_fee` DECIMAL(15,2) NOT NULL COMMENT 'Phí hệ thống (5%)',
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `pending_transactions` (
   `notes` TEXT COMMENT 'Ghi chú',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  
+
   PRIMARY KEY (`pending_id`),
   FOREIGN KEY (`order_id`) REFERENCES `orders`(`order_id`) ON DELETE CASCADE,
   FOREIGN KEY (`buyer_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE,
@@ -34,7 +34,8 @@ CREATE TABLE IF NOT EXISTS `pending_transactions` (
   INDEX `idx_order` (`order_id`),
   INDEX `idx_buyer` (`buyer_id`),
   INDEX `idx_seller` (`seller_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 COMMENT='Giao dịch pending - giữ tiền tạm thời';
 
 -- ================================================

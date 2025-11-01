@@ -170,18 +170,24 @@
                             <div class="digital-item-card">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h6 class="mb-0">
-                                        <i class="fas fa-tag me-2"></i>${item.productName}
+                                        <i class="fas fa-tag me-2"></i>${not empty order.product ? order.product.name : 'Sản phẩm số'}
                                     </h6>
                                     <span class="badge bg-light text-dark">#${status.index + 1}</span>
+                                </div>
+                                
+                                <!-- Loại code -->
+                                <div class="mb-2">
+                                    <div class="small opacity-75">LOẠI:</div>
+                                    <span class="badge bg-info">${item.codeType}</span>
                                 </div>
                                 
                                 <!-- Mã thẻ -->
                                 <div class="mb-2">
                                     <div class="small opacity-75">MÃ THẺ:</div>
-                                    <div class="code-display" id="code-${item.digitalId}">
-                                        ${item.code}
+                                    <div class="code-display" id="code-${item.codeId}">
+                                        ${item.codeValue}
                                     </div>
-                                    <button class="copy-btn btn-sm" onclick="copyToClipboard('code-${item.digitalId}', 'Mã thẻ')">
+                                    <button class="copy-btn btn-sm" onclick="copyToClipboard('code-${item.codeId}', 'Mã thẻ')">
                                         <i class="fas fa-copy me-1"></i>Copy mã
                                     </button>
                                 </div>
@@ -190,10 +196,10 @@
                                 <c:if test="${not empty item.serial}">
                                     <div class="mb-2">
                                         <div class="small opacity-75">SERIAL:</div>
-                                        <div class="code-display" id="serial-${item.digitalId}">
+                                        <div class="code-display" id="serial-${item.codeId}">
                                             ${item.serial}
                                         </div>
-                                        <button class="copy-btn btn-sm" onclick="copyToClipboard('serial-${item.digitalId}', 'Serial')">
+                                        <button class="copy-btn btn-sm" onclick="copyToClipboard('serial-${item.codeId}', 'Serial')">
                                             <i class="fas fa-copy me-1"></i>Copy serial
                                         </button>
                                     </div>
@@ -203,10 +209,10 @@
                                 <c:if test="${not empty item.password}">
                                     <div class="mb-2">
                                         <div class="small opacity-75">MẬT KHẨU:</div>
-                                        <div class="code-display" id="password-${item.digitalId}">
+                                        <div class="code-display" id="password-${item.codeId}">
                                             ${item.password}
                                         </div>
-                                        <button class="copy-btn btn-sm" onclick="copyToClipboard('password-${item.digitalId}', 'Mật khẩu')">
+                                        <button class="copy-btn btn-sm" onclick="copyToClipboard('password-${item.codeId}', 'Mật khẩu')">
                                             <i class="fas fa-copy me-1"></i>Copy mật khẩu
                                         </button>
                                     </div>

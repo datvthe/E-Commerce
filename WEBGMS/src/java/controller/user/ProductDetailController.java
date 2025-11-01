@@ -3,6 +3,7 @@ package controller.user;
 import dao.ProductDAO;
 import dao.ProductImageDAO;
 import dao.InventoryDAO;
+import dao.DigitalGoodsCodeDAO;
 import dao.ReviewDAO;
 import dao.WishlistDAO;
 import model.product.Products;
@@ -29,6 +30,7 @@ public class ProductDetailController extends HttpServlet {
     private ProductDAO productDAO = new ProductDAO();
     private ProductImageDAO imageDAO = new ProductImageDAO();
     private InventoryDAO inventoryDAO = new InventoryDAO();
+    private DigitalGoodsCodeDAO digitalGoodsDAO = new DigitalGoodsCodeDAO();
     private ReviewDAO reviewDAO = new ReviewDAO();
     private WishlistDAO wishlistDAO = new WishlistDAO();
 
@@ -64,9 +66,21 @@ public class ProductDetailController extends HttpServlet {
         // Get product images
         List<ProductImages> images = imageDAO.getImagesByProductId(product.getProduct_id());
         
-        // Get inventory
-        Inventory inventory = inventoryDAO.getInventoryByProductId(product.getProduct_id());
-        int availableStock = inventoryDAO.getAvailableQuantity(product.getProduct_id());
+        // ✨ Get available stock - CÁCH 2: COUNT từ digital_goods_codes
+        int availableStock = 0;
+        Inventory inventory = null;
+        
+        // Kiểm tra nếu là digital product
+        if (digitalGoodsDAO.isDigitalProduct(product.getProduct_id())) {
+            // Digital goods: COUNT trực tiếp từ digital_goods_codes
+            availableStock = digitalGoodsDAO.countAvailableCodes(product.getProduct_id());
+            System.out.println("📦 Digital product " + product.getProduct_id() + ": " + availableStock + " codes available");
+        } else {
+            // Physical goods: Lấy từ inventory
+            inventory = inventoryDAO.getInventoryByProductId(product.getProduct_id());
+            availableStock = inventoryDAO.getAvailableQuantity(product.getProduct_id());
+            System.out.println("📦 Physical product " + product.getProduct_id() + ": " + availableStock + " items in stock");
+        }
         
         // Get reviews (first page, 10 per page)
         int reviewPage = 1;

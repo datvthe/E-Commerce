@@ -3,7 +3,7 @@ package controller.order;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import dao.*;
-import model.order.DigitalProduct;
+import model.order.DigitalGoodsCode;
 import model.product.Products;
 import model.user.Users;
 import jakarta.servlet.ServletException;
@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,9 +29,10 @@ public class CheckoutProcessController extends HttpServlet {
     private final ProductDAO productDAO = new ProductDAO();
     private final WalletDAO walletDAO = new WalletDAO();
     private final OrderDAO orderDAO = new OrderDAO();
-    private final DigitalProductDAO digitalProductDAO = new DigitalProductDAO();
+    private final DigitalGoodsCodeDAO digitalGoodsDAO = new DigitalGoodsCodeDAO();
     private final OrderQueueDAO orderQueueDAO = new OrderQueueDAO();
     private final PendingTransactionDAO pendingTransactionDAO = new PendingTransactionDAO();
+    private final InventoryDAO inventoryDAO = new InventoryDAO();
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -85,22 +87,28 @@ public class CheckoutProcessController extends HttpServlet {
             conn = DBConnection.getConnection();
             conn.setAutoCommit(false);
             
-            // 5. Kiểm tra và lock digital products
-            List<DigitalProduct> availableProducts = digitalProductDAO.getAvailableProducts(productId, quantity, conn);
+            System.out.println("═══════════════════════════════════════════════");
+            System.out.println("🛒 CHECKOUT: 1 ORDER = 1 CODE DUY NHẤT");
+            System.out.println("   User muốn: " + quantity + " codes");
+            System.out.println("   → Tạo: " + quantity + " orders riêng biệt");
+            System.out.println("═══════════════════════════════════════════════");
             
-            if (availableProducts.size() < quantity) {
+            // 5. ✨ Kiểm tra và lock digital codes
+            List<DigitalGoodsCode> availableCodes = digitalGoodsDAO.getAvailableCodesWithLock(productId, quantity, conn);
+            
+            if (availableCodes.size() < quantity) {
                 conn.rollback();
+                System.err.println("❌ Out of stock! Requested: " + quantity + ", Available: " + availableCodes.size());
                 jsonResponse.addProperty("status", "OUT_OF_STOCK");
-                jsonResponse.addProperty("message", "Sản phẩm đã hết hàng! Còn lại: " + availableProducts.size());
+                jsonResponse.addProperty("message", "Sản phẩm đã hết hàng! Còn lại: " + availableCodes.size());
                 response.getWriter().write(new Gson().toJson(jsonResponse));
                 return;
             }
             
-            // 6. Tạo transaction ID (dùng số thay vì string)
+            // 6. Tạo transaction ID
             long transactionId = System.currentTimeMillis();
             
-            // 7. Trừ tiền ví user (sử dụng WalletDAO.processTopUp với số âm)
-            // Hoặc tạo method withdraw riêng
+            // 7. Trừ tiền ví user (TỔNG TIỀN cho tất cả codes)
             boolean walletUpdated = withdrawFromWallet(conn, user.getUser_id(), totalAmount.doubleValue(), transactionId, product.getName());
             
             if (!walletUpdated) {
@@ -111,30 +119,52 @@ public class CheckoutProcessController extends HttpServlet {
                 return;
             }
             
-            // 8. Tạo order
-            Long orderId = orderDAO.createInstantOrder(
-                Long.valueOf(user.getUser_id()), sellerId, productId, quantity,
-                unitPrice, totalAmount, String.valueOf(transactionId)
-            );
+            // 8. ✨ TẠO NHIỀU ORDERS (1 order per code)
+            List<Long> createdOrderIds = new ArrayList<>();
             
-            if (orderId == null) {
-                conn.rollback();
-                jsonResponse.addProperty("status", "ERROR");
-                jsonResponse.addProperty("message", "Không thể tạo đơn hàng!");
-                response.getWriter().write(new Gson().toJson(jsonResponse));
-                return;
+            for (int i = 0; i < availableCodes.size(); i++) {
+                DigitalGoodsCode code = availableCodes.get(i);
+                
+                // 8a. Tạo 1 order cho 1 code
+                Long orderId = orderDAO.createInstantOrder(
+                    Long.valueOf(user.getUser_id()), 
+                    sellerId, 
+                    unitPrice,  // Giá 1 code
+                    String.valueOf(transactionId + i), // Unique transaction ID
+                    conn
+                );
+                
+                if (orderId == null) {
+                    conn.rollback();
+                    jsonResponse.addProperty("status", "ERROR");
+                    jsonResponse.addProperty("message", "Không thể tạo đơn hàng!");
+                    response.getWriter().write(new Gson().toJson(jsonResponse));
+                    return;
+                }
+                
+                // 8b. Insert vào order_items (link order với product và code)
+                orderDAO.insertOrderItem(orderId, code.getCodeId(), productId, unitPrice, conn);
+                
+                // 8c. Đánh dấu code đã sử dụng
+                boolean marked = digitalGoodsDAO.markCodeAsUsed(code.getCodeId(), Long.valueOf(user.getUser_id()), conn);
+                if (!marked) {
+                    conn.rollback();
+                    jsonResponse.addProperty("status", "ERROR");
+                    jsonResponse.addProperty("message", "Không thể cập nhật mã digital!");
+                    response.getWriter().write(new Gson().toJson(jsonResponse));
+                    return;
+                }
+                
+                createdOrderIds.add(orderId);
+                System.out.println("  ✓ Order " + (i+1) + "/" + quantity + ": ID=" + orderId + ", Code=" + code.getCodeId());
             }
             
-            // 9. Đánh dấu digital products là đã bán
-            for (DigitalProduct dp : availableProducts) {
-                digitalProductDAO.markAsSold(dp.getDigitalId(), Long.valueOf(user.getUser_id()), orderId, conn);
-                digitalProductDAO.linkDigitalProductToOrder(orderId, dp.getDigitalId(), conn);
-            }
-            
-            // 10. Tạo PENDING TRANSACTION (giữ tiền 7 ngày trước khi chuyển cho seller)
-            int holdDays = 7; // Giữ tiền 7 ngày
+            // 9. Tạo PENDING TRANSACTION (cho tổng tiền)
+            int holdDays = 7;
             Long pendingId = pendingTransactionDAO.createPendingTransaction(
-                conn, orderId, user.getUser_id(), product.getSeller_id().getUser_id(),
+                conn, createdOrderIds.get(0), // Dùng order đầu tiên làm reference
+                user.getUser_id(), 
+                product.getSeller_id().getUser_id(),
                 totalAmount, holdDays, transactionId
             );
             
@@ -146,19 +176,23 @@ public class CheckoutProcessController extends HttpServlet {
                 return;
             }
             
-            // 11. Thêm vào queue (để background worker xử lý thêm nếu cần)
-            orderQueueDAO.addToQueue(orderId, 10); // Priority = 10
-            
-            // 12. Cập nhật order status thành COMPLETED (vì đã giao hàng ngay)
-            orderDAO.updateOrderStatus(orderId, "COMPLETED", "COMPLETED");
-            
-            // 13. COMMIT transaction
+            // 10. COMMIT transaction
             conn.commit();
             
-            // 13. Trả về success
+            System.out.println("✅ Committed " + createdOrderIds.size() + " orders successfully!");
+            
+            // 11. ✨ Sync inventory SAU khi commit
+            try {
+                inventoryDAO.syncInventoryForProduct(productId);
+            } catch (Exception e) {
+                System.err.println("⚠️ Failed to sync inventory: " + e.getMessage());
+            }
+            
+            // 12. Trả về success với danh sách order IDs
             jsonResponse.addProperty("status", "SUCCESS");
-            jsonResponse.addProperty("message", "Đặt hàng thành công!");
-            jsonResponse.addProperty("orderId", orderId);
+            jsonResponse.addProperty("message", "Đặt hàng thành công! Đã tạo " + createdOrderIds.size() + " đơn hàng");
+            jsonResponse.addProperty("orderId", createdOrderIds.get(0)); // Order đầu tiên
+            jsonResponse.addProperty("totalOrders", createdOrderIds.size());
             
             response.getWriter().write(new Gson().toJson(jsonResponse));
             

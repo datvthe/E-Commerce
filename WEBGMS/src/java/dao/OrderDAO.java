@@ -15,39 +15,40 @@ import java.util.List;
 public class OrderDAO extends DBConnection {
     
     /**
-     * Tạo đơn hàng mới (digital goods - instant delivery)
+     * ✨ Tạo đơn hàng mới (digital goods - instant delivery)
+     * 
+     * ⚠️ NGUYÊN TẮC: 1 ORDER = 1 CODE DUY NHẤT
+     * ════════════════════════════════════════
+     * - Mỗi order CHỈ chứa 1 code
+     * - Quantity LUÔN = 1 (cố định)
+     * - Nếu user muốn mua 3 codes → Tạo 3 orders riêng biệt
+     * - Dùng order_id làm identifier
+     * 
+     * @param productPrice - Giá 1 code (= total_amount)
      * @return order_id của đơn hàng mới tạo
      */
-    public Long createInstantOrder(Long buyerId, Long sellerId, Long productId, 
-                                   Integer quantity, BigDecimal unitPrice, 
-                                   BigDecimal totalAmount, String transactionId) throws SQLException {
+    public Long createInstantOrder(Long buyerId, Long sellerId, BigDecimal productPrice, 
+                                   String transactionId, Connection conn) throws SQLException {
         
-        String orderNumber = generateOrderNumber();
-        
+        // ✅ INSERT vào orders (theo cấu trúc: buyer_id, seller_id, status, total_amount)
         String sql = "INSERT INTO orders " +
-                    "(order_number, buyer_id, seller_id, product_id, quantity, " +
-                    "unit_price, total_amount, currency, payment_method, payment_status, " +
-                    "order_status, delivery_status, transaction_id, queue_status, created_at) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, 'VND', 'WALLET', 'PAID', 'PENDING', 'INSTANT', ?, 'WAITING', NOW())";
+                    "(buyer_id, seller_id, status, total_amount, currency, created_at) " +
+                    "VALUES (?, ?, 'paid', ?, 'VND', NOW())";
         
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
-            ps.setString(1, orderNumber);
-            ps.setLong(2, buyerId);
-            ps.setLong(3, sellerId);
-            ps.setLong(4, productId);
-            ps.setInt(5, quantity);
-            ps.setBigDecimal(6, unitPrice);
-            ps.setBigDecimal(7, totalAmount);
-            ps.setString(8, transactionId);
+            ps.setLong(1, buyerId);
+            ps.setLong(2, sellerId);
+            ps.setBigDecimal(3, productPrice); // total_amount = giá 1 code
             
             int affected = ps.executeUpdate();
             
             if (affected > 0) {
                 try (ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs.next()) {
-                        return rs.getLong(1);
+                        Long orderId = rs.getLong(1);
+                        System.out.println("✅ Created order ID: " + orderId + " | Amount: " + productPrice);
+                        return orderId;
                     }
                 }
             }
@@ -57,28 +58,40 @@ public class OrderDAO extends DBConnection {
     }
     
     /**
-     * Generate unique order number
-     * Format: ORDER-YYYYMMDD-XXXXX
+     * Insert vào order_items (link order với product và code)
      */
-    private String generateOrderNumber() {
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyyMMdd");
-        String datePart = sdf.format(new java.util.Date());
-        int randomPart = (int) (Math.random() * 100000);
-        return String.format("ORDER-%s-%05d", datePart, randomPart);
+    public void insertOrderItem(Long orderId, Integer codeId, Long productId, 
+                                BigDecimal price, Connection conn) throws SQLException {
+        
+        // ✅ 1 ORDER = 1 CODE → quantity luôn = 1
+        String sql = "INSERT INTO order_items " +
+                    "(order_id, product_id, quantity, price_at_purchase, discount_applied, subtotal) " +
+                    "VALUES (?, ?, 1, ?, 0, ?)";
+        
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, orderId);
+            ps.setLong(2, productId);
+            ps.setBigDecimal(3, price);
+            ps.setBigDecimal(4, price); // subtotal = price (vì quantity = 1)
+            
+            ps.executeUpdate();
+            System.out.println("  ✓ Added order_item: order=" + orderId + ", product=" + productId + ", code=" + codeId);
+        }
     }
     
     /**
-     * Lấy order theo ID
+     * Lấy order theo ID (JOIN với order_items để lấy product_id)
      */
     public Orders getOrderById(Long orderId) {
         String sql = "SELECT o.*, " +
                     "b.email as buyer_email, b.full_name as buyer_name, " +
                     "s.email as seller_email, s.full_name as seller_name, " +
-                    "p.name as product_name, p.slug as product_slug " +
+                    "oi.product_id, p.name as product_name, p.slug as product_slug " +
                     "FROM orders o " +
                     "LEFT JOIN users b ON o.buyer_id = b.user_id " +
                     "LEFT JOIN users s ON o.seller_id = s.user_id " +
-                    "LEFT JOIN products p ON o.product_id = p.product_id " +
+                    "LEFT JOIN order_items oi ON o.order_id = oi.order_id " +
+                    "LEFT JOIN products p ON oi.product_id = p.product_id " +
                     "WHERE o.order_id = ?";
         
         try (Connection conn = DBConnection.getConnection();
@@ -105,10 +118,11 @@ public class OrderDAO extends DBConnection {
         List<Orders> orders = new ArrayList<>();
         
         String sql = "SELECT o.*, " +
-                    "p.name as product_name, p.slug as product_slug, " +
+                    "oi.product_id, p.name as product_name, p.slug as product_slug, " +
                     "s.full_name as seller_name " +
                     "FROM orders o " +
-                    "LEFT JOIN products p ON o.product_id = p.product_id " +
+                    "LEFT JOIN order_items oi ON o.order_id = oi.order_id " +
+                    "LEFT JOIN products p ON oi.product_id = p.product_id " +
                     "LEFT JOIN users s ON o.seller_id = s.user_id " +
                     "WHERE o.buyer_id = ? " +
                     "ORDER BY o.created_at DESC " +
@@ -159,18 +173,15 @@ public class OrderDAO extends DBConnection {
     /**
      * Cập nhật trạng thái order
      */
-    public boolean updateOrderStatus(Long orderId, String orderStatus, String queueStatus) {
-        String sql = "UPDATE orders SET order_status = ?, queue_status = ?, " +
-                    "processed_at = IF(? = 'COMPLETED', NOW(), processed_at) " +
+    public boolean updateOrderStatus(Long orderId, String status) {
+        String sql = "UPDATE orders SET status = ?, updated_at = NOW() " +
                     "WHERE order_id = ?";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
-            ps.setString(1, orderStatus);
-            ps.setString(2, queueStatus);
-            ps.setString(3, queueStatus);
-            ps.setLong(4, orderId);
+            ps.setString(1, status);
+            ps.setLong(2, orderId);
             
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -187,21 +198,46 @@ public class OrderDAO extends DBConnection {
         Orders order = new Orders();
         
         order.setOrderId(rs.getLong("order_id"));
-        order.setOrderNumber(rs.getString("order_number"));
+        order.setOrderNumber("ORD-" + rs.getLong("order_id")); // Format: ORD-123
         order.setBuyerId(rs.getLong("buyer_id"));
         order.setSellerId(rs.getLong("seller_id"));
-        order.setProductId(rs.getLong("product_id"));
-        order.setQuantity(rs.getInt("quantity"));
-        order.setUnitPrice(rs.getBigDecimal("unit_price"));
+        
+        // ✅ 1 ORDER = 1 CODE → quantity luôn = 1
+        order.setQuantity(1);
+        order.setUnitPrice(rs.getBigDecimal("total_amount")); // Price 1 code = total_amount
         order.setTotalAmount(rs.getBigDecimal("total_amount"));
         order.setCurrency(rs.getString("currency"));
-        order.setPaymentMethod(rs.getString("payment_method"));
-        order.setPaymentStatus(rs.getString("payment_status"));
-        order.setOrderStatus(rs.getString("order_status"));
-        order.setDeliveryStatus(rs.getString("delivery_status"));
-        order.setTransactionId(rs.getString("transaction_id"));
-        order.setQueueStatus(rs.getString("queue_status"));
-        order.setProcessedAt(rs.getTimestamp("processed_at"));
+        
+        // Status từ orders.status
+        String status = rs.getString("status");
+        order.setPaymentStatus(status); // paid, pending, cancelled, refunded
+        order.setOrderStatus(status);
+        
+        // Product info từ JOIN order_items
+        try {
+            Long productIdObj = rs.getObject("product_id", Long.class);
+            if (productIdObj != null) {
+                order.setProductId(productIdObj);
+                
+                Products product = new Products();
+                product.setProduct_id(productIdObj);
+                
+                String productName = rs.getString("product_name");
+                if (productName != null) {
+                    product.setName(productName);
+                }
+                
+                String productSlug = rs.getString("product_slug");
+                if (productSlug != null) {
+                    product.setSlug(productSlug);
+                }
+                
+                order.setProduct(product);
+            }
+        } catch (SQLException ignored) {
+            // order_items might not be joined
+        }
+        
         order.setCreatedAt(rs.getTimestamp("created_at"));
         order.setUpdatedAt(rs.getTimestamp("updated_at"));
         

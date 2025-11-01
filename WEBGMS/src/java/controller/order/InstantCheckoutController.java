@@ -2,7 +2,7 @@ package controller.order;
 
 import dao.ProductDAO;
 import dao.WalletDAO;
-import dao.DigitalProductDAO;
+import dao.DigitalGoodsCodeDAO;
 import model.product.Products;
 import model.user.Users;
 import jakarta.servlet.ServletException;
@@ -23,7 +23,7 @@ public class InstantCheckoutController extends HttpServlet {
     
     private final ProductDAO productDAO = new ProductDAO();
     private final WalletDAO walletDAO = new WalletDAO();
-    private final DigitalProductDAO digitalProductDAO = new DigitalProductDAO();
+    private final DigitalGoodsCodeDAO digitalGoodsDAO = new DigitalGoodsCodeDAO();
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -68,8 +68,10 @@ public class InstantCheckoutController extends HttpServlet {
                 return;
             }
             
-            // 3. Kiểm tra stock (số lượng digital products còn)
-            int availableStock = digitalProductDAO.getAvailableStock(productId);
+            // 3. ✨ Kiểm tra stock (COUNT từ digital_goods_codes)
+            int availableStock = digitalGoodsDAO.countAvailableCodes(productId);
+            
+            System.out.println("🔍 Checking stock for product " + productId + ": " + availableStock + " codes available");
             
             if (availableStock < quantity) {
                 request.setAttribute("error", "❌ Sản phẩm đã hết hàng! Còn lại: " + availableStock);

@@ -1,7 +1,7 @@
 package controller.order;
 
 import dao.OrderDAO;
-import dao.DigitalProductDAO;
+import dao.DigitalGoodsCodeDAO;
 import dao.WalletDAO;
 import model.order.Orders;
 import model.order.DigitalProduct;
@@ -22,7 +22,7 @@ import java.util.List;
 public class OrderSuccessController extends HttpServlet {
     
     private final OrderDAO orderDAO = new OrderDAO();
-    private final DigitalProductDAO digitalProductDAO = new DigitalProductDAO();
+    private final DigitalGoodsCodeDAO digitalGoodsDAO = new DigitalGoodsCodeDAO();
     private final WalletDAO walletDAO = new WalletDAO();
     
     @Override
@@ -65,18 +65,24 @@ public class OrderSuccessController extends HttpServlet {
                 return;
             }
             
-            // 4. Lấy digital products (mã thẻ/tài khoản)
-            List<DigitalProduct> digitalItems = digitalProductDAO.getDigitalProductsByOrderId(orderId);
+            // 4. ✨ Lấy product_id từ order_items
+            Long productId = order.getProductId();
             
-            // 5. Lấy số dư ví hiện tại
+            // 5. Lấy TOÀN BỘ codes đã mua của product này (có thể nhiều orders)
+            List<model.order.DigitalGoodsCode> digitalItems = digitalGoodsDAO.getCodesByUserId(
+                Long.valueOf(user.getUser_id()), 
+                productId
+            );
+            
+            // 6. Lấy số dư ví hiện tại
             double currentBalance = walletDAO.getBalance(user.getUser_id());
             
-            // 6. Set attributes
+            // 7. Set attributes
             request.setAttribute("order", order);
             request.setAttribute("digitalItems", digitalItems);
             request.setAttribute("currentBalance", currentBalance);
             
-            // 7. Forward to success page
+            // 8. Forward to success page
             request.getRequestDispatcher("/views/user/order-success.jsp").forward(request, response);
             
         } catch (NumberFormatException e) {
