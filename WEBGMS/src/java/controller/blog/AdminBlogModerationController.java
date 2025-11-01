@@ -33,11 +33,26 @@ public class AdminBlogModerationController extends HttpServlet {
         HttpSession session = request.getSession();
         Users user = (Users) session.getAttribute("user");
         
+        // Debug logging
+        System.out.println("=== Blog Moderation Access Check ===");
+        System.out.println("User: " + (user != null ? user.getEmail() : "NULL"));
+        System.out.println("Role: " + (user != null ? user.getDefault_role() : "NULL"));
+        
         // Check login and admin role
-        if (user == null || !"admin".equalsIgnoreCase(user.getRole())) {
+        if (user == null) {
+            System.out.println("Access DENIED: User not logged in");
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+        
+        if (!"admin".equalsIgnoreCase(user.getDefault_role())) {
+            System.out.println("Access DENIED: User role is not admin: " + user.getDefault_role());
+            request.setAttribute("error", "Bạn không có quyền truy cập trang này!");
+            response.sendRedirect(request.getContextPath() + "/home");
+            return;
+        }
+        
+        System.out.println("Access GRANTED: Admin access");
         
         try {
             // Pagination
@@ -96,12 +111,16 @@ public class AdminBlogModerationController extends HttpServlet {
         Users user = (Users) session.getAttribute("user");
         
         // Check login and admin role
-        if (user == null || !"admin".equalsIgnoreCase(user.getRole())) {
+        if (user == null || !"admin".equalsIgnoreCase(user.getDefault_role())) {
+            System.out.println("POST Access DENIED: User not admin");
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
         
         String action = request.getParameter("action");
+        System.out.println("=== ADMIN BLOG MODERATION POST ===");
+        System.out.println("Action: " + action);
+        System.out.println("User: " + user.getEmail());
         
         switch (action) {
             case "approve":
@@ -114,6 +133,7 @@ public class AdminBlogModerationController extends HttpServlet {
                 deleteBlog(request, response);
                 break;
             default:
+                System.out.println("Unknown action: " + action);
                 response.sendRedirect(request.getContextPath() + "/admin/blog-moderation");
                 break;
         }
@@ -127,15 +147,21 @@ public class AdminBlogModerationController extends HttpServlet {
         
         try {
             String blogIdStr = request.getParameter("blogId");
+            System.out.println("Approve - blogId param: " + blogIdStr);
+            
             if (blogIdStr == null || blogIdStr.isEmpty()) {
+                System.out.println("Approve - ERROR: Missing blogId");
                 response.sendRedirect(request.getContextPath() + "/admin/blog-moderation?error=missing_id");
                 return;
             }
             
             Long blogId = Long.parseLong(blogIdStr);
+            System.out.println("Approving blogId: " + blogId + " by moderator: " + user.getUser_id());
             
             // Approve blog (sử dụng stored procedure - tự động tạo notification)
             boolean success = blogDAO.approveBlog(blogId, user.getUser_id());
+            
+            System.out.println("Approve result: " + success);
             
             if (success) {
                 response.sendRedirect(request.getContextPath() + "/admin/blog-moderation?success=approved");
@@ -144,6 +170,7 @@ public class AdminBlogModerationController extends HttpServlet {
             }
             
         } catch (Exception e) {
+            System.out.println("Approve - EXCEPTION: " + e.getMessage());
             e.printStackTrace();
             response.sendRedirect(request.getContextPath() + "/admin/blog-moderation?error=" + e.getMessage());
         }
@@ -159,20 +186,29 @@ public class AdminBlogModerationController extends HttpServlet {
             String blogIdStr = request.getParameter("blogId");
             String reason = request.getParameter("reason");
             
+            System.out.println("Reject - blogId param: " + blogIdStr);
+            System.out.println("Reject - reason param: " + reason);
+            
             if (blogIdStr == null || blogIdStr.isEmpty()) {
+                System.out.println("Reject - ERROR: Missing blogId");
                 response.sendRedirect(request.getContextPath() + "/admin/blog-moderation?error=missing_id");
                 return;
             }
             
             if (reason == null || reason.trim().isEmpty()) {
+                System.out.println("Reject - ERROR: Missing reason");
                 response.sendRedirect(request.getContextPath() + "/admin/blog-moderation?error=missing_reason");
                 return;
             }
             
             Long blogId = Long.parseLong(blogIdStr);
+            System.out.println("Rejecting blogId: " + blogId + " by moderator: " + user.getUser_id());
+            System.out.println("Reason: " + reason);
             
             // Reject blog (sử dụng stored procedure - tự động tạo notification)
             boolean success = blogDAO.rejectBlog(blogId, user.getUser_id(), reason);
+            
+            System.out.println("Reject result: " + success);
             
             if (success) {
                 response.sendRedirect(request.getContextPath() + "/admin/blog-moderation?success=rejected");
@@ -181,6 +217,7 @@ public class AdminBlogModerationController extends HttpServlet {
             }
             
         } catch (Exception e) {
+            System.out.println("Reject - EXCEPTION: " + e.getMessage());
             e.printStackTrace();
             response.sendRedirect(request.getContextPath() + "/admin/blog-moderation?error=" + e.getMessage());
         }

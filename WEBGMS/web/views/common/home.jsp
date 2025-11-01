@@ -389,11 +389,14 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
                     </c:forEach>
                   </div>
                 </div>
-                <a
-                  href="<%= request.getContextPath() %>/blog"
-                  class="nav-item nav-link"
-                  >Tin tức</a
-                >
+                <c:if test="${not empty sessionScope.user}">
+                  <a
+                    href="<%= request.getContextPath() %>/user/my-blogs"
+                    class="nav-item nav-link"
+                  >
+                    <i class="fas fa-blog me-1"></i>Blog của tôi
+                  </a>
+                </c:if>
                 <a href="#" class="nav-item nav-link">Chia sẻ</a>
                 <a
                   href="<%= request.getContextPath() %>/contact"

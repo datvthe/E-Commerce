@@ -274,7 +274,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- TinyMCE -->
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@6/tinymce.min.js" referrerpolicy="origin"></script>
     
     <script>
         // Initialize TinyMCE
@@ -294,7 +294,12 @@
             content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
             language: 'vi',
             branding: false,
-            promotion: false
+            promotion: false,
+            setup: function(editor) {
+                editor.on('change', function() {
+                    editor.save();
+                });
+            }
         });
         
         // Slug preview
@@ -366,6 +371,11 @@
         
         // Form validation
         document.getElementById('blogForm').addEventListener('submit', function(e) {
+            // Trigger TinyMCE to save content to textarea
+            if (tinymce && tinymce.get('content')) {
+                tinymce.get('content').save();
+            }
+            
             const title = document.getElementById('title').value.trim();
             
             if (!title) {
@@ -375,12 +385,21 @@
             }
             
             // Get TinyMCE content
-            const content = tinymce.get('content').getContent();
-            if (!content || content.trim() === '') {
+            let content = '';
+            if (tinymce && tinymce.get('content')) {
+                content = tinymce.get('content').getContent();
+            } else {
+                content = document.getElementById('content').value;
+            }
+            
+            if (!content || content.trim() === '' || content === '<p></p>' || content === '<p><br></p>') {
                 e.preventDefault();
                 alert('Vui lòng nhập nội dung blog!');
                 return false;
             }
+            
+            // Allow form to submit
+            return true;
         });
         
         // Initialize character counters
