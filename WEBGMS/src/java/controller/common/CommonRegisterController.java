@@ -1,6 +1,7 @@
 package controller.common;
 
 import dao.UsersDAO;
+import dao.EmailVerificationDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -8,6 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import model.user.Users;
+import model.user.EmailVerification;
+import service.EmailService;
 
 @WebServlet(name = "CommonRegisterController", urlPatterns = {"/register"})
 public class CommonRegisterController extends HttpServlet {
@@ -61,6 +64,23 @@ public class CommonRegisterController extends HttpServlet {
 
             UsersDAO usersDAO = new UsersDAO();
             if (usersDAO.isEmailExists(email)) {
+                // Email exists: if account is not ACTIVE, resend verification instead of blocking
+                Users existing = usersDAO.getUserByEmail(email);
+                if (existing != null && (existing.getStatus() == null || !"active".equalsIgnoreCase(existing.getStatus()))) {
+                    try {
+                        EmailVerificationDAO verificationDAO = new EmailVerificationDAO();
+                        String verificationCode = verificationDAO.generateVerificationCode(
+                            (long) existing.getUser_id(),
+                            email
+                        );
+                        EmailVerificationService.sendVerificationEmail(email, existing.getFull_name(), verificationCode);
+                        request.getSession().setAttribute("success", "Email đã tồn tại nhưng chưa kích hoạt. Đã gửi lại mã xác thực!");
+                        response.sendRedirect(request.getContextPath() + "/verify-email?email=" + email);
+                        return;
+                    } catch (Exception ignore) {
+                        // fall through to error
+                    }
+                }
                 request.getSession().setAttribute("error", "Email đã được sử dụng!");
                 response.sendRedirect(request.getContextPath() + "/register");
                 return;
@@ -78,7 +98,7 @@ public class CommonRegisterController extends HttpServlet {
                 return;
             }
 
-            // Create user (password will be hashed in createUser method)
+            // Create user with pending status (password will be hashed in createUser method)
             Users created = usersDAO.createUser(fullName, email, password, phone);
             if (created == null) {
                 request.getSession().setAttribute("error", "Tạo tài khoản thất bại!");
@@ -88,10 +108,42 @@ public class CommonRegisterController extends HttpServlet {
 
             usersDAO.assignDefaultUserRole(created.getUser_id());
 
-            // Auto login after register
-            request.getSession().setAttribute("user", created);
-            request.getSession().setAttribute("message", "Đăng ký thành công!");
-            response.sendRedirect(request.getContextPath() + "/home");
+            // ================================================
+            // CREATE VERIFICATION CODE & SEND EMAIL
+            // ================================================
+            try {
+                EmailVerificationDAO verificationDAO = new EmailVerificationDAO();
+                EmailVerification verification = verificationDAO.createEmailVerificationRequest(email);
+                
+                if (verification != null) {
+                    // Send verification email
+                    EmailService emailService = new EmailService();
+                    boolean emailSent = emailService.sendRegistrationVerificationEmail(
+                        email,
+                        verification.getVerificationCode()
+                    );
+                    
+                    if (emailSent) {
+                        request.getSession().setAttribute("message", 
+                            "Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.");
+                        request.getSession().setAttribute("verification_email", email);
+                        response.sendRedirect(request.getContextPath() + "/verify-email");
+                    } else {
+                        request.getSession().setAttribute("error", 
+                            "Không thể gửi email xác thực. Vui lòng thử lại sau.");
+                        response.sendRedirect(request.getContextPath() + "/register");
+                    }
+                } else {
+                    request.getSession().setAttribute("error", 
+                        "Không thể tạo mã xác thực. Vui lòng thử lại.");
+                    response.sendRedirect(request.getContextPath() + "/register");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                request.getSession().setAttribute("error", 
+                    "Lỗi hệ thống khi gửi email xác thực. Vui lòng thử lại.");
+                response.sendRedirect(request.getContextPath() + "/register");
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
             request.getSession().setAttribute("error", "Có lỗi hệ thống, vui lòng thử lại sau!");

@@ -249,13 +249,15 @@ public class UsersDAO extends DBConnection {
 
     public Users createUser(String fullName, String email, String password, String phoneNumber) {
         Users user = null;
-        // Password is already hashed in CommonRegisterController, don't hash again
-        String sql = "INSERT INTO users (full_name, email, password_hash, phone_number, status, email_verified, default_role, created_at) VALUES (?, ?, ?, ?, 'active', 0, 'customer', NOW())";
+        // Hash password before storing
+        String hashedPassword = util.PasswordUtil.hashPassword(password);
+        // Create user with 'pending' status - will be activated after email verification
+        String sql = "INSERT INTO users (full_name, email, password_hash, phone_number, status, email_verified, default_role, created_at) VALUES (?, ?, ?, ?, 'pending', 0, 'customer', NOW())";
         try (Connection conn = DBConnection.getConnection(); 
              PreparedStatement ps = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, fullName);
             ps.setString(2, email);
-            ps.setString(3, password);
+            ps.setString(3, hashedPassword);
             ps.setString(4, phoneNumber);
             int affected = ps.executeUpdate();
             if (affected > 0) {

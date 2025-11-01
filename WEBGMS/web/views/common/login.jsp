@@ -17,6 +17,7 @@
         <link href="<%= request.getContextPath() %>/views/assets/electro/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
         <link href="<%= request.getContextPath() %>/views/assets/electro/css/bootstrap.min.css" rel="stylesheet">
         <link href="<%= request.getContextPath() %>/views/assets/electro/css/style.css" rel="stylesheet">
+        
         <style>
             /* Orange Theme Override */
             .bg-primary {
@@ -43,6 +44,17 @@
             .btn-outline-primary:hover {
                 background-color: #ff6b35 !important;
                 border-color: #ff6b35 !important;
+            }
+            
+            /* Fix Bootstrap validation icons position when password toggle is present */
+            .form-control.is-valid,
+            .form-control.is-invalid {
+                background-position: right calc(2.5em + 0.375rem) center !important;
+            }
+            
+            /* Ensure password toggle button is always on top */
+            .password-toggle-btn {
+                z-index: 1000 !important;
             }
         </style>
     </head>
@@ -174,35 +186,80 @@
             <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-5">
-                    <form action="<%= request.getContextPath() %>/login" method="post" class="border p-4 shadow rounded bg-light">
-                        <h3 class="mb-4 text-center">Đăng nhập</h3>
-                        <div class="form-group mb-3">
-                            <label for="account">Email hoặc Số điện thoại</label>
-                                <input type="text" class="form-control" id="account" name="account" placeholder="Nhập email hoặc số điện thoại" required>
+                    <!-- Alert Messages -->
+                    <c:if test="${not empty sessionScope.message}">
+                        <div class="alert alert-success alert-dismissible fade show" role="alert" data-auto-dismiss="true">
+                            <i class="fas fa-check-circle"></i> ${sessionScope.message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
-                        <div class="form-group mb-3">
-                            <label for="password">Mật khẩu</label>
-                                <input type="password" class="form-control" id="password" name="password" placeholder="Nhập mật khẩu" required>
+                        <c:remove var="message" scope="session"/>
+                    </c:if>
+
+                    <c:if test="${not empty sessionScope.error}">
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert" data-auto-dismiss="true">
+                            <i class="fas fa-exclamation-circle"></i> ${sessionScope.error}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
+                        <c:remove var="error" scope="session"/>
+                    </c:if>
+
+                    <form action="<%= request.getContextPath() %>/login" method="post" 
+                          class="border p-4 shadow rounded bg-light" data-auth-form>
+                        <h3 class="mb-4 text-center">
+                            <i class="fas fa-sign-in-alt text-primary"></i> Đăng nhập
+                        </h3>
+                        
+                        <div class="form-group mb-3">
+                            <label for="account">
+                                <i class="fas fa-envelope"></i> Email hoặc Số điện thoại
+                            </label>
+                            <input type="text" class="form-control" id="account" name="account" 
+                                   placeholder="Nhập email hoặc số điện thoại" 
+                                   autocomplete="username" required autofocus>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="password">
+                                <i class="fas fa-lock"></i> Mật khẩu
+                            </label>
+                            <div class="position-relative">
+                                <input type="password" class="form-control" id="password" name="password" 
+                                       placeholder="Nhập mật khẩu" autocomplete="current-password" 
+                                       required data-toggle-password>
+                            </div>
+                        </div>
+                        
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="remember" name="remember">
-                                    <label class="form-check-label" for="remember">Ghi nhớ đăng nhập</label>
+                                <label class="form-check-label" for="remember" 
+                                       title="Bạn sẽ tự động đăng nhập trong 3 ngày tới" 
+                                       data-bs-toggle="tooltip">
+                                    <i class="fas fa-history"></i> Ghi nhớ đăng nhập
+                                </label>
                             </div>
                             <div>
-                                <a href="<%= request.getContextPath() %>/forgot-password">Quên mật khẩu?</a>
+                                <a href="<%= request.getContextPath() %>/forgot-password" class="text-decoration-none">
+                                    <i class="fas fa-key"></i> Quên mật khẩu?
+                                </a>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+                        
+                        <button type="submit" class="btn btn-primary w-100 mb-3">
+                            <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                        </button>
                         
                         <!-- Divider -->
-                        <div class="text-center my-3">
-                            <span class="text-muted">hoặc</span>
+                        <div class="position-relative my-4">
+                            <hr>
+                            <span class="position-absolute top-50 start-50 translate-middle bg-light px-3 text-muted">
+                                hoặc
+                            </span>
                         </div>
                         
                         <!-- Google Login Button -->
                         <a href="<%= request.getContextPath() %>/auth/google?action=login" 
-                           class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center">
+                           class="btn btn-outline-danger w-100 d-flex align-items-center justify-content-center mb-3">
                             <svg width="20" height="20" viewBox="0 0 24 24" class="me-2">
                                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -212,9 +269,14 @@
                             Đăng nhập với Google
                         </a>
                         
-                        <p class="mt-3 text-center">
-                            Chưa có tài khoản? <a href="<%= request.getContextPath() %>/register">Đăng ký</a>
-                        </p>
+                        <div class="text-center">
+                            <p class="text-muted mb-0">
+                                Chưa có tài khoản? 
+                                <a href="<%= request.getContextPath() %>/register" class="fw-bold text-decoration-none">
+                                    Đăng ký ngay <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </p>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -289,6 +351,7 @@
         <script src="<%= request.getContextPath() %>/views/assets/electro/lib/counterup/counterup.min.js"></script>
         <script src="<%= request.getContextPath() %>/views/assets/electro/lib/owlcarousel/owl.carousel.min.js"></script>
         <script src="<%= request.getContextPath() %>/views/assets/electro/js/main.js"></script>
+        <script src="<%= request.getContextPath() %>/views/assets/js/auth-enhancement.js"></script>
         
         <script>
             document.addEventListener('DOMContentLoaded', function() {
