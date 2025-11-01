@@ -53,6 +53,7 @@ public class UsersDAO extends DBConnection {
                         user.setDate_of_birth(rs.getDate("date_of_birth"));
                         user.setAddress(rs.getString("address"));
                         user.setAvatar_url(rs.getString("avatar_url"));
+                        user.setDefault_role(rs.getString("default_role")); // ← THIẾU DÒNG NÀY!
                         user.setStatus(rs.getString("status"));
                         user.setEmail_verified(rs.getBoolean("email_verified"));
                         user.setLast_login_at(rs.getDate("last_login_at"));
@@ -96,6 +97,7 @@ public class UsersDAO extends DBConnection {
                     user.setFull_name(rs.getString("full_name"));
                     user.setEmail(rs.getString("email"));
                     user.setPhone_number(rs.getString("phone_number"));
+                    user.setDefault_role(rs.getString("default_role")); // ← THÊM DÒNG NÀY
                     user.setStatus(rs.getString("status"));
                 }
             }

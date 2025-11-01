@@ -342,6 +342,9 @@ pageEncoding="UTF-8"%>
                                         <li><a class="dropdown-item py-2" href="<%= request.getContextPath() %>/wishlist">
                                             <i class="fas fa-heart me-2 text-danger"></i>Danh sách yêu thích
                                         </a></li>
+                                        <li><a class="dropdown-item py-2" href="<%= request.getContextPath() %>/user/my-blogs">
+                                            <i class="fas fa-blog me-2 text-warning"></i>Blog của tôi
+                                        </a></li>
                                         <li><hr class="dropdown-divider my-2"></li>
                                         <li><a class="dropdown-item py-2 text-danger" href="#" onclick="logout()">
                                             <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
@@ -569,11 +572,16 @@ pageEncoding="UTF-8"%>
               </div>
             </div>
             <a href="<%= request.getContextPath() %>/blog" class="nav-item nav-link">Tin tức</a>
+            <c:if test="${not empty sessionScope.user}">
+              <a href="<%= request.getContextPath() %>/user/my-blogs" class="nav-item nav-link">
+                <i class="fas fa-blog me-1"></i>Blog của tôi
+              </a>
+            </c:if>
             <a href="#" class="nav-item nav-link">Chia sẻ</a>
             <a
               href="<%= request.getContextPath() %>/contact"
               class="nav-item nav-link me-2"
-              >Hỗ trợ</a>
+              >Hỗ trợ</a
             >
             <div class="nav-item dropdown d-block d-lg-none mb-3">
               <a
@@ -763,6 +771,12 @@ pageEncoding="UTF-8"%>
                                     <i class="fas fa-newspaper me-2"></i>Tin tức
                                 </a>
                                 
+                                <c:if test="${not empty sessionScope.user}">
+                                    <a href="<%= request.getContextPath() %>/user/my-blogs" class="nav-item nav-link nav-link-enhanced">
+                                        <i class="fas fa-blog me-2"></i>Blog của tôi
+                                    </a>
+                                </c:if>
+                                
                                 <!-- Role-based navigation -->
                                 <jsp:include page="role-navigation.jsp" />
                                 
@@ -786,6 +800,9 @@ pageEncoding="UTF-8"%>
                                                 </a>
                                                 <a class="dropdown-item py-2" href="<%= request.getContextPath() %>/wishlist">
                                                     <i class="fas fa-heart me-2 text-danger"></i>Yêu thích
+                                                </a>
+                                                <a class="dropdown-item py-2" href="<%= request.getContextPath() %>/user/my-blogs">
+                                                    <i class="fas fa-blog me-2 text-warning"></i>Blog của tôi
                                                 </a>
                                                 <div class="dropdown-divider my-2"></div>
                                                 <a class="dropdown-item py-2 text-danger" href="#" onclick="logout()">
