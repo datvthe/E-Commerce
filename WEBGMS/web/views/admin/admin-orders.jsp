@@ -80,7 +80,8 @@
                         <th>Người mua</th>
                         <th>Người bán</th>
                         <th>Tổng tiền</th>
-                        <th>Trạng thái</th>
+                        <th>TT thanh toán</th>
+                        <th>TT đơn hàng</th>
                         <th>Ngày tạo</th>
                         <th>Hành động</th>
                     </tr>
@@ -90,19 +91,46 @@
                         <tr>
                             <td>#${o.order_id}</td>
                             <td>
-                                <div>${o.buyer_id.full_name}</div>
-                                <div style="font-size:12px;color:#666">${o.buyer_id.email}</div>
+                                <c:choose>
+                                    <c:when test="${not empty o.buyer}">
+                                        <div>${o.buyer.full_name}</div>
+                                        <div style="font-size:12px;color:#666">${o.buyer.email}</div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div>User #${o.buyerId}</div>
+                                        <div style="font-size:12px;color:#666">--</div>
+                                    </c:otherwise>
+                                </c:choose>
                             </td>
                             <td>
-                                <div>${o.seller_id.full_name}</div>
-                                <div style="font-size:12px;color:#666">${o.seller_id.email}</div>
+                                <c:choose>
+                                    <c:when test="${not empty o.seller}">
+                                        <div>${o.seller.full_name}</div>
+                                        <div style="font-size:12px;color:#666">${o.seller.email}</div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div>User #${o.sellerId}</div>
+                                        <div style="font-size:12px;color:#666">--</div>
+                                    </c:otherwise>
+                                </c:choose>
                             </td>
                             <td class="price"><fmt:formatNumber value="${o.total_amount}" type="number" groupingUsed="true"/> ${o.currency}</td>
-                            <td><span class="status ${o.status}">${o.status}</span></td>
+                    <td><span class="status ${o.payment_status}">${o.payment_status != null ? o.payment_status : 'N/A'}</span></td>
+                            <td><span class="status ${o.order_status}">${o.order_status != null ? o.order_status : o.status}</span></td>
                             <td><fmt:formatDate value="${o.created_at}" pattern="dd/MM/yyyy HH:mm"/></td>
                             <td class="actions">
                                 <a class="btn btn-secondary" href="${pageContext.request.contextPath}/admin/orders/view?id=${o.order_id}">Xem</a>
-                                <a class="btn btn-secondary" href="#" onclick="showStatusModal(${o.order_id}, '${o.status}')">Cập nhật</a>
+                                <a class="btn btn-secondary" href="#" onclick="showStatusModal(${o.order_id}, '${o.order_status}')">Cập nhật</a>
+                                <form method="post" action="${pageContext.request.contextPath}/admin/orders/update-status" style="display:inline">
+                                    <input type="hidden" name="order_id" value="${o.order_id}" />
+                                    <input type="hidden" name="status" value="COMPLETED" />
+                                    <button class="btn" type="submit">Duyệt</button>
+                                </form>
+                                <form method="post" action="${pageContext.request.contextPath}/admin/orders/update-status" style="display:inline" onsubmit="return confirm('Từ chối đơn #${o.order_id}?')">
+                                    <input type="hidden" name="order_id" value="${o.order_id}" />
+                                    <input type="hidden" name="status" value="CANCELED" />
+                                    <button class="btn btn-danger" type="submit">Từ chối</button>
+                                </form>
                                 <form method="post" action="${pageContext.request.contextPath}/admin/orders/delete" style="display:inline" onsubmit="return confirm('Xóa đơn hàng #${o.order_id}?')">
                                     <input type="hidden" name="id" value="${o.order_id}" />
                                     <button class="btn btn-danger" type="submit">Xóa</button>
@@ -151,7 +179,7 @@
 <script>
 function showStatusModal(id, current) {
   document.getElementById('modalOrderId').value = id;
-  document.getElementById('modalStatus').value = current === 'pending' ? 'paid' : current;
+  document.getElementById('modalStatus').value = current;
   document.getElementById('statusModal').style.display = 'block';
 }
 function hideStatusModal() {

@@ -58,7 +58,8 @@ pageEncoding="UTF-8"%>
 <!-- Spinner Start -->
 <div
   id="spinner"
-  class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center"
+  class="bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center"
+  style="display:none"
 >
   <div
     class="spinner-border text-primary"
@@ -69,6 +70,17 @@ pageEncoding="UTF-8"%>
   </div>
 </div>
 <!-- Spinner End -->
+<script>
+  // Hide global page spinner once content is ready (prevents overlay from blocking page)
+  (function() {
+    const spinner = document.getElementById('spinner');
+    if (!spinner) return;
+    const hide = () => { try { spinner.classList.remove('show'); spinner.style.display = 'none'; } catch(e) {} };
+    // Hide on window load and also as a fallback after 1.5s
+    window.addEventListener('load', hide);
+    setTimeout(hide, 1500);
+  })();
+</script>
 
 <!-- Topbar Start -->
 <div class="container-fluid px-5 d-none border-bottom d-lg-block">
@@ -556,12 +568,12 @@ pageEncoding="UTF-8"%>
                 >
               </div>
             </div>
-            <a href="#" class="nav-item nav-link">Tin tức</a>
+            <a href="<%= request.getContextPath() %>/blog" class="nav-item nav-link">Tin tức</a>
             <a href="#" class="nav-item nav-link">Chia sẻ</a>
             <a
               href="<%= request.getContextPath() %>/contact"
               class="nav-item nav-link me-2"
-              >Hỗ trợ</a
+              >Hỗ trợ</a>
             >
             <div class="nav-item dropdown d-block d-lg-none mb-3">
               <a
@@ -746,6 +758,9 @@ pageEncoding="UTF-8"%>
                                 </a>
                                 <a href="<%= request.getContextPath() %>/categories" class="nav-item nav-link nav-link-enhanced">
                                     <i class="fas fa-th-list me-2"></i>Danh mục
+                                </a>
+                                <a href="<%= request.getContextPath() %>/blog" class="nav-item nav-link nav-link-enhanced">
+                                    <i class="fas fa-newspaper me-2"></i>Tin tức
                                 </a>
                                 
                                 <!-- Role-based navigation -->

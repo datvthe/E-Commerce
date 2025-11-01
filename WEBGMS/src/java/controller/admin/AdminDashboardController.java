@@ -42,6 +42,8 @@ public class AdminDashboardController extends HttpServlet {
         java.util.List<model.user.Users> recentUsers = usersDAO.getRecentUsers(5);
         java.util.List<model.order.Orders> recentOrders = orderDAO.getRecentOrders(5);
         java.util.List<model.product.ProductCategories> adminCategories = cateDAO.getAllCategories(1, 10); // top 10 for dashboard
+        model.analytics.TopBuyerStats topBuyer = orderDAO.getTopBuyerByOrders();
+        java.util.List<model.analytics.TopBuyerStats> topBuyers = orderDAO.getTopBuyersByOrders(5);
         
         request.setAttribute("totalUsers", totalUsers);
         request.setAttribute("totalProducts", totalProducts);
@@ -52,6 +54,8 @@ public class AdminDashboardController extends HttpServlet {
         request.setAttribute("recentOrders", recentOrders);
         request.setAttribute("totalCategories", totalCategories);
         request.setAttribute("adminCategories", adminCategories);
+        request.setAttribute("topBuyer", topBuyer);
+        request.setAttribute("topBuyers", topBuyers);
         
         request.getRequestDispatcher("/views/admin/admin-dashboard.jsp").forward(request, response);
     }

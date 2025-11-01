@@ -36,4 +36,15 @@
     <url-pattern>/seller/register</url-pattern>
 </servlet-mapping>
 
+    
+    <!-- Explicit mapping to ensure /product/* resolves even if annotation scanning is off -->
+    <servlet>
+        <servlet-name>ProductDetailController</servlet-name>
+        <servlet-class>controller.user.SimpleProductDetailController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ProductDetailController</servlet-name>
+        <url-pattern>/product/*</url-pattern>
+    </servlet-mapping>
+
 </web-app>

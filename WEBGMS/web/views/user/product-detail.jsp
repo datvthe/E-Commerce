@@ -98,11 +98,18 @@
         </style>
     </head>
     <body>
-        <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div id="spinner" class="bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center" style="display:none;">
             <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
                 <span class="sr-only">Loading...</span>
-                        </div>
-                            </div>
+            </div>
+        </div>
+        <script>
+            // Ensure spinner is hidden (prevents blank screen overlay)
+            (function(){
+                var sp = document.getElementById('spinner');
+                if (sp) { sp.classList.remove('show'); sp.style.display = 'none'; }
+            })();
+        </script>
         <div class="container-fluid px-5 d-none border-bottom d-lg-block">
             <div class="row gx-0 align-items-center">
                 <div class="col-lg-4 text-center text-lg-start mb-lg-0">
@@ -323,9 +330,25 @@
                                             </div>
                                             <div class="col-6">
                                                 <p class="mb-2"><strong>Tình trạng:</strong> 
-                                                    <span class="text-success"><i class="fas fa-check-circle"></i> Còn hàng</span>
+                                                    <c:choose>
+                                                        <c:when test="${not empty availableStock and availableStock > 0}">
+                                                            <span class="text-success"><i class="fas fa-check-circle"></i> Còn hàng</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-danger"><i class="fas fa-times-circle"></i> Hết hàng</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </p>
-                                                <p class="mb-2"><strong>Số lượng:</strong> <span class="text-primary">25 sản phẩm</span></p>
+                                                <p class="mb-2"><strong>Số lượng:</strong> 
+                                                    <c:choose>
+                                                        <c:when test="${not empty availableStock}">
+                                                            <span class="text-primary">${availableStock} sản phẩm</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-danger">0 sản phẩm</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </p>
                                                 <p class="mb-2"><strong>Giao hàng:</strong> <span class="text-success"><i class="fas fa-truck"></i> Tức thì</span></p>
                                             </div>
                                         </div>
@@ -417,7 +440,7 @@
                                                 </button>
                                             </div>
                                             <input type="number" class="form-control form-control-sm text-center border-0" 
-                                                   value="1" min="1" max="25" id="quantity">
+                                                   value="1" min="1" max="${not empty availableStock ? availableStock : 1}" id="quantity">
                                             <div class="input-group-btn">
                                                 <button class="btn btn-sm btn-plus rounded-circle bg-light border" type="button">
                                                     <i class="fa fa-plus"></i>
@@ -431,9 +454,18 @@
                                         <!-- Physical Goods Buttons -->
                                         <div class="row g-2">
                                             <div class="col-md-9">
-                                                <button class="btn btn-primary w-100 py-3" onclick="buyNow()">
-                                                    <i class="fas fa-bolt me-2"></i>Mua ngay
-                                                </button>
+                                                <c:choose>
+                                                    <c:when test="${not empty availableStock and availableStock > 0}">
+                                                        <button class="btn btn-primary w-100 py-3" onclick="buyNow()">
+                                                            <i class="fas fa-bolt me-2"></i>Mua ngay
+                                                        </button>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <button class="btn btn-secondary w-100 py-3" disabled>
+                                                            <i class="fas fa-times me-2"></i>Hết hàng
+                                                        </button>
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </div>
                                             <div class="col-md-3">
                                                 <c:if test="${not empty sessionScope.user}">
@@ -989,12 +1021,17 @@
         <!-- Global Variables -->
         <script>
             var productId = parseInt("${empty product.product_id ? 1 : product.product_id}");
-            var maxQuantity = 25;
+            var maxQuantity = parseInt("${not empty availableStock ? availableStock : 0}");
             
             // Check if product data is available
             if (productId === 0) {
                 console.error('Product data not found');
                 document.body.innerHTML = '<div class="container mt-5"><div class="alert alert-danger text-center"><h4>Sản phẩm không tồn tại</h4><p>Xin lỗi, sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p><a href="<%= request.getContextPath() %>/products" class="btn btn-primary">Quay lại cửa hàng</a></div></div>';
+            }
+            
+            // Check if product is out of stock
+            if (maxQuantity <= 0) {
+                console.warn('Product is out of stock');
             }
         </script>
 
@@ -1031,9 +1068,15 @@
 
             // Buy Now function - Instant checkout for digital goods
             function buyNow() {
+                // Check if product is in stock
+                if (maxQuantity <= 0) {
+                    alert('Sản phẩm đã hết hàng!');
+                    return;
+                }
+                
                 const quantity = document.getElementById('quantity').value || 1;
                 if (quantity > maxQuantity) {
-                    alert('Số lượng vượt quá tồn kho!');
+                    alert('Số lượng vượt quá tồn kho! Còn lại: ' + maxQuantity + ' sản phẩm');
                     return;
                 }
                 

@@ -28,6 +28,7 @@
                 <div class="title" style="display:flex; align-items:center; gap:12px;">
                   <h2>Bảng điều khiển</h2>
                   <a href="<%= request.getContextPath() %>/admin/orders" class="main-btn primary-btn btn-hover" style="padding:6px 12px; text-decoration:none;">Quản lý Order</a>
+                  <a href="<%= request.getContextPath() %>/wallet" class="main-btn danger-btn btn-hover" style="padding:6px 12px; text-decoration:none;">Ví Admin</a>
                 </div>
               </div>
               <div class="col-md-6">
@@ -80,6 +81,46 @@
               <div class="card-style">
                 <h6 class="text-muted mb-2">Doanh thu hôm nay</h6>
                 <h3 class="mb-0">${revenueToday} VND</h3>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top buyer -->
+          <div class="row g-3 mb-30">
+            <div class="col-xl-6 col-md-8">
+              <div class="card-style">
+                <h6 class="mb-2">Top 5 người mua nhiều nhất</h6>
+                <c:choose>
+                  <c:when test="${not empty topBuyers}">
+                    <div class="table-wrapper table-responsive">
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th><h6>Hạng</h6></th>
+                            <th><h6>Họ tên</h6></th>
+                            <th><h6>Email</h6></th>
+                            <th><h6>Số đơn</h6></th>
+                            <th><h6>Tổng chi</h6></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <c:forEach var="b" items="${topBuyers}" varStatus="s">
+                            <tr>
+                              <td><p>#${s.index + 1}</p></td>
+                              <td><p>${b.fullName}</p></td>
+                              <td><p>${b.email}</p></td>
+                              <td><p>${b.orders}</p></td>
+                              <td><p>${b.totalAmount} VND</p></td>
+                            </tr>
+                          </c:forEach>
+                        </tbody>
+                      </table>
+                    </div>
+                  </c:when>
+                  <c:otherwise>
+                    <p class="text-muted mb-0">Chưa có dữ liệu</p>
+                  </c:otherwise>
+                </c:choose>
               </div>
             </div>
           </div>
@@ -161,49 +202,6 @@
             </div>
           </div>
 
-          <!-- Categories snapshot -->
-          <div class="row g-3 mt-2">
-            <div class="col-lg-12">
-              <div class="card-style">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                  <h6 class="mb-0">Danh mục hiện có (${totalCategories})</h6>
-                  <div>
-                    <a href="<%= request.getContextPath() %>/admin/categories" class="main-btn primary-btn btn-hover">Quản lý danh mục</a>
-                    <a href="<%= request.getContextPath() %>/admin/categories?action=create" class="main-btn success-btn btn-hover">Thêm danh mục</a>
-                  </div>
-                </div>
-                <div class="table-wrapper table-responsive">
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th><h6>ID</h6></th>
-                        <th><h6>Tên</h6></th>
-                        <th><h6>Slug</h6></th>
-                        <th><h6>Trạng thái</h6></th>
-                        <th><h6>Ngày tạo</h6></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <c:forEach var="c" items="${adminCategories}">
-                        <tr>
-                          <td><p>${c.category_id}</p></td>
-                          <td><p>${c.name}</p></td>
-                          <td><p>${c.slug}</p></td>
-                          <td>
-                            <span class="status-btn ${c.status == 'active' ? 'success-btn' : 'warning-btn'}">${c.status}</span>
-                          </td>
-                          <td><p>${c.created_at}</p></td>
-                        </tr>
-                      </c:forEach>
-                      <c:if test="${empty adminCategories}">
-                        <tr><td colspan="5" class="text-center">Không có dữ liệu</td></tr>
-                      </c:if>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
     </main>

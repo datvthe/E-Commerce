@@ -82,7 +82,7 @@ public class SellerOrdersController extends HttpServlet {
                 Orders order = orderDAO.getOrderById(orderId);
                 
                 // Kiểm tra quyền sở hữu
-                if (order == null || order.getSeller_id().getUser_id() != seller.getUser_id()) {
+                if (order == null || (order.getSellerId() != null && order.getSellerId().intValue() != seller.getUser_id())) {
                     request.setAttribute("error", "❌ Đơn hàng không tồn tại hoặc bạn không có quyền xem!");
                     response.sendRedirect(request.getContextPath() + "/seller/orders");
                     return;
@@ -124,14 +124,14 @@ public class SellerOrdersController extends HttpServlet {
                 
                 // Kiểm tra quyền sở hữu
                 Orders order = orderDAO.getOrderById(orderId);
-                if (order == null || order.getSeller_id().getUser_id() != seller.getUser_id()) {
+                if (order == null || (order.getSellerId() != null && order.getSellerId().intValue() != seller.getUser_id())) {
                     request.setAttribute("error", "❌ Đơn hàng không tồn tại hoặc bạn không có quyền cập nhật!");
                     response.sendRedirect(request.getContextPath() + "/seller/orders");
                     return;
                 }
 
                 // Validate status transition
-                String currentStatus = order.getStatus();
+                String currentStatus = order.getOrderStatus();
                 if (!isValidStatusTransition(currentStatus, newStatus)) {
                     request.setAttribute("error", "❌ Không thể chuyển từ trạng thái '" + currentStatus + "' sang '" + newStatus + "'!");
                     response.sendRedirect(request.getContextPath() + "/seller/orders");

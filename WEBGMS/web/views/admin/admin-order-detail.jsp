@@ -41,7 +41,8 @@
                 </form>
             </div>
         </div>
-        <p>Trạng thái: <span class="status ${order.status}">${order.status}</span></p>
+        <p>Trạng thái đơn: <span class="status ${order.status}">${order.status}</span></p>
+        <p>Trạng thái thanh toán: <span class="status ${order.payment_status}">${order.payment_status}</span></p>
         <p>Tổng tiền: <strong><fmt:formatNumber value="${order.total_amount}" type="number" groupingUsed="true"/> ${order.currency}</strong></p>
         <p>Ngày tạo: <fmt:formatDate value="${order.created_at}" pattern="dd/MM/yyyy HH:mm"/></p>
         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:16px;">
@@ -56,41 +57,85 @@
                 <p>${order.seller_id.email}</p>
             </div>
             <div class="card">
-                <h3>Vận chuyển</h3>
-                <p>Địa chỉ: ${order.shipping_address}</p>
-                <p>Phương thức: ${order.shipping_method}</p>
-                <p>Mã vận đơn: ${order.tracking_number}</p>
+                <h3>Giao hàng</h3>
+                <c:choose>
+                    <c:when test="${not empty order.shipping_method}">
+                        <p>Địa chỉ: ${order.shipping_address}</p>
+                        <p>Phương thức: ${order.shipping_method}</p>
+                        <p>Mã vận đơn: ${order.tracking_number}</p>
+                    </c:when>
+                    <c:otherwise>
+                        <p>Hình thức: <strong>Giao tức thì (Digital)</strong></p>
+                        <p>Không có vận chuyển vật lý.</p>
+                    </c:otherwise>
+                </c:choose>
             </div>
         </div>
     </div>
 
     <div class="card">
         <h3>Sản phẩm trong đơn</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Mã SP</th>
-                    <th>Tên sản phẩm</th>
-                    <th>Số lượng</th>
-                    <th>Đơn giá</th>
-                    <th>Tạm tính</th>
-                </tr>
-            </thead>
-            <tbody>
-                <c:forEach var="it" items="${orderItems}">
+
+        <!-- Bảng sản phẩm vật lý (nếu có) -->
+        <c:if test="${not empty orderItems}">
+            <table>
+                <thead>
                     <tr>
-                        <td>${it.productId.product_id}</td>
-                        <td>${it.productId.name}</td>
-                        <td>${it.quantity}</td>
-                        <td><fmt:formatNumber value="${it.priceAtPurchase}" type="number" groupingUsed="true"/></td>
-                        <td><fmt:formatNumber value="${it.subtotal}" type="number" groupingUsed="true"/></td>
+                        <th>Mã SP</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Tạm tính</th>
                     </tr>
-                </c:forEach>
-                <c:if test="${empty orderItems}">
-                    <tr><td colspan="5" style="text-align:center; color:#888;">Không có sản phẩm</td></tr>
-                </c:if>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <c:forEach var="it" items="${orderItems}">
+                        <tr>
+                            <td>${it.productId.product_id}</td>
+                            <td>${it.productId.name}</td>
+                            <td>${it.quantity}</td>
+                            <td><fmt:formatNumber value="${it.priceAtPurchase}" type="number" groupingUsed="true"/></td>
+                            <td><fmt:formatNumber value="${it.subtotal}" type="number" groupingUsed="true"/></td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </c:if>
+
+        <!-- Bảng sản phẩm số (Digital) hiển thị chung trong cùng thẻ -->
+        <c:if test="${not empty digitalItems}">
+            <div style="margin-top:16px"></div>
+            <h3 style="margin:12px 0 6px 0; font-size:18px;">Sản phẩm số (Digital)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Mã/Code</th>
+                        <th>Serial</th>
+                        <th>Mật khẩu</th>
+                        <th>Hết hạn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach var="di" items="${digitalItems}" varStatus="s">
+                        <tr>
+                            <td>${s.index+1}</td>
+                            <td>${di.productName}</td>
+                            <td>${di.code}</td>
+                            <td>${empty di.serial ? '-' : di.serial}</td>
+                            <td>${empty di.password ? '-' : di.password}</td>
+                            <td><c:out value="${di.expiresAt}"/></td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </c:if>
+
+        <!-- Nếu hoàn toàn không có sản phẩm -->
+        <c:if test="${empty orderItems and empty digitalItems}">
+            <div style="padding:12px; text-align:center; color:#888;">Không có sản phẩm trong đơn.</div>
+        </c:if>
     </div>
 </div>
 

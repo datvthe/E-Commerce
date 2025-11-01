@@ -413,8 +413,9 @@
                     font-weight: 600;
                     z-index: 9999;
                     animation: slideIn 0.3s ease;
-                    background: ${type === 'success' ? '#28a745' : '#dc3545'};
                 `;
+                // Set dynamic background color without JSP EL conflicts
+                notification.style.background = (type === 'success' ? '#28a745' : '#dc3545');
                 notification.textContent = message;
                 
                 const style = document.createElement('style');

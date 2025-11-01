@@ -13,7 +13,10 @@
 
         <!-- ======== main-wrapper start =========== -->
         <main class="main-wrapper">
-            <jsp:include page="/views/component/headerAdmin.jsp" />
+            <jsp:include page="/views/component/headerAdmin.jsp">
+                <jsp:param name="headerBackUrl" value="${pageContext.request.contextPath}/admin/categories" />
+                <jsp:param name="headerBackLabel" value="Danh mục" />
+            </jsp:include>
 
             <!-- ========== section start ========== -->
             <section class="section">
