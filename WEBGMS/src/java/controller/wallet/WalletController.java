@@ -22,8 +22,28 @@ public class WalletController extends HttpServlet {
         }
 
         WalletDAO dao = new WalletDAO();
-        double balance = dao.getBalance(user.getUser_id());
-        List<Transaction> transactions = dao.getTransactions(user.getUser_id());
+        UsersDAO usersDAO = new UsersDAO();
+
+        boolean isAdmin = false;
+        try {
+            isAdmin = "admin".equalsIgnoreCase(user.getDefault_role());
+            if (!isAdmin) {
+                var ur = usersDAO.getRoleByUserId(user.getUser_id());
+                isAdmin = ur != null && ur.getRole_id() != null &&
+                          "admin".equalsIgnoreCase(ur.getRole_id().getRole_name());
+            }
+        } catch (Exception ignored) {}
+
+        double balance;
+        List<Transaction> transactions;
+        if (isAdmin) {
+            balance = dao.getAdminGroupBalance();
+            transactions = dao.getAdminGroupTransactions(20);
+            request.setAttribute("isAdminGroupView", true);
+        } else {
+            balance = dao.getBalance(user.getUser_id());
+            transactions = dao.getTransactions(user.getUser_id());
+        }
 
         request.setAttribute("balance", balance);
         request.setAttribute("transactions", transactions);

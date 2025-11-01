@@ -59,7 +59,7 @@ public class OrderSuccessController extends HttpServlet {
             }
             
             // 3. Kiểm tra quyền truy cập (chỉ buyer mới xem được)
-            if (!order.getBuyerId().equals((long) user.getUser_id())) {
+            if (order.getBuyerId() == null || !order.getBuyerId().equals((long) user.getUser_id())) {
                 request.setAttribute("error", "❌ Bạn không có quyền xem đơn hàng này!");
                 request.getRequestDispatcher("/views/common/error.jsp").forward(request, response);
                 return;

@@ -3,9 +3,8 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
+  <%@ include file="/views/component/head.jspf" %>
   <title>${post.title}</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
   <jsp:include page="/views/component/header.jsp" />

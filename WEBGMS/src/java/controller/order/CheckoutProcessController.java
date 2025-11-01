@@ -31,6 +31,9 @@ public class CheckoutProcessController extends HttpServlet {
     private final DigitalProductDAO digitalProductDAO = new DigitalProductDAO();
     private final OrderQueueDAO orderQueueDAO = new OrderQueueDAO();
     private final PendingTransactionDAO pendingTransactionDAO = new PendingTransactionDAO();
+
+    // Admin receiver (change if needed)
+    private static final String ADMIN_EMAIL = "admin@example.com"; // fallback; will auto-resolve a real admin if not found
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -87,21 +90,29 @@ public class CheckoutProcessController extends HttpServlet {
             
             // 5. Kiểm tra và lock digital products
             List<DigitalProduct> availableProducts = digitalProductDAO.getAvailableProducts(productId, quantity, conn);
-            
+
+            boolean allowWithoutDigital = false;
             if (availableProducts.size() < quantity) {
-                conn.rollback();
-                jsonResponse.addProperty("status", "OUT_OF_STOCK");
-                jsonResponse.addProperty("message", "Sản phẩm đã hết hàng! Còn lại: " + availableProducts.size());
-                response.getWriter().write(new Gson().toJson(jsonResponse));
-                return;
+                // Fallback: if product.quantity in Products table >= requested, allow purchase (for manual/physical delivery)
+                int fallbackQty = product.getQuantity();
+                if (fallbackQty >= quantity) {
+                    allowWithoutDigital = true; // proceed but skip digital code linking
+                } else {
+                    conn.rollback();
+                    jsonResponse.addProperty("status", "OUT_OF_STOCK");
+                    jsonResponse.addProperty("message", "Sản phẩm đã hết hàng! Còn lại: " + availableProducts.size());
+                    response.getWriter().write(new Gson().toJson(jsonResponse));
+                    return;
+                }
             }
             
-            // 6. Tạo transaction ID (dùng số thay vì string)
-            long transactionId = System.currentTimeMillis();
+            // 7. Trừ tiền ví user
+            long baseTxn = System.currentTimeMillis();
+            long withdrawTxnId = baseTxn;      // for buyer withdraw
+            long adminDepositTxnId = baseTxn + 1; // for admin credit
             
-            // 7. Trừ tiền ví user (sử dụng WalletDAO.processTopUp với số âm)
-            // Hoặc tạo method withdraw riêng
-            boolean walletUpdated = withdrawFromWallet(conn, user.getUser_id(), totalAmount.doubleValue(), transactionId, product.getName());
+            // 7. Trừ tiền ví user
+            boolean walletUpdated = withdrawFromWallet(conn, user.getUser_id(), totalAmount.doubleValue(), withdrawTxnId, product.getName());
             
             if (!walletUpdated) {
                 conn.rollback();
@@ -114,7 +125,7 @@ public class CheckoutProcessController extends HttpServlet {
             // 8. Tạo order
             Long orderId = orderDAO.createInstantOrder(
                 Long.valueOf(user.getUser_id()), sellerId, productId, quantity,
-                unitPrice, totalAmount, String.valueOf(transactionId)
+                unitPrice, totalAmount, String.valueOf(withdrawTxnId)
             );
             
             if (orderId == null) {
@@ -125,32 +136,54 @@ public class CheckoutProcessController extends HttpServlet {
                 return;
             }
             
-            // 9. Đánh dấu digital products là đã bán
-            for (DigitalProduct dp : availableProducts) {
-                digitalProductDAO.markAsSold(dp.getDigitalId(), Long.valueOf(user.getUser_id()), orderId, conn);
-                digitalProductDAO.linkDigitalProductToOrder(orderId, dp.getDigitalId(), conn);
+            // 9. Đánh dấu digital products là đã bán (nếu có)
+            if (!allowWithoutDigital) {
+                for (DigitalProduct dp : availableProducts) {
+                    digitalProductDAO.markAsSold(dp.getDigitalId(), Long.valueOf(user.getUser_id()), orderId, conn);
+                    digitalProductDAO.linkDigitalProductToOrder(orderId, dp.getDigitalId(), conn);
+                }
             }
             
-            // 10. Tạo PENDING TRANSACTION (giữ tiền 7 ngày trước khi chuyển cho seller)
-            int holdDays = 7; // Giữ tiền 7 ngày
-            Long pendingId = pendingTransactionDAO.createPendingTransaction(
-                conn, orderId, user.getUser_id(), product.getSeller_id().getUser_id(),
-                totalAmount, holdDays, transactionId
-            );
-            
-            if (pendingId == null) {
+            // 10. Chuyển tiền vào ví ADMIN ngay khi thanh toán thành công
+            int adminId = 0;
+            try {
+                dao.UsersDAO usersDAO = new dao.UsersDAO();
+                model.user.Users admin = usersDAO.getUserByEmail(ADMIN_EMAIL);
+                if (admin == null) admin = usersDAO.getAnyAdminUser();
+                if (admin != null) adminId = admin.getUser_id();
+            } catch (Exception ignore) {}
+
+            if (adminId <= 0) {
                 conn.rollback();
                 jsonResponse.addProperty("status", "ERROR");
-                jsonResponse.addProperty("message", "Không thể tạo pending transaction!");
+                jsonResponse.addProperty("message", "Không tìm thấy tài khoản ADMIN để nhận tiền");
                 response.getWriter().write(new Gson().toJson(jsonResponse));
                 return;
             }
-            
-            // 11. Thêm vào queue (để background worker xử lý thêm nếu cần)
-            orderQueueDAO.addToQueue(orderId, 10); // Priority = 10
-            
-            // 12. Cập nhật order status thành COMPLETED (vì đã giao hàng ngay)
-            orderDAO.updateOrderStatus(orderId, "COMPLETED", "COMPLETED");
+
+            String adminNote = String.format(
+                    "Nhận tiền từ %s (User #%d) mua '%s' x%d - Order #%d",
+                    user.getFull_name()!=null?user.getFull_name():("User"), user.getUser_id(),
+                    product.getName(), quantity, orderId);
+
+            boolean credited = creditToWallet(conn, adminId, totalAmount.doubleValue(), adminDepositTxnId, adminNote);
+            if (!credited) {
+                conn.rollback();
+                jsonResponse.addProperty("status", "ERROR");
+                jsonResponse.addProperty("message", "Không thể cộng tiền cho ADMIN!");
+                response.getWriter().write(new Gson().toJson(jsonResponse));
+                return;
+            }
+
+            // Record transfer linking buyer and admin
+            long fromWalletId = getOrCreateWalletId(conn, user.getUser_id());
+            long toWalletId = getOrCreateWalletId(conn, adminId);
+            insertWalletTransfer(conn, user.getUser_id(), adminId, fromWalletId, toWalletId,
+                    totalAmount.doubleValue(), withdrawTxnId, adminDepositTxnId,
+                    "Purchase order #" + orderId + " - " + product.getName());
+
+            // Update order to PAID (legacy will map to 'paid') and mark queue COMPLETED
+            orderDAO.updateOrderStatus(orderId, "PAID", "COMPLETED");
             
             // 13. COMMIT transaction
             conn.commit();
@@ -198,53 +231,123 @@ public class CheckoutProcessController extends HttpServlet {
      * Trừ tiền từ ví user
      */
     private boolean withdrawFromWallet(Connection conn, int userId, double amount, long transactionId, String description) throws SQLException {
-        // Lấy wallet info
-        String sqlGetWallet = "SELECT wallet_id, balance FROM wallets WHERE user_id = ? FOR UPDATE";
-        long walletId = 0;
-        double oldBalance = 0;
-        
-        try (PreparedStatement ps = conn.prepareStatement(sqlGetWallet)) {
-            ps.setInt(1, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    walletId = rs.getLong("wallet_id");
-                    oldBalance = rs.getDouble("balance");
-                } else {
-                    return false; // Wallet không tồn tại
-                }
-            }
-        }
-        
-        // Kiểm tra số dư
-        if (oldBalance < amount) {
-            return false; // Không đủ tiền
-        }
-        
-        double newBalance = oldBalance - amount;
-        
-        // Update wallet
-        String sqlUpdate = "UPDATE wallets SET balance = ? WHERE wallet_id = ?";
+        // Thực hiện trừ tiền theo cách atomic để tránh lock chờ lâu
+        String sqlUpdate = "UPDATE wallets SET balance = balance - ? WHERE user_id = ? AND balance >= ?";
+        int affected;
         try (PreparedStatement ps = conn.prepareStatement(sqlUpdate)) {
-            ps.setDouble(1, newBalance);
-            ps.setLong(2, walletId);
-            ps.executeUpdate();
+            ps.setDouble(1, amount);
+            ps.setInt(2, userId);
+            ps.setDouble(3, amount);
+            affected = ps.executeUpdate();
         }
-        
-        // Insert transaction (simplified - chỉ các cột cần thiết)
-        // Dùng 'WITHDRAW' vì đây là trừ tiền (type ENUM chỉ có DEPOSIT, WITHDRAW, TRANSFER)
+        if (affected == 0) {
+            return false; // không đủ tiền hoặc không có ví
+        }
+
+        // Ghi nhận giao dịch rút tiền
         String sqlTrans = "INSERT INTO transactions " +
-                         "(transaction_id, user_id, type, amount, currency, status, note) " +
-                         "VALUES (?, ?, 'WITHDRAW', ?, 'VND', 'success', ?)";
-        
+                "(transaction_id, user_id, type, amount, currency, status, note) " +
+                "VALUES (?, ?, 'WITHDRAW', ?, 'VND', 'success', ?)";
         try (PreparedStatement ps = conn.prepareStatement(sqlTrans)) {
-            ps.setLong(1, transactionId);  // transaction_id là BIGINT
+            ps.setLong(1, transactionId);
             ps.setInt(2, userId);
             ps.setDouble(3, amount);
             ps.setString(4, "Mua sản phẩm: " + description);
             ps.executeUpdate();
         }
-        
         return true;
+    }
+
+    /**
+     * Cộng tiền vào ví (dùng chung cho ADMIN nhận tiền)
+     */
+    private boolean creditToWallet(Connection conn, int userId, double amount, long transactionId, String note) throws SQLException {
+        // Cộng tiền bằng một câu lệnh cập nhật; nếu chưa có ví thì tạo
+        int affected;
+        try (PreparedStatement ps = conn.prepareStatement("UPDATE wallets SET balance = balance + ? WHERE user_id = ?")) {
+            ps.setDouble(1, amount);
+            ps.setInt(2, userId);
+            affected = ps.executeUpdate();
+        }
+        if (affected == 0) {
+            try (PreparedStatement ps = conn.prepareStatement("INSERT INTO wallets (user_id, balance, currency) VALUES (?, ?, 'VND')")) {
+                ps.setInt(1, userId);
+                ps.setDouble(2, amount);
+                ps.executeUpdate();
+            }
+        }
+        try (PreparedStatement ps = conn.prepareStatement(
+                "INSERT INTO transactions (transaction_id, user_id, type, amount, currency, status, note) VALUES (?, ?, 'DEPOSIT', ?, 'VND', 'success', ?)")) {
+            ps.setLong(1, transactionId);
+            ps.setInt(2, userId);
+            ps.setDouble(3, amount);
+            ps.setString(4, note);
+            ps.executeUpdate();
+        }
+        return true;
+    }
+
+    // Helpers to record transfer linking buyer and admin
+    private long getOrCreateWalletId(Connection conn, int userId) throws SQLException {
+        String q = "SELECT wallet_id FROM wallets WHERE user_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(q)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getLong(1);
+            }
+        }
+        try (PreparedStatement ps = conn.prepareStatement(
+                "INSERT INTO wallets (user_id, balance, currency) VALUES (?,0,'VND')",
+                Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, userId);
+            ps.executeUpdate();
+            try (ResultSet k = ps.getGeneratedKeys()) { if (k.next()) return k.getLong(1); }
+        }
+        throw new SQLException("Cannot create wallet for user " + userId);
+    }
+
+    private void insertWalletTransfer(Connection conn, int fromUserId, int toUserId,
+                                      long fromWalletId, long toWalletId, double amount,
+                                      long txFrom, long txTo, String description) throws SQLException {
+        ensureWalletTransfersTable(conn);
+        String sql = "INSERT INTO wallet_transfers (from_user_id, to_user_id, from_wallet_id, to_wallet_id, amount, fee, net_amount, status, transaction_id_from, transaction_id_to, description) " +
+                     "VALUES (?, ?, ?, ?, ?, 0, ?, 'completed', ?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, fromUserId);
+            ps.setInt(2, toUserId);
+            ps.setLong(3, fromWalletId);
+            ps.setLong(4, toWalletId);
+            ps.setDouble(5, amount);
+            ps.setDouble(6, amount);
+            ps.setLong(7, txFrom);
+            ps.setLong(8, txTo);
+            ps.setString(9, description);
+            ps.executeUpdate();
+        }
+    }
+
+    private void ensureWalletTransfersTable(Connection conn) throws SQLException {
+        String ddl = "CREATE TABLE IF NOT EXISTS wallet_transfers (" +
+                "transfer_id BIGINT NOT NULL AUTO_INCREMENT, " +
+                "from_user_id BIGINT NOT NULL, " +
+                "to_user_id BIGINT NOT NULL, " +
+                "from_wallet_id BIGINT NOT NULL, " +
+                "to_wallet_id BIGINT NOT NULL, " +
+                "amount DECIMAL(15,2) NOT NULL, " +
+                "fee DECIMAL(15,2) DEFAULT 0.00, " +
+                "net_amount DECIMAL(15,2) NOT NULL, " +
+                "status VARCHAR(20) DEFAULT 'completed', " +
+                "transaction_id_from BIGINT, " +
+                "transaction_id_to BIGINT, " +
+                "description TEXT, " +
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                "PRIMARY KEY (transfer_id), " +
+                "INDEX idx_transfer_from (from_user_id), " +
+                "INDEX idx_transfer_to (to_user_id), " +
+                "INDEX idx_transfer_status (status), " +
+                "INDEX idx_transfer_created (created_at) " +
+                ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+        try (java.sql.Statement st = conn.createStatement()) { st.executeUpdate(ddl); }
     }
 }
 

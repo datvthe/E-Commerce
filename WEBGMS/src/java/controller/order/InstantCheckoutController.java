@@ -70,8 +70,9 @@ public class InstantCheckoutController extends HttpServlet {
             
             // 3. Kiểm tra stock (số lượng digital products còn)
             int availableStock = digitalProductDAO.getAvailableStock(productId);
-            
-            if (availableStock < quantity) {
+            // Nới lỏng kiểm tra: chỉ chặn nếu biết chắc còn < quantity (>0) 
+            // Nếu hệ thống chưa đồng bộ kho (trả 0), vẫn cho phép tiếp tục và sẽ kiểm tra lại khi thanh toán.
+            if (availableStock > 0 && availableStock < quantity) {
                 request.setAttribute("error", "❌ Sản phẩm đã hết hàng! Còn lại: " + availableStock);
                 request.getRequestDispatcher("/views/common/error.jsp").forward(request, response);
                 return;

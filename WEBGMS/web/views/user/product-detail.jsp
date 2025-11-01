@@ -98,11 +98,18 @@
         </style>
     </head>
     <body>
-        <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div id="spinner" class="bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center" style="display:none;">
             <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
                 <span class="sr-only">Loading...</span>
-                        </div>
-                            </div>
+            </div>
+        </div>
+        <script>
+            // Ensure spinner is hidden (prevents blank screen overlay)
+            (function(){
+                var sp = document.getElementById('spinner');
+                if (sp) { sp.classList.remove('show'); sp.style.display = 'none'; }
+            })();
+        </script>
         <div class="container-fluid px-5 d-none border-bottom d-lg-block">
             <div class="row gx-0 align-items-center">
                 <div class="col-lg-4 text-center text-lg-start mb-lg-0">
