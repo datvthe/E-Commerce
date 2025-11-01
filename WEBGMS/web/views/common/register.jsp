@@ -17,6 +17,7 @@
         <link href="<%= request.getContextPath() %>/views/assets/electro/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
         <link href="<%= request.getContextPath() %>/views/assets/electro/css/bootstrap.min.css" rel="stylesheet">
         <link href="<%= request.getContextPath() %>/views/assets/electro/css/style.css" rel="stylesheet">
+        
         <style>
             /* Orange Theme Override */
             .bg-primary {
@@ -43,6 +44,36 @@
             .btn-outline-primary:hover {
                 background-color: #ff6b35 !important;
                 border-color: #ff6b35 !important;
+            }
+            
+            /* Fix Bootstrap validation icons position when password toggle is present */
+            .form-control.is-valid,
+            .form-control.is-invalid {
+                background-position: right calc(2.5em + 0.375rem) center !important;
+            }
+            
+            /* Ensure password toggle button is always on top */
+            .password-toggle-btn {
+                z-index: 1000 !important;
+            }
+            
+            /* Hide browser autofill icons (fingerprint, etc) */
+            input::-webkit-credentials-auto-fill-button,
+            input::-webkit-contacts-auto-fill-button {
+                visibility: hidden;
+                display: none !important;
+                pointer-events: none;
+                height: 0;
+                width: 0;
+                margin: 0;
+            }
+            
+            /* Hide Bootstrap validation feedback icons for password fields with manual toggle */
+            input[type="password"].form-control:valid,
+            input[type="password"].form-control:invalid,
+            input[type="text"][id*="password"].form-control:valid,
+            input[type="text"][id*="password"].form-control:invalid {
+                background-image: none !important;
             }
         </style>
     </head>
@@ -174,22 +205,56 @@
             <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-6 col-md-8">
-                    <form action="<%= request.getContextPath() %>/register" method="post" class="border p-4 rounded bg-white wow fadeInUp" data-wow-delay="0.1s">
-                        <h3 class="mb-4 text-center">Tạo tài khoản</h3>
+                    <!-- Alert Messages -->
+                    <c:if test="${not empty sessionScope.message}">
+                        <div class="alert alert-success alert-dismissible fade show" role="alert" data-auto-dismiss="true">
+                            <i class="fas fa-check-circle"></i> ${sessionScope.message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        <c:remove var="message" scope="session"/>
+                    </c:if>
+
+                    <c:if test="${not empty sessionScope.error}">
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert" data-auto-dismiss="true">
+                            <i class="fas fa-exclamation-circle"></i> ${sessionScope.error}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        <c:remove var="error" scope="session"/>
+                    </c:if>
+
+                    <form action="<%= request.getContextPath() %>/register" method="post" 
+                          class="border p-4 rounded bg-white shadow wow fadeInUp" 
+                          data-wow-delay="0.1s" data-auth-form>
+                        <h3 class="mb-4 text-center">
+                            <i class="fas fa-user-plus text-primary"></i> Tạo tài khoản
+                        </h3>
 
                         <div class="form-group mb-3">
-                            <label for="full_name" class="mb-1">Họ và tên</label>
-                            <input type="text" class="form-control rounded-pill py-2" id="full_name" name="full_name" required>
+                            <label for="full_name" class="mb-1">
+                                <i class="fas fa-user"></i> Họ và tên
+                            </label>
+                            <input type="text" class="form-control rounded-pill py-2" 
+                                   id="full_name" name="full_name" 
+                                   placeholder="Nhập họ và tên đầy đủ"
+                                   autocomplete="name" required autofocus>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="email" class="mb-1">Email</label>
-                            <input type="email" class="form-control rounded-pill py-2" id="email" name="email" required>
+                            <label for="email" class="mb-1">
+                                <i class="fas fa-envelope"></i> Email
+                            </label>
+                            <input type="email" class="form-control rounded-pill py-2" 
+                                   id="email" name="email" 
+                                   placeholder="example@email.com"
+                                   autocomplete="email" required>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle"></i> Email sẽ được dùng để xác thực tài khoản
+                            </div>
                         </div>
 
                         <div class="form-group mb-3">
                             <label for="phone_number" class="mb-1">
-                                <i class="fas fa-phone me-1"></i>Số điện thoại
+                                <i class="fas fa-phone"></i> Số điện thoại
                             </label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-end-0">
@@ -199,32 +264,60 @@
                                        class="form-control rounded-pill rounded-start-0 border-start-0 py-2" 
                                        id="phone_number" 
                                        name="phone_number" 
-                                       placeholder="Nhập số điện thoại"
+                                       placeholder="Nhập số điện thoại (9-10 chữ số)"
                                        pattern="[0-9]{9,10}"
                                        maxlength="10"
+                                       autocomplete="tel"
                                        required>
-                            </div>
-                            <div class="form-text">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Nhập 9-10 chữ số (VD: 123456789)
                             </div>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="password" class="mb-1">Mật khẩu</label>
-                            <input type="password" class="form-control rounded-pill py-2" id="password" name="password" minlength="8" required>
+                            <label for="password" class="mb-1">
+                                <i class="fas fa-lock"></i> Mật khẩu
+                            </label>
+                            <input type="password" class="form-control rounded-pill py-2" 
+                                   id="password" name="password" 
+                                   placeholder="Tối thiểu 8 ký tự"
+                                   minlength="8" 
+                                   autocomplete="new-password"
+                                   required 
+                                   data-strength-check>
                         </div>
 
                         <div class="form-group mb-4">
-                            <label for="confirm_password" class="mb-1">Xác nhận mật khẩu</label>
-                            <input type="password" class="form-control rounded-pill py-2" id="confirm_password" name="confirm_password" minlength="8" required>
+                            <label for="confirm_password" class="mb-1">
+                                <i class="fas fa-lock"></i> Xác nhận mật khẩu
+                            </label>
+                            <input type="password" class="form-control rounded-pill py-2" 
+                                   id="confirm_password" name="confirm_password" 
+                                   placeholder="Nhập lại mật khẩu"
+                                   minlength="8" 
+                                   autocomplete="new-password"
+                                   required>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100 rounded-pill py-2"><i class="fas fa-user-plus me-2"></i>Đăng ký</button>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="terms" required>
+                            <label class="form-check-label small" for="terms">
+                                Tôi đồng ý với 
+                                <a href="#" class="text-decoration-none">Điều khoản dịch vụ</a> và 
+                                <a href="#" class="text-decoration-none">Chính sách bảo mật</a>
+                            </label>
+                        </div>
 
-                        <p class="mt-3 text-center">
-                            Đã có tài khoản? <a href="<%= request.getContextPath() %>/login">Đăng nhập</a>
-                        </p>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 mb-3">
+                            <i class="fas fa-user-plus"></i> Đăng ký
+                        </button>
+
+                        <div class="text-center">
+                            <p class="text-muted mb-0">
+                                Đã có tài khoản? 
+                                <a href="<%= request.getContextPath() %>/login" class="fw-bold text-decoration-none">
+                                    Đăng nhập ngay <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </p>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -299,6 +392,7 @@
         <script src="<%= request.getContextPath() %>/views/assets/electro/lib/counterup/counterup.min.js"></script>
         <script src="<%= request.getContextPath() %>/views/assets/electro/lib/owlcarousel/owl.carousel.min.js"></script>
         <script src="<%= request.getContextPath() %>/views/assets/electro/js/main.js"></script>
+        <script src="<%= request.getContextPath() %>/views/assets/js/auth-enhancement.js"></script>
         
         <script>
             document.addEventListener('DOMContentLoaded', function() {

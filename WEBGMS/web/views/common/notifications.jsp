@@ -143,33 +143,6 @@
             >
               <i class="bi bi-bell-fill" style="font-size: 1.2rem"></i>
             </a>
-            <div class="dropdown">
-              <a
-                href="#"
-                class="dropdown-toggle text-muted me-2"
-                data-bs-toggle="dropdown"
-              >
-                <small> VND</small>
-              </a>
-              <div class="dropdown-menu rounded">
-                <a href="#" class="dropdown-item"> USD</a>
-                <a href="#" class="dropdown-item"> Euro</a>
-              </div>
-            </div>
-            <div class="dropdown">
-              <a
-                href="#"
-                class="dropdown-toggle text-muted mx-2"
-                data-bs-toggle="dropdown"
-              >
-                <small> English</small>
-              </a>
-              <div class="dropdown-menu rounded">
-                <a href="#" class="dropdown-item"> English</a>
-                <a href="#" class="dropdown-item"> Turkish</a>
-                <a href="#" class="dropdown-item"> Spanol</a>
-              </div>
-            </div>
             <c:choose>
               <c:when test="${not empty sessionScope.user}">
                 <a

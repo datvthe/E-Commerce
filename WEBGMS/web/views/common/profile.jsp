@@ -217,7 +217,6 @@
                             </c:choose>
 
                         </li>
-                        <li><a class="btn btn-outline-warning mx-2" href="#"><i class="fa fa-heart"></i> Yêu thích</a></li>
                     </ul>
                 </div>
             </div>
