@@ -2,9 +2,8 @@ package service;
 
 import dao.OrderDAO;
 import dao.OrderQueueDAO;
-import dao.DigitalProductDAO;
 import model.order.OrderQueue;
-import model.order.DigitalProduct;
+import model.order.Orders;
 import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
@@ -16,28 +15,39 @@ import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 
 /**
- * OrderQueueProcessor - Background worker tự động xử lý queue
- * Chạy mỗi 5 giây để kiểm tra và xử lý các đơn hàng đang chờ
+ * ✨ NEW: OrderQueueProcessor - Background worker xử lý fulfillment
+ * 
+ * OLD FLOW: Xử lý order_queue table
+ * NEW FLOW: Xử lý orders có status='paid' nhưng delivery_status='pending'
+ * 
+ * Chạy mỗi 3 giây để:
+ * 1. Lấy orders PAID nhưng chưa delivered
+ * 2. Gọi OrderFulfillmentService để giao code
+ * 3. Auto refund nếu hết code
  */
 @WebListener
 public class OrderQueueProcessor implements ServletContextListener {
     
     private ScheduledExecutorService scheduler;
-    private final OrderQueueDAO queueDAO = new OrderQueueDAO();
     private final OrderDAO orderDAO = new OrderDAO();
-    private final DigitalProductDAO digitalProductDAO = new DigitalProductDAO();
+    private final OrderFulfillmentService fulfillmentService = new OrderFulfillmentService();
+    
+    // Legacy DAOs - giữ lại để xử lý old queue nếu cần
+    private final OrderQueueDAO queueDAO = new OrderQueueDAO();
     
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        System.out.println("🚀 [OrderQueueProcessor] Starting background worker...");
+        System.out.println("🚀 [NEW FLOW] OrderQueueProcessor starting...");
         
-        // Tạo scheduler chạy mỗi 5 giây
+        // Tạo scheduler chạy mỗi 3 giây (nhanh hơn để user nhận code sớm)
         scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(() -> {
-            processQueue();
-        }, 5, 5, TimeUnit.SECONDS); // Delay 5s, chạy mỗi 5s
+            processNewFlowOrders();  // ✨ NEW: Xử lý theo flow mới
+            // processQueue();  // Legacy: Giữ lại nếu cần xử lý old queue
+        }, 2, 3, TimeUnit.SECONDS); // Delay 2s, chạy mỗi 3s
         
         System.out.println("✅ [OrderQueueProcessor] Background worker started!");
+        System.out.println("   → Processing PAID orders every 3 seconds");
     }
     
     @Override
@@ -59,7 +69,21 @@ public class OrderQueueProcessor implements ServletContextListener {
     }
     
     /**
-     * Xử lý queue - chạy định kỳ
+     * ✨ NEW FLOW: Xử lý orders PAID nhưng chưa delivered
+     */
+    private void processNewFlowOrders() {
+        try {
+            // Gọi OrderFulfillmentService để xử lý batch
+            fulfillmentService.fulfillPendingOrders(10); // Process tối đa 10 orders/lần
+            
+        } catch (Exception e) {
+            System.err.println("❌ [OrderQueueProcessor] Error in new flow: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * LEGACY: Xử lý queue - giữ lại để backward compatible
      */
     private void processQueue() {
         try {
@@ -71,7 +95,7 @@ public class OrderQueueProcessor implements ServletContextListener {
                 return;
             }
             
-            System.out.println("📦 [OrderQueueProcessor] Processing " + waitingItems.size() + " items...");
+            System.out.println("📦 [LEGACY] OrderQueueProcessor processing " + waitingItems.size() + " items...");
             
             // 2. Xử lý từng queue item
             for (OrderQueue queueItem : waitingItems) {
@@ -79,7 +103,7 @@ public class OrderQueueProcessor implements ServletContextListener {
             }
             
         } catch (Exception e) {
-            System.err.println("❌ [OrderQueueProcessor] Error: " + e.getMessage());
+            System.err.println("❌ [LEGACY] OrderQueueProcessor Error: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -102,15 +126,10 @@ public class OrderQueueProcessor implements ServletContextListener {
             System.out.println("⚙️ [OrderQueueProcessor] Processing queue #" + queueItem.getQueueId() + 
                              " | Order #" + queueItem.getOrderId());
             
-            // 2. Lấy digital products cho order này
-            List<DigitalProduct> digitalItems = digitalProductDAO.getDigitalProductsByOrderId(queueItem.getOrderId());
-            
-            if (digitalItems == null || digitalItems.isEmpty()) {
-                // Chưa có digital items → Có thể đơn hàng này đã được xử lý trước đó
-                System.out.println("ℹ️ [OrderQueueProcessor] No digital items for order #" + queueItem.getOrderId());
-                queueDAO.markFailed(queueItem.getQueueId(), "No digital items found");
-                return;
-            }
+            // 2. ⚠️ SKIP: Legacy queue không dùng nữa
+            System.out.println("ℹ️ [LEGACY] Skipping old queue item #" + queueItem.getQueueId());
+            queueDAO.markCompleted(queueItem.getQueueId());
+            return;
             
             // 3. Kiểm tra đã giao đủ chưa
             // (Logic này đã được xử lý trong CheckoutProcessController)

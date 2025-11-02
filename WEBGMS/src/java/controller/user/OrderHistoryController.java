@@ -1,9 +1,9 @@
 package controller.user;
 
 import dao.OrderDAO;
-import dao.DigitalProductDAO;
+import dao.DigitalGoodsCodeDAO;
 import model.order.Orders;
-import model.order.DigitalProduct;
+import model.order.DigitalGoodsCode;
 import model.user.Users;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -24,7 +24,7 @@ import java.util.Map;
 public class OrderHistoryController extends HttpServlet {
     
     private OrderDAO orderDAO = new OrderDAO();
-    private DigitalProductDAO digitalProductDAO = new DigitalProductDAO();
+    private DigitalGoodsCodeDAO digitalGoodsCodeDAO = new DigitalGoodsCodeDAO();
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -60,11 +60,13 @@ public class OrderHistoryController extends HttpServlet {
             Long userId = Long.valueOf(user.getUser_id());
             List<Orders> orders = orderDAO.getOrdersByUserId(userId, pageSize, offset);
             
-            // Lấy digital products cho từng order
-            Map<Long, List<DigitalProduct>> orderDigitalProducts = new HashMap<>();
+            // ✨ FIX: Lấy digital codes cho từng order (từ digital_goods_codes)
+            Map<Long, List<DigitalGoodsCode>> orderDigitalProducts = new HashMap<>();
             for (Orders order : orders) {
-                List<DigitalProduct> digitalProducts = digitalProductDAO.getDigitalProductsByOrderId(order.getOrderId());
-                orderDigitalProducts.put(order.getOrderId(), digitalProducts);
+                List<DigitalGoodsCode> digitalCodes = digitalGoodsCodeDAO.getCodesByOrderId(order.getOrderId());
+                orderDigitalProducts.put(order.getOrderId(), digitalCodes);
+                
+                System.out.println("📦 Order " + order.getOrderId() + " has " + digitalCodes.size() + " codes");
             }
             
             // Đếm tổng số orders (để phân trang)

@@ -6,6 +6,7 @@ import dao.WalletDAO;
 import model.order.Orders;
 import model.order.DigitalProduct;
 import model.user.Users;
+import service.OrderFulfillmentService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -24,6 +25,7 @@ public class OrderSuccessController extends HttpServlet {
     private final OrderDAO orderDAO = new OrderDAO();
     private final DigitalGoodsCodeDAO digitalGoodsDAO = new DigitalGoodsCodeDAO();
     private final WalletDAO walletDAO = new WalletDAO();
+    private final OrderFulfillmentService fulfillmentService = new OrderFulfillmentService();
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -65,14 +67,28 @@ public class OrderSuccessController extends HttpServlet {
                 return;
             }
             
-            // 4. ✨ Lấy product_id từ order_items
-            Long productId = order.getProductId();
+            // 4. ✨ INSTANT FULFILLMENT: Nếu order PAID mà chưa có code → Gán ngay!
+            if ("paid".equalsIgnoreCase(order.getPaymentStatus())) {
+                System.out.println("⚡ [OrderSuccess] Order PAID, checking for codes...");
+                
+                // Try to fulfill ngay lập tức
+                boolean fulfilled = fulfillmentService.fulfillOrder(orderId);
+                
+                if (fulfilled) {
+                    System.out.println("✅ [OrderSuccess] Instant fulfillment successful!");
+                    // Reload order để lấy status mới
+                    order = orderDAO.getOrderById(orderId);
+                } else {
+                    System.out.println("⚠️ [OrderSuccess] Fulfillment in progress or failed");
+                }
+            }
             
-            // 5. Lấy TOÀN BỘ codes đã mua của product này (có thể nhiều orders)
-            List<model.order.DigitalGoodsCode> digitalItems = digitalGoodsDAO.getCodesByUserId(
-                Long.valueOf(user.getUser_id()), 
-                productId
-            );
+            // 5. ✨ Lấy codes của ORDER NÀY
+            List<model.order.DigitalGoodsCode> digitalItems = digitalGoodsDAO.getCodesByOrderId(orderId);
+            
+            System.out.println("📦 [OrderSuccess] Order " + orderId + ": " + 
+                             "Status=" + order.getPaymentStatus() + 
+                             ", Codes=" + digitalItems.size());
             
             // 6. Lấy số dư ví hiện tại
             double currentBalance = walletDAO.getBalance(user.getUser_id());

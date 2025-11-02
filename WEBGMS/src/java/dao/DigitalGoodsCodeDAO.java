@@ -151,7 +151,53 @@ public class DigitalGoodsCodeDAO extends DBConnection {
     }
     
     /**
-     * Lấy codes đã mua của user trong 1 order
+     * ✨ NEW: Lấy codes của 1 ORDER cụ thể
+     * 
+     * LOGIC (vì table order_items KHÔNG có digital_code_id):
+     * 1. Lấy order info (buyer_id, product_id, quantity, created_at)
+     * 2. Lấy codes có: used_by = buyer_id AND product_id = product_id
+     * 3. Filter codes có used_at GẦN NHẤT với order.created_at
+     * 4. LIMIT = quantity của order (hiện tại = 1)
+     */
+    public List<DigitalGoodsCode> getCodesByOrderId(Long orderId) {
+        List<DigitalGoodsCode> codes = new ArrayList<>();
+        
+        // Strategy: Lấy codes được used NGAY SAU khi order được tạo (trong 5 phút)
+        String sql = "SELECT dgc.* FROM digital_goods_codes dgc " +
+                    "INNER JOIN orders o ON dgc.used_by = o.buyer_id " +
+                    "INNER JOIN order_items oi ON oi.order_id = o.order_id AND oi.product_id = dgc.product_id " +
+                    "WHERE o.order_id = ? " +
+                    "AND dgc.is_used = 1 " +
+                    "AND dgc.used_at >= o.created_at " + // Code được gán SAU khi order tạo
+                    "AND TIMESTAMPDIFF(SECOND, o.created_at, dgc.used_at) <= 300 " + // Trong 5 phút
+                    "ORDER BY ABS(TIMESTAMPDIFF(SECOND, dgc.used_at, o.created_at)) ASC " + // Lấy code GẦN NHẤT
+                    "LIMIT 1"; // 1 order = 1 code
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setLong(1, orderId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    codes.add(extractCodeFromResultSet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        if (!codes.isEmpty()) {
+            System.out.println("✅ Found " + codes.size() + " code(s) for order " + orderId);
+        } else {
+            System.out.println("⚠️ No codes found for order " + orderId + " - might be processing");
+        }
+        
+        return codes;
+    }
+    
+    /**
+     * Lấy codes đã mua của user (theo product_id)
      */
     public List<DigitalGoodsCode> getCodesByUserId(Long userId, Long productId) {
         List<DigitalGoodsCode> codes = new ArrayList<>();

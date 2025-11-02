@@ -51,8 +51,13 @@
             font-weight: 500;
         }
         
-        .status-paid {
+        .status-completed {
             background: #10b981;
+            color: white;
+        }
+        
+        .status-processing {
+            background: #3b82f6;
             color: white;
         }
         
@@ -61,8 +66,13 @@
             color: white;
         }
         
-        .status-completed {
-            background: #3b82f6;
+        .status-cancelled {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .status-refunded {
+            background: #6b7280;
             color: white;
         }
         
@@ -222,19 +232,40 @@
                                         </div>
                                         <div>
                                             <c:choose>
-                                                <c:when test="${order.queueStatus == 'COMPLETED'}">
+                                                <%-- ✨ NEW FLOW: Status theo thứ tự ưu tiên --%>
+                                                
+                                                <%-- 1. DELIVERED - Đã giao hàng --%>
+                                                <c:when test="${not empty order.paymentStatus and order.paymentStatus.equalsIgnoreCase('DELIVERED')}">
                                                     <span class="order-status status-completed">
-                                                        <i class="fas fa-check-circle"></i> Hoàn thành
+                                                        <i class="fas fa-check-circle"></i> Đã giao hàng
                                                     </span>
                                                 </c:when>
-                                                <c:when test="${order.paymentStatus == 'PAID'}">
-                                                    <span class="order-status status-paid">
-                                                        <i class="fas fa-check"></i> Đã thanh toán
+                                                
+                                                <%-- 2. REFUNDED - Đã hoàn tiền --%>
+                                                <c:when test="${not empty order.paymentStatus and order.paymentStatus.equalsIgnoreCase('REFUNDED')}">
+                                                    <span class="order-status status-refunded">
+                                                        <i class="fas fa-undo"></i> Đã hoàn tiền
                                                     </span>
                                                 </c:when>
+                                                
+                                                <%-- 3. CANCELLED - Đã hủy --%>
+                                                <c:when test="${not empty order.paymentStatus and order.paymentStatus.equalsIgnoreCase('CANCELLED')}">
+                                                    <span class="order-status status-cancelled">
+                                                        <i class="fas fa-times-circle"></i> Đã hủy
+                                                    </span>
+                                                </c:when>
+                                                
+                                                <%-- 4. PAID - Đã thanh toán, đang xử lý --%>
+                                                <c:when test="${not empty order.paymentStatus and order.paymentStatus.equalsIgnoreCase('PAID')}">
+                                                    <span class="order-status status-processing">
+                                                        <i class="fas fa-spinner fa-spin"></i> Đang xử lý
+                                                    </span>
+                                                </c:when>
+                                                
+                                                <%-- 5. PENDING hoặc khác --%>
                                                 <c:otherwise>
                                                     <span class="order-status status-pending">
-                                                        <i class="fas fa-clock"></i> Đang xử lý
+                                                        <i class="fas fa-clock"></i> Chờ thanh toán
                                                     </span>
                                                 </c:otherwise>
                                             </c:choose>

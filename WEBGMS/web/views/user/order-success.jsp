@@ -264,7 +264,7 @@
                 
                 <!-- Action Buttons -->
                 <div class="action-buttons">
-                    <a href="${pageContext.request.contextPath}/orders" class="btn btn-outline-primary">
+                    <a href="${pageContext.request.contextPath}/user/order-history" class="btn btn-outline-primary">
                         <i class="fas fa-list me-2"></i>Đơn hàng của tôi
                     </a>
                     <a href="${pageContext.request.contextPath}/products" class="btn btn-primary">

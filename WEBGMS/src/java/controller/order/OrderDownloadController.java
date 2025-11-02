@@ -1,9 +1,9 @@
 package controller.order;
 
 import dao.OrderDAO;
-import dao.DigitalProductDAO;
+import dao.DigitalGoodsCodeDAO;
 import model.order.Orders;
-import model.order.DigitalProduct;
+import model.order.DigitalGoodsCode;
 import model.user.Users;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -22,7 +22,7 @@ import java.util.List;
 public class OrderDownloadController extends HttpServlet {
     
     private final OrderDAO orderDAO = new OrderDAO();
-    private final DigitalProductDAO digitalProductDAO = new DigitalProductDAO();
+    private final DigitalGoodsCodeDAO digitalGoodsCodeDAO = new DigitalGoodsCodeDAO();
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -48,7 +48,7 @@ public class OrderDownloadController extends HttpServlet {
             }
             
             // Get digital items
-            List<DigitalProduct> digitalItems = digitalProductDAO.getDigitalProductsByOrderId(orderId);
+            List<DigitalGoodsCode> digitalItems = digitalGoodsCodeDAO.getCodesByOrderId(orderId);
             
             // Generate TXT content
             StringBuilder content = new StringBuilder();
@@ -65,18 +65,11 @@ public class OrderDownloadController extends HttpServlet {
             content.append("=".repeat(60)).append("\n\n");
             
             int index = 1;
-            for (DigitalProduct item : digitalItems) {
-                content.append("[").append(index++).append("] ").append(item.getProductName() != null ? item.getProductName() : "Sản phẩm").append("\n");
+            for (DigitalGoodsCode item : digitalItems) {
+                content.append("[").append(index++).append("] ").append(order.getProduct() != null ? order.getProduct().getName() : "Sản phẩm").append("\n");
                 content.append("-".repeat(60)).append("\n");
-                content.append("MÃ: ").append(item.getCode()).append("\n");
-                
-                if (item.getSerial() != null && !item.getSerial().isEmpty()) {
-                    content.append("SERIAL: ").append(item.getSerial()).append("\n");
-                }
-                
-                if (item.getPassword() != null && !item.getPassword().isEmpty()) {
-                    content.append("MẬT KHẨU: ").append(item.getPassword()).append("\n");
-                }
+                content.append("LOẠI: ").append(item.getCodeType()).append("\n");
+                content.append("MÃ: ").append(item.getCodeValue()).append("\n");
                 
                 if (item.getExpiresAt() != null) {
                     content.append("HẠN SỬ DỤNG: ").append(item.getExpiresAt()).append("\n");

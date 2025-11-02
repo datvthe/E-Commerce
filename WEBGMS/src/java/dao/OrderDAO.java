@@ -58,12 +58,14 @@ public class OrderDAO extends DBConnection {
     }
     
     /**
-     * Insert vào order_items (link order với product và code)
+     * ✨ Insert vào order_items - KHÔNG dùng digital_code_id vì DB không có cột này
+     * Code sẽ được track qua: digital_goods_codes.used_by + used_at
      */
     public void insertOrderItem(Long orderId, Integer codeId, Long productId, 
                                 BigDecimal price, Connection conn) throws SQLException {
         
         // ✅ 1 ORDER = 1 CODE → quantity luôn = 1
+        // ⚠️ KHÔNG dùng digital_code_id vì table không có cột này
         String sql = "INSERT INTO order_items " +
                     "(order_id, product_id, quantity, price_at_purchase, discount_applied, subtotal) " +
                     "VALUES (?, ?, 1, ?, 0, ?)";
@@ -75,8 +77,21 @@ public class OrderDAO extends DBConnection {
             ps.setBigDecimal(4, price); // subtotal = price (vì quantity = 1)
             
             ps.executeUpdate();
-            System.out.println("  ✓ Added order_item: order=" + orderId + ", product=" + productId + ", code=" + codeId);
+            System.out.println("  ✓ Added order_item: order=" + orderId + ", product=" + productId);
         }
+    }
+    
+    /**
+     * ⚠️ DEPRECATED: Table order_items không có cột digital_code_id
+     * Link giữa order và code được track qua:
+     * - digital_goods_codes.used_by = buyer_id
+     * - digital_goods_codes.used_at ≈ order.created_at
+     */
+    @Deprecated
+    public boolean updateOrderItemCode(Long orderId, Integer codeId, Connection conn) throws SQLException {
+        // Do nothing - table không có cột này
+        System.out.println("⚠️ Table order_items không có digital_code_id - tracking via used_by + used_at");
+        return true;
     }
     
     /**
@@ -171,7 +186,102 @@ public class OrderDAO extends DBConnection {
     }
     
     /**
-     * Cập nhật trạng thái order
+     * ✨ NEW FLOW: Tạo order với status PENDING (chưa trừ tiền)
+     * CHỈ DÙNG status, KHÔNG dùng delivery_status
+     */
+    public Long createPendingOrder(Long buyerId, Long sellerId, Long productId, 
+                                   Integer quantity, BigDecimal totalAmount, 
+                                   Connection conn) throws SQLException {
+        
+        String sql = "INSERT INTO orders " +
+                    "(buyer_id, seller_id, status, total_amount, currency, created_at) " +
+                    "VALUES (?, ?, 'pending', ?, 'VND', NOW())";
+        
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setLong(1, buyerId);
+            ps.setLong(2, sellerId);
+            ps.setBigDecimal(3, totalAmount);
+            
+            int affected = ps.executeUpdate();
+            
+            if (affected > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        Long orderId = rs.getLong(1);
+                        System.out.println("✅ Created PENDING order ID: " + orderId);
+                        return orderId;
+                    }
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Cập nhật order sang PAID (sau khi trừ tiền thành công)
+     */
+    public boolean updateOrderToPaid(Long orderId, String transactionId, Connection conn) throws SQLException {
+        String sql = "UPDATE orders SET status = 'paid', updated_at = NOW() WHERE order_id = ?";
+        
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, orderId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+    
+    /**
+     * Cập nhật order sang DELIVERED (sau khi giao code thành công)
+     * CHỈ DÙNG status
+     */
+    public boolean updateOrderToDelivered(Long orderId, Connection conn) throws SQLException {
+        String sql = "UPDATE orders SET status = 'delivered', updated_at = NOW() WHERE order_id = ?";
+        
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, orderId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+    
+    /**
+     * Cập nhật order sang CANCELLED (khi hết code hoặc lỗi)
+     * KHÔNG dùng notes vì table không có cột này
+     */
+    public boolean updateOrderToCancelled(Long orderId, String reason, Connection conn) throws SQLException {
+        String sql = "UPDATE orders SET status = 'cancelled', updated_at = NOW() WHERE order_id = ?";
+        
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, orderId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+    
+    /**
+     * Cập nhật order sang REFUNDED (khi user yêu cầu hoàn tiền)
+     * KHÔNG dùng notes vì table không có cột này
+     */
+    public boolean updateOrderToRefunded(Long orderId, String reason, Connection conn) throws SQLException {
+        String sql = "UPDATE orders SET status = 'refunded', updated_at = NOW() WHERE order_id = ?";
+        
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, orderId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+    
+    /**
+     * ⚠️ DEPRECATED: Không dùng delivery_status nữa, chỉ dùng status
+     * Method này giữ lại để backward compatible nhưng không làm gì
+     */
+    @Deprecated
+    public boolean updateDeliveryStatus(Long orderId, String deliveryStatus, Connection conn) throws SQLException {
+        // Do nothing - không có cột delivery_status trong DB
+        System.out.println("⚠️ updateDeliveryStatus is deprecated - using status only");
+        return true;
+    }
+    
+    /**
+     * Cập nhật trạng thái order (legacy method - giữ lại để backward compatible)
      */
     public boolean updateOrderStatus(Long orderId, String status) {
         String sql = "UPDATE orders SET status = ?, updated_at = NOW() " +
@@ -192,13 +302,46 @@ public class OrderDAO extends DBConnection {
     }
     
     /**
+     * ✨ Lấy danh sách orders PAID nhưng chưa DELIVERED (để xử lý trong queue)
+     * CHỈ DÙNG status (không dùng delivery_status)
+     */
+    public List<Orders> getPaidPendingDeliveryOrders(int limit) {
+        List<Orders> orders = new ArrayList<>();
+        
+        String sql = "SELECT o.*, " +
+                    "oi.product_id, p.name as product_name " +
+                    "FROM orders o " +
+                    "LEFT JOIN order_items oi ON o.order_id = oi.order_id " +
+                    "LEFT JOIN products p ON oi.product_id = p.product_id " +
+                    "WHERE o.status = 'paid' " +
+                    "ORDER BY o.created_at ASC " +
+                    "LIMIT ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, limit);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    orders.add(extractOrderFromResultSet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return orders;
+    }
+    
+    /**
      * Extract Order từ ResultSet
      */
     private Orders extractOrderFromResultSet(ResultSet rs) throws SQLException {
         Orders order = new Orders();
         
         order.setOrderId(rs.getLong("order_id"));
-        order.setOrderNumber("ORD-" + rs.getLong("order_id")); // Format: ORD-123
+        order.setOrderNumber("ORD-" + rs.getLong("order_id")); // Generated, không lưu DB
         order.setBuyerId(rs.getLong("buyer_id"));
         order.setSellerId(rs.getLong("seller_id"));
         
@@ -210,8 +353,12 @@ public class OrderDAO extends DBConnection {
         
         // Status từ orders.status
         String status = rs.getString("status");
-        order.setPaymentStatus(status); // paid, pending, cancelled, refunded
+        order.setPaymentStatus(status); // paid, pending, cancelled, refunded, delivered
         order.setOrderStatus(status);
+        
+        // ✨ NOTE: KHÔNG dùng delivery_status nữa, chỉ dùng status
+        // deliveryStatus được set = status
+        order.setDeliveryStatus(status);
         
         // Product info từ JOIN order_items
         try {
