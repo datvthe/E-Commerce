@@ -50,7 +50,13 @@ public class AdminOrdersController extends HttpServlet {
                 String pageStr = request.getParameter("page");
                 if (pageStr != null && !pageStr.trim().isEmpty()) page = Integer.parseInt(pageStr);
             } catch (NumberFormatException ignored) {}
-
+            
+            // Kiểm tra page < 1 -> quay lại trang quản lý mặc định
+            if (page < 1) {
+                response.sendRedirect(request.getContextPath() + "/admin/orders");
+                return;
+            }
+            
             List<Orders> orders;
             int totalOrders;
             boolean showAll = (status == null || status.trim().isEmpty() || "all".equalsIgnoreCase(status));
@@ -63,6 +69,12 @@ public class AdminOrdersController extends HttpServlet {
                 totalOrders = orderDAO.getOrderCount(status);
             }
             int totalPages = (int) Math.ceil((double) totalOrders / pageSize);
+            
+            // Kiểm tra page > totalPages -> quay lại trang 1
+            if (totalPages > 0 && page > totalPages) {
+                response.sendRedirect(request.getContextPath() + "/admin/orders");
+                return;
+            }
 
             request.setAttribute("orders", orders);
             request.setAttribute("currentPage", page);

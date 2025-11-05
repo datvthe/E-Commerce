@@ -1,11 +1,20 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%
+    // Prevent caching
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
+%>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
         <title>Quản lý người dùng - Admin</title>
     </head>
     <body>
@@ -91,10 +100,9 @@
                                         <div class="col-md-3">
                                             <select name="role" class="form-select">
                                                 <option value="all" ${role == 'all' || empty role ? 'selected' : ''}>Tất cả vai trò</option>
-<option value="Admin" ${role == 'Admin' ? 'selected' : ''}>Quản trị viên</option>
-                                                <option value="Manager" ${role == 'Manager' ? 'selected' : ''}>Quản lý</option>
-                                                <option value="Seller" ${role == 'Seller' ? 'selected' : ''}>Người bán</option>
-                                                <option value="Customer" ${role == 'Customer' ? 'selected' : ''}>Khách hàng</option>
+                                                <option value="admin" ${role == 'admin' ? 'selected' : ''}>Quản trị viên</option>
+                                                <option value="seller" ${role == 'seller' ? 'selected' : ''}>Người bán</option>
+                                                <option value="customer" ${role == 'customer' ? 'selected' : ''}>Khách hàng</option>
                                             </select>
                                         </div>
                                         <div class="col-md-2">
@@ -114,6 +122,7 @@
                                                 <th><h6>Họ tên</h6></th>
                                                 <th><h6>Email</h6></th>
                                                 <th><h6>Số điện thoại</h6></th>
+                                                <th><h6>Vai trò</h6></th>
                                                 <th><h6>Trạng thái</h6></th>
                                                 <th><h6>Ngày tạo</h6></th>
                                                 <th><h6>Thao tác</h6></th>
@@ -140,6 +149,19 @@
                                                     </td>
                                                     <td><p>${user.email}</p></td>
                                                     <td><p>${user.phone_number}</p></td>
+                                                    <td>
+                                                        <c:choose>
+                                                            <c:when test="${user.default_role == 'admin' || user.default_role == 'Admin'}">
+                                                                <span class="status-btn" style="background: #dc3545; color: white;">Quản trị viên</span>
+                                                            </c:when>
+                                                            <c:when test="${user.default_role == 'seller' || user.default_role == 'Seller'}">
+                                                                <span class="status-btn" style="background: #0dcaf0; color: white;">Người bán</span>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span class="status-btn success-btn">Khách hàng</span>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </td>
                                                     <td>
                                                         <c:choose>
                                                             <c:when test="${user.status == 'active'}">

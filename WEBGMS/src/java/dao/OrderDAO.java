@@ -409,22 +409,30 @@ public class OrderDAO extends DBConnection {
     
     /**
      * Lấy doanh thu hôm nay (tất cả sellers)
+     * Tính theo các đơn đã nhận tiền hôm nay. Hỗ trợ cả schema mới (payment_status)
+     * và schema cũ chỉ có cột status/order_status.
+     * "COALESCE tra ve gia tri dau tien k null
      */
     public BigDecimal getRevenueTodayAll() {
+        // Prefer robust condition that works across schemas
+        // Paid if: payment_status = 'PAID' (new) OR status/order_status in ('paid','completed','delivered') (legacy)
+        final String orderStatusExpr = "COALESCE(status, order_status)";
         String sql = "SELECT COALESCE(SUM(total_amount), 0) FROM orders " +
-                    "WHERE DATE(created_at) = CURDATE() AND payment_status = 'PAID'";
-        
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            
-            if (rs.next()) {
-                return rs.getBigDecimal(1);
+                "WHERE DATE(created_at) = CURDATE() AND (" +
+                "UPPER(COALESCE(payment_status,'')) = 'PAID' OR LOWER(" + orderStatusExpr + ") IN ('paid','completed','delivered')" +
+                ")";
+        try (Connection conn = DBConnection.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getBigDecimal(1);
+            } catch (SQLException primary) {
+                // Fallback for very old schema with only 'status'
+                String legacy = "SELECT COALESCE(SUM(total_amount), 0) FROM orders " +
+                        "WHERE DATE(created_at) = CURDATE() AND LOWER(status) IN ('paid','delivered')";
+                try (PreparedStatement ps2 = conn.prepareStatement(legacy); ResultSet rs2 = ps2.executeQuery()) {
+                    if (rs2.next()) return rs2.getBigDecimal(1);
+                }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        
+        } catch (SQLException e) { e.printStackTrace(); }
         return BigDecimal.ZERO;
     }
     
@@ -515,12 +523,34 @@ public class OrderDAO extends DBConnection {
                 "LEFT JOIN users s ON o.seller_id = s.user_id " +
                 "ORDER BY o.created_at DESC LIMIT ?";
         
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, limit);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    orders.add(extractOrderFromResultSet(rs));
+        try (Connection conn = DBConnection.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, limit);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        orders.add(extractOrderFromResultSet(rs));
+                    }
+                }
+            } catch (SQLException primary) {
+                // Fallback for legacy schema without order_number column
+                String legacy = "SELECT " +
+                        "o.order_id, NULL AS order_number, o.buyer_id, o.seller_id, " +
+                        "NULL AS product_id, NULL AS quantity, NULL AS unit_price, " +
+                        "o.total_amount, o.currency, o.payment_method, NULL AS payment_status, " +
+                        "o.status AS order_status, o.delivery_status, NULL AS transaction_id, NULL AS queue_status, " +
+                        "NULL AS processed_at, o.created_at, o.updated_at, " +
+                        "b.email AS buyer_email, b.full_name AS buyer_name, " +
+                        "s.email AS seller_email, s.full_name AS seller_name, " +
+                        "NULL AS product_name, NULL AS product_slug " +
+                        "FROM orders o " +
+                        "LEFT JOIN users b ON o.buyer_id = b.user_id " +
+                        "LEFT JOIN users s ON o.seller_id = s.user_id " +
+                        "ORDER BY o.created_at DESC LIMIT ?";
+                try (PreparedStatement ps2 = conn.prepareStatement(legacy)) {
+                    ps2.setInt(1, limit);
+                    try (ResultSet rs2 = ps2.executeQuery()) {
+                        while (rs2.next()) orders.add(extractOrderFromResultSet(rs2));
+                    }
                 }
             }
         } catch (SQLException e) {

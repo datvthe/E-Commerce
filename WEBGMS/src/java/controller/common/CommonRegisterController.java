@@ -69,14 +69,14 @@ public class CommonRegisterController extends HttpServlet {
                 if (existing != null && (existing.getStatus() == null || !"active".equalsIgnoreCase(existing.getStatus()))) {
                     try {
                         EmailVerificationDAO verificationDAO = new EmailVerificationDAO();
-                        String verificationCode = verificationDAO.generateVerificationCode(
-                            (long) existing.getUser_id(),
-                            email
-                        );
-                        EmailVerificationService.sendVerificationEmail(email, existing.getFull_name(), verificationCode);
-                        request.getSession().setAttribute("success", "Email đã tồn tại nhưng chưa kích hoạt. Đã gửi lại mã xác thực!");
-                        response.sendRedirect(request.getContextPath() + "/verify-email?email=" + email);
-                        return;
+                        EmailVerification verification = verificationDAO.createEmailVerificationRequest(email);
+                        if (verification != null) {
+                            EmailService emailService = new EmailService();
+                            emailService.sendRegistrationVerificationEmail(email, verification.getVerificationCode());
+                            request.getSession().setAttribute("success", "Email đã tồn tại nhưng chưa kích hoạt. Đã gửi lại mã xác thực!");
+                            response.sendRedirect(request.getContextPath() + "/verify-email?email=" + email);
+                            return;
+                        }
                     } catch (Exception ignore) {
                         // fall through to error
                     }

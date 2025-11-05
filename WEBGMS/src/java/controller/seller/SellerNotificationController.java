@@ -4,7 +4,7 @@ import dao.NotificationDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import model.notification.Notification;
+import model.Notifications;
 import model.user.Users;
 
 import java.io.IOException;
@@ -33,16 +33,14 @@ public class SellerNotificationController extends HttpServlet {
         }
 
         try {
-            long userId = user.getUser_id();
+            int userId = (int) user.getUser_id();
             
             // Lấy notifications
-            List<Notification> allNotifications = notificationDAO.getNotificationsByUserId(userId, 50);
-            List<Notification> unreadNotifications = notificationDAO.getUnreadNotifications(userId);
-            int unreadCount = notificationDAO.countUnreadNotifications(userId);
+            List<Notifications> allNotifications = notificationDAO.getNotificationsByUserId(userId);
+            int unreadCount = notificationDAO.getUnreadCount(userId);
             
             // Set attributes
             request.setAttribute("allNotifications", allNotifications);
-            request.setAttribute("unreadNotifications", unreadNotifications);
             request.setAttribute("unreadCount", unreadCount);
             request.setAttribute("user", user);
             
@@ -97,7 +95,7 @@ public class SellerNotificationController extends HttpServlet {
             throws IOException {
         String notificationIdStr = request.getParameter("notificationId");
         if (notificationIdStr != null && !notificationIdStr.trim().isEmpty()) {
-            long notificationId = Long.parseLong(notificationIdStr);
+            int notificationId = Integer.parseInt(notificationIdStr);
             notificationDAO.markAsRead(notificationId);
         }
         response.sendRedirect(request.getContextPath() + "/seller/notifications");
@@ -105,7 +103,7 @@ public class SellerNotificationController extends HttpServlet {
     
     private void handleMarkAllAsRead(HttpServletRequest request, HttpServletResponse response, long userId)
             throws IOException {
-        notificationDAO.markAllAsRead(userId);
+        notificationDAO.markAllAsRead((int) userId);
         response.sendRedirect(request.getContextPath() + "/seller/notifications");
     }
     
@@ -113,15 +111,16 @@ public class SellerNotificationController extends HttpServlet {
             throws IOException {
         String notificationIdStr = request.getParameter("notificationId");
         if (notificationIdStr != null && !notificationIdStr.trim().isEmpty()) {
-            long notificationId = Long.parseLong(notificationIdStr);
-            notificationDAO.deleteNotification(notificationId, userId);
+            int notificationId = Integer.parseInt(notificationIdStr);
+            notificationDAO.deleteNotification(notificationId);
         }
         response.sendRedirect(request.getContextPath() + "/seller/notifications");
     }
     
     private void handleDeleteAllRead(HttpServletRequest request, HttpServletResponse response, long userId)
             throws IOException {
-        notificationDAO.deleteAllReadNotifications(userId);
+        // Not supported by DAO; fallback to marking all as read
+        notificationDAO.markAllAsRead((int) userId);
         response.sendRedirect(request.getContextPath() + "/seller/notifications");
     }
 }
