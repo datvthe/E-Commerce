@@ -1,10 +1,13 @@
 package controller.order;
 
 import dao.ProductDAO;
+import dao.ProductImageDAO;
 import dao.WalletDAO;
 import dao.DigitalGoodsCodeDAO;
 import model.product.Products;
+import model.product.ProductImages;
 import model.user.Users;
+import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -22,6 +25,7 @@ import java.math.BigDecimal;
 public class InstantCheckoutController extends HttpServlet {
     
     private final ProductDAO productDAO = new ProductDAO();
+    private final ProductImageDAO productImageDAO = new ProductImageDAO();
     private final WalletDAO walletDAO = new WalletDAO();
     private final DigitalGoodsCodeDAO digitalGoodsDAO = new DigitalGoodsCodeDAO();
     
@@ -67,6 +71,10 @@ public class InstantCheckoutController extends HttpServlet {
                 request.getRequestDispatcher("/views/common/error.jsp").forward(request, response);
                 return;
             }
+            
+            // 2.1. Fetch product images
+            List<ProductImages> productImages = productImageDAO.getImagesByProductId(productId);
+            product.setProductImages(productImages);
             
             // 3. ✨ Kiểm tra stock (COUNT từ digital_goods_codes)
             int availableStock = digitalGoodsDAO.countAvailableCodes(productId);

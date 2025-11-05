@@ -116,14 +116,19 @@
                 <div class="product-summary">
                     <h5 class="mb-3"><i class="fas fa-box me-2"></i>Sản phẩm</h5>
                     <div class="d-flex align-items-center">
-                        <c:choose>
-                            <c:when test="${not empty product.productImages}">
-                                <img src="${product.productImages[0].url}" alt="${product.name}">
-                            </c:when>
-                            <c:otherwise>
-                                <img src="${pageContext.request.contextPath}/views/assets/user/img/product-1.png" alt="${product.name}">
-                            </c:otherwise>
-                        </c:choose>
+                        <c:set var="primaryImage" value="" />
+                        <c:forEach var="img" items="${product.productImages}">
+                            <c:if test="${img.is_primary and empty primaryImage}">
+                                <c:set var="primaryImage" value="${img.url}" />
+                            </c:if>
+                        </c:forEach>
+                        <c:if test="${empty primaryImage and not empty product.productImages}">
+                            <c:set var="primaryImage" value="${product.productImages[0].url}" />
+                        </c:if>
+                        <c:if test="${empty primaryImage}">
+                            <c:set var="primaryImage" value="${pageContext.request.contextPath}/views/assets/user/img/product-1.png" />
+                        </c:if>
+                        <img src="${primaryImage}" alt="${product.name}">
                         <div class="ms-3 flex-grow-1">
                             <h6 class="mb-1">${product.name}</h6>
                             <div class="text-muted small">
