@@ -83,6 +83,12 @@ public class AdminCategoryController extends HttpServlet {
             }
         }
         
+        // Kếm tra page < 1 -> quảy lại trang quản lý mặc định
+        if (page < 1) {
+            response.sendRedirect(request.getContextPath() + "/admin/categories");
+            return;
+        }
+        
         ProductCategoriesDAO categoryDAO = new ProductCategoriesDAO();
         List<ProductCategories> categories;
         int totalCategories;
@@ -97,6 +103,12 @@ public class AdminCategoryController extends HttpServlet {
         }
         
         int totalPages = (int) Math.ceil((double) totalCategories / PAGE_SIZE);
+        
+        // Kếm tra page > totalPages -> quảy lại trang 1
+        if (totalPages > 0 && page > totalPages) {
+            response.sendRedirect(request.getContextPath() + "/admin/categories");
+            return;
+        }
         
         request.setAttribute("categories", categories);
         request.setAttribute("currentPage", page);

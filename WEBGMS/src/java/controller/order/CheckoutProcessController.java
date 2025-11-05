@@ -185,10 +185,29 @@ public class CheckoutProcessController extends HttpServlet {
             // Update order to PAID (legacy will map to 'paid') and mark queue COMPLETED
             orderDAO.updateOrderStatus(orderId, "PAID", "COMPLETED");
             
-            // 13. COMMIT transaction
+            // 12. Commit before sending side-effect notifications
             conn.commit();
-            
-            // 13. Trả về success
+
+            // 13. Notify ADMIN about new paid order (non-blocking best-effort)
+            try {
+                dao.UsersDAO usersDAO = new dao.UsersDAO();
+                model.user.Users admin = usersDAO.getAnyAdminUser();
+                if (admin != null) {
+                    String title = "Đơn hàng mới đã thanh toán";
+                    String msg = String.format("User #%d đặt mua '%s' x%d • Order #%d • Tổng: %s", 
+                            user.getUser_id(), product.getName(), quantity, orderId, totalAmount.toPlainString());
+                    new service.NotificationService().sendNotificationToUser(admin.getUser_id(), title, msg, "order");
+                } else {
+                    // Fallback broadcast if no admin resolved
+                    new service.NotificationService().sendBroadcastNotification(
+                            "Đơn hàng mới", 
+                            String.format("Order #%d bởi User #%d • %s x%d • Tổng: %s", 
+                                    orderId, user.getUser_id(), product.getName(), quantity, totalAmount.toPlainString()),
+                            "order");
+                }
+            } catch (Exception ignore) {}
+
+            // 14. Trả về success
             jsonResponse.addProperty("status", "SUCCESS");
             jsonResponse.addProperty("message", "Đặt hàng thành công!");
             jsonResponse.addProperty("orderId", orderId);

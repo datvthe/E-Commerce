@@ -114,6 +114,23 @@
                                         </div>
 
                                         <div class="select-style-1 mb-20">
+                                            <label>Vai trò <span class="text-danger">*</span></label>
+                                            <select name="role" class="form-select" required>
+                                                <option value="">Chọn vai trò</option>
+                                                <c:forEach var="r" items="${roles}">
+                                                    <c:if test="${r.role_name != 'Manager' && r.role_name != 'moderator'}">  
+                                                        <option value="${r.role_id}" 
+                                                            <c:forEach var="userRole" items="${userRoles}">
+                                                                ${userRole.role_id == r.role_id ? 'selected' : ''}
+                                                            </c:forEach>
+                                                        >${r.role_name}</option>
+                                                    </c:if>
+                                                </c:forEach>
+                                            </select>
+                                            <small class="text-muted">Các vai trò: Admin, Seller, Customer</small>
+                                        </div>
+
+                                        <div class="select-style-1 mb-20">
                                             <label>Trạng thái <span class="text-danger">*</span></label>
                                             <select name="status" class="form-select" required>
                                                 <option value="active" ${user.status == 'active' ? 'selected' : ''}>Hoạt động</option>
@@ -123,15 +140,28 @@
                                         </div>
                                     </c:if>
 
-                                    <div class="d-flex gap-2">
-                                        <button type="submit" class="main-btn primary-btn btn-hover">
-                                            <i class="lni lni-save"></i> ${isEdit ? 'Cập nhật' : 'Tạo mới'}
-                                        </button>
-                                        <a href="<%= request.getContextPath() %>/admin/users" 
-                                           class="main-btn danger-btn-outline btn-hover">
-                                            <i class="lni lni-close"></i> Hủy
-                                        </a>
-                                    </div>
+                                    <c:if test="${isEdit}">
+                                        <div class="d-flex gap-2">
+                                            <button type="submit" class="main-btn primary-btn btn-hover">
+                                                <i class="lni lni-save"></i> Cập nhật
+                                            </button>
+                                            <a href="<%= request.getContextPath() %>/admin/users" 
+                                               class="main-btn danger-btn-outline btn-hover">
+                                                <i class="lni lni-close"></i> Hủy
+                                            </a>
+                                        </div>
+                                    </c:if>
+                                    <c:if test="${!isEdit}">
+                                        <div class="d-flex gap-2">
+                                            <button type="submit" class="main-btn primary-btn btn-hover">
+                                                <i class="lni lni-save"></i> Tạo mới
+                                            </button>
+                                            <a href="<%= request.getContextPath() %>/admin/users" 
+                                               class="main-btn danger-btn-outline btn-hover">
+                                                <i class="lni lni-close"></i> Hủy
+                                            </a>
+                                        </div>
+                                    </c:if>
                                 </form>
                             </div>
                         </div>

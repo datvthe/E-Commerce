@@ -75,6 +75,11 @@ public class AdminUserController extends HttpServlet {
     private void listUsers(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        // Prevent browser caching
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
+        
         String keyword = request.getParameter("keyword");
         String status = request.getParameter("status");
         String role = request.getParameter("role");
@@ -87,6 +92,12 @@ public class AdminUserController extends HttpServlet {
             } catch (NumberFormatException e) {
                 page = 1;
             }
+        }
+        
+        // If page is less than 1 -> redirect back to the default listing page
+        if (page < 1) {
+            response.sendRedirect(request.getContextPath() + "/admin/users");
+            return;
         }
         
         UsersDAO userDAO = new UsersDAO();
@@ -104,6 +115,13 @@ public class AdminUserController extends HttpServlet {
         }
         
         int totalPages = (int) Math.ceil((double) totalUsers / PAGE_SIZE);
+        
+        // If requested page is greater than available pages (and there is at least one page),
+        // redirect back to the default listing page
+        if (totalPages > 0 && page > totalPages) {
+            response.sendRedirect(request.getContextPath() + "/admin/users");
+            return;
+        }
         
         request.setAttribute("users", users);
         request.setAttribute("currentPage", page);
@@ -146,9 +164,11 @@ public class AdminUserController extends HttpServlet {
         
         RoleDAO roleDAO = new RoleDAO();
         List<Roles> roles = roleDAO.getAllRoles();
+        List<Roles> userRoles = roleDAO.getRolesByUserId(userId);
         
         request.setAttribute("user", user);
         request.setAttribute("roles", roles);
+        request.setAttribute("userRoles", userRoles);
         request.setAttribute("isEdit", true);
         
         request.getRequestDispatcher("/views/admin/user-form.jsp").forward(request, response);
@@ -179,7 +199,23 @@ public class AdminUserController extends HttpServlet {
         Users user = userDAO.createUser(fullName, email, password, phoneNumber);
         
         if (user != null) {
-            userDAO.assignDefaultUserRole(user.getUser_id());
+            // Lấy role từ form (nếu admin chỉ định)
+            String roleStr = request.getParameter("role");
+            
+            if (roleStr != null && !roleStr.isEmpty()) {
+                try {
+                    int roleId = Integer.parseInt(roleStr);
+                    RoleDAO roleDAO = new RoleDAO();
+                    roleDAO.assignRoleToUser(user.getUser_id(), roleId);
+                } catch (NumberFormatException e) {
+                    // Nếu không hợp lệ, gán role mặc định
+                    userDAO.assignDefaultUserRole(user.getUser_id());
+                }
+            } else {
+                // Nếu không chọn role, gán role mặc định (Customer)
+                userDAO.assignDefaultUserRole(user.getUser_id());
+            }
+            
             request.getSession().setAttribute("success", "Tạo người dùng thành công");
             response.sendRedirect(request.getContextPath() + "/admin/users");
         } else {
@@ -198,6 +234,7 @@ public class AdminUserController extends HttpServlet {
         String address = request.getParameter("address");
         String gender = request.getParameter("gender");
         String status = request.getParameter("status");
+        String roleStr = request.getParameter("role");
         
         int userId = Integer.parseInt(userIdStr);
         UsersDAO userDAO = new UsersDAO();
@@ -216,6 +253,22 @@ public class AdminUserController extends HttpServlet {
         user.setStatus(status);
         
         boolean success = userDAO.updateUser(user);
+        
+        // Cập nhật role nếu admin chỉ định
+        if (success && roleStr != null && !roleStr.isEmpty()) {
+            try {
+                int roleId = Integer.parseInt(roleStr);
+                RoleDAO roleDAO = new RoleDAO();
+                
+                // Xóa tất cả role cũ
+                roleDAO.removeAllRolesFromUser(userId);
+                
+                // Gán role mới
+                roleDAO.assignRoleToUser(userId, roleId);
+            } catch (NumberFormatException e) {
+                // Nếu role không hợp lệ, bỏ qua
+            }
+        }
         
         if (success) {
             request.getSession().setAttribute("success", "Cập nhật người dùng thành công");

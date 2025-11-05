@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="vi">
@@ -33,7 +34,7 @@
         </c:if>
         <div class="card-style mb-30">
           <div class="d-flex justify-content-between align-items-center mb-20">
-            <h6 class="mb-0">Danh sách sản phẩm (${totalProducts})</h6>
+            <h6 class="mb-0">Danh sách sản phẩm (<fmt:formatNumber value="${totalProducts}" type="number" groupingUsed="true"/>)</h6>
             <a href="<%= request.getContextPath() %>/admin/products/create" class="main-btn primary-btn btn-hover"><i class="lni lni-plus"></i> Thêm sản phẩm</a>
           </div>
           <form method="get" action="<%= request.getContextPath() %>/admin/products" class="mb-20">
@@ -77,8 +78,8 @@
                   <tr>
                     <td><p>${p.product_id}</p></td>
                     <td><p>${p.name}</p></td>
-                    <td><p>${p.price} ${p.currency}</p></td>
-                    <td><p>${p.quantity}</p></td>
+                    <td><p><fmt:formatNumber value="${p.price}" type="number" groupingUsed="true"/> ${p.currency}</p></td>
+                    <td><p><fmt:formatNumber value="${p.quantity}" type="number" groupingUsed="true"/></p></td>
                     <td><span class="status-btn ${p.status=='active' ? 'success-btn' : (p.status=='inactive' ? 'warning-btn' : '')}">${p.status}</span></td>
                     <td><p>${p.created_at}</p></td>
                     <td>

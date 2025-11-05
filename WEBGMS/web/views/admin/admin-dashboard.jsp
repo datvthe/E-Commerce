@@ -6,6 +6,7 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="jakarta.tags.core" %>
+<%@taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
   <head>
@@ -62,25 +63,25 @@
             <div class="col-xl-3 col-md-6">
               <div class="card-style">
                 <h6 class="text-muted mb-2">Tổng người dùng</h6>
-                <h3 class="mb-0">${totalUsers}</h3>
+                <h3 class="mb-0"><fmt:formatNumber value="${totalUsers}" type="number" groupingUsed="true"/></h3>
               </div>
             </div>
             <div class="col-xl-3 col-md-6">
               <div class="card-style">
                 <h6 class="text-muted mb-2">Tổng sản phẩm</h6>
-                <h3 class="mb-0">${totalProducts}</h3>
+                <h3 class="mb-0"><fmt:formatNumber value="${totalProducts}" type="number" groupingUsed="true"/></h3>
               </div>
             </div>
             <div class="col-xl-3 col-md-6">
               <div class="card-style">
                 <h6 class="text-muted mb-2">Tổng đơn hàng</h6>
-                <h3 class="mb-0">${totalOrders}</h3>
+                <h3 class="mb-0"><fmt:formatNumber value="${totalOrders}" type="number" groupingUsed="true"/></h3>
               </div>
             </div>
             <div class="col-xl-3 col-md-6">
               <div class="card-style">
                 <h6 class="text-muted mb-2">Doanh thu hôm nay</h6>
-                <h3 class="mb-0">${revenueToday} VND</h3>
+                <h3 class="mb-0"><fmt:formatNumber value="${revenueToday}" type="number" groupingUsed="true"/> VND</h3>
               </div>
             </div>
           </div>
@@ -110,7 +111,7 @@
                               <td><p>${b.fullName}</p></td>
                               <td><p>${b.email}</p></td>
                               <td><p>${b.orders}</p></td>
-                              <td><p>${b.totalAmount} VND</p></td>
+                              <td><p><fmt:formatNumber value="${b.totalAmount}" type="number" groupingUsed="true"/> VND</p></td>
                             </tr>
                           </c:forEach>
                         </tbody>
@@ -188,7 +189,7 @@
                               ${o.status}
                             </span>
                           </td>
-                          <td><p>${o.total_amount} ${o.currency}</p></td>
+                          <td><p><fmt:formatNumber value="${o.total_amount}" type="number" groupingUsed="true"/> ${o.currency}</p></td>
                           <td><p>${o.created_at}</p></td>
                         </tr>
                       </c:forEach>

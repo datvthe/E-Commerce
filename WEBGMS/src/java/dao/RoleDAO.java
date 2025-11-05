@@ -163,4 +163,44 @@ public class RoleDAO extends DBConnection {
 
         return userRoles;
     }
+    
+    // Lấy tất cả roles của người dùng
+    public List<Roles> getRolesByUserId(int userId) {
+        List<Roles> roles = new ArrayList<>();
+        String sql = "SELECT r.* FROM Roles r " +
+                    "JOIN User_Roles ur ON r.role_id = ur.role_id " +
+                    "WHERE ur.user_id = ? ORDER BY r.role_id";
+        
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Roles role = new Roles();
+                    role.setRole_id(rs.getInt("role_id"));
+                    role.setRole_name(rs.getString("role_name"));
+                    role.setDescription(rs.getString("description"));
+                    roles.add(role);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return roles;
+    }
+    
+    // Xóa tất cả roles của người dùng
+    public boolean removeAllRolesFromUser(int userId) {
+        String sql = "DELETE FROM User_Roles WHERE user_id = ?";
+        try (Connection conn = DBConnection.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            int affected = ps.executeUpdate();
+            return affected >= 0;  // Thành công nếu không có lỗi (affected có thể = 0 nếu không có roles)
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

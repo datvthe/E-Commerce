@@ -352,7 +352,7 @@ public class UsersDAO extends DBConnection {
     }
     
     public boolean updateUser(Users user) {
-        String sql = "UPDATE users SET full_name = ?, email = ?, phone_number = ?, address = ?, default_role = ?, gender = ?, date_of_birth = ?, avatar_url = ?, updated_at = NOW() WHERE user_id = ?";
+        String sql = "UPDATE users SET full_name = ?, email = ?, phone_number = ?, address = ?, default_role = ?, gender = ?, date_of_birth = ?, avatar_url = ?, status = ?, updated_at = NOW() WHERE user_id = ?";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getFull_name());
             ps.setString(2, user.getEmail());
@@ -362,7 +362,8 @@ public class UsersDAO extends DBConnection {
             ps.setString(6, user.getGender());
             ps.setDate(7, user.getDate_of_birth());
             ps.setString(8, user.getAvatar_url());
-            ps.setInt(9, user.getUser_id());
+            ps.setString(9, user.getStatus());
+            ps.setInt(10, user.getUser_id());
             
             int affected = ps.executeUpdate();
             return affected > 0;
@@ -444,13 +445,26 @@ public class UsersDAO extends DBConnection {
     public List<Users> getAllUsers(int page, int pageSize) {
         List<Users> list = new ArrayList<>();
         int offset = (page - 1) * pageSize;
-        String sql = "SELECT * FROM users WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        // JOIN with User_Roles and Roles to fetch current role instead of default_role
+        String sql = "SELECT u.*, r.role_name FROM users u " +
+                    "LEFT JOIN User_Roles ur ON u.user_id = ur.user_id " +
+                    "LEFT JOIN Roles r ON ur.role_id = r.role_id " +
+                    "WHERE u.deleted_at IS NULL " +
+                    "ORDER BY u.created_at DESC LIMIT ? OFFSET ?";
         try (Connection conn = DBConnection.getConnection(); 
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, pageSize);
             ps.setInt(2, offset);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) list.add(mapUser(rs));
+                while (rs.next()) {
+                    Users user = mapUser(rs);
+                    // Override default_role with the actual role from User_Roles table
+                    String actualRole = rs.getString("role_name");
+                    if (actualRole != null && !actualRole.isEmpty()) {
+                        user.setDefault_role(actualRole);
+                    }
+                    list.add(user);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -461,22 +475,27 @@ public class UsersDAO extends DBConnection {
     public List<Users> searchUsers(String keyword, String status, String role, int page, int pageSize) {
         List<Users> list = new ArrayList<>();
         int offset = (page - 1) * pageSize;
-        StringBuilder sql = new StringBuilder("SELECT * FROM users WHERE deleted_at IS NULL ");
+        // JOIN with User_Roles and Roles to fetch current role instead of default_role
+        StringBuilder sql = new StringBuilder("SELECT u.*, r.role_name FROM users u " +
+                                            "LEFT JOIN User_Roles ur ON u.user_id = ur.user_id " +
+                                            "LEFT JOIN Roles r ON ur.role_id = r.role_id " +
+                                            "WHERE u.deleted_at IS NULL ");
         List<Object> params = new ArrayList<>();
         if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append("AND (full_name LIKE ? OR email LIKE ? OR phone_number LIKE ?) ");
+            sql.append("AND (u.full_name LIKE ? OR u.email LIKE ? OR u.phone_number LIKE ?) ");
             String k = "%" + keyword.trim() + "%";
             params.add(k); params.add(k); params.add(k);
         }
         if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
-            sql.append("AND status = ? ");
+            sql.append("AND u.status = ? ");
             params.add(status);
         }
         if (role != null && !role.trim().isEmpty() && !"all".equalsIgnoreCase(role)) {
-            sql.append("AND default_role = ? ");
+            // Filter by actual role from User_Roles table, case-insensitive
+            sql.append("AND LOWER(r.role_name) = ? ");
             params.add(role.toLowerCase());
         }
-        sql.append("ORDER BY created_at DESC LIMIT ? OFFSET ?");
+        sql.append("ORDER BY u.created_at DESC LIMIT ? OFFSET ?");
         try (Connection conn = DBConnection.getConnection(); 
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             int idx = 1;
@@ -487,7 +506,15 @@ public class UsersDAO extends DBConnection {
             ps.setInt(idx++, pageSize);
             ps.setInt(idx, offset);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) list.add(mapUser(rs));
+                while (rs.next()) {
+                    Users user = mapUser(rs);
+                    // Override default_role with the actual role from User_Roles table
+                    String actualRole = rs.getString("role_name");
+                    if (actualRole != null && !actualRole.isEmpty()) {
+                        user.setDefault_role(actualRole);
+                    }
+                    list.add(user);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -496,19 +523,24 @@ public class UsersDAO extends DBConnection {
     }
 
     public int countUsers(String keyword, String status, String role) {
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM users WHERE deleted_at IS NULL ");
+        // JOIN with User_Roles and Roles to count users with current role from User_Roles table
+        StringBuilder sql = new StringBuilder("SELECT COUNT(DISTINCT u.user_id) FROM users u " +
+                                            "LEFT JOIN User_Roles ur ON u.user_id = ur.user_id " +
+                                            "LEFT JOIN Roles r ON ur.role_id = r.role_id " +
+                                            "WHERE u.deleted_at IS NULL ");
         List<Object> params = new ArrayList<>();
         if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append("AND (full_name LIKE ? OR email LIKE ? OR phone_number LIKE ?) ");
+            sql.append("AND (u.full_name LIKE ? OR u.email LIKE ? OR u.phone_number LIKE ?) ");
             String k = "%" + keyword.trim() + "%";
             params.add(k); params.add(k); params.add(k);
         }
         if (status != null && !status.trim().isEmpty() && !"all".equalsIgnoreCase(status)) {
-            sql.append("AND status = ? ");
+            sql.append("AND u.status = ? ");
             params.add(status);
         }
         if (role != null && !role.trim().isEmpty() && !"all".equalsIgnoreCase(role)) {
-            sql.append("AND default_role = ? ");
+            // Filter by actual role from User_Roles table, case-insensitive
+            sql.append("AND LOWER(r.role_name) = ? ");
             params.add(role.toLowerCase());
         }
         try (Connection conn = DBConnection.getConnection(); 

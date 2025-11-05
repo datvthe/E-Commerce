@@ -34,11 +34,25 @@ public class AdminProductsController extends HttpServlet {
             String category = request.getParameter("category_id");
             int page = 1; int pageSize = 12;
             try { String p = request.getParameter("page"); if (p != null) page = Integer.parseInt(p);} catch (Exception ignore) {}
+            
+            // Kiểm tra page < 1 -> quay lại trang quản lý mặc định
+            if (page < 1) {
+                response.sendRedirect(request.getContextPath() + "/admin/products");
+                return;
+            }
+            
             List<Products> list = productDAO.adminFilterProducts(page, pageSize, keyword, category, status);
             // NOTE: show the quantity saved in Products table (what admin edited)
             // If you want to see real available digital codes, add a separate column instead.
             int total = productDAO.adminCountFilteredProducts(keyword, category, status);
             int totalPages = (int)Math.ceil((double)total / pageSize);
+            
+            // Kiểm tra page > totalPages -> quay lại trang 1
+            if (totalPages > 0 && page > totalPages) {
+                response.sendRedirect(request.getContextPath() + "/admin/products");
+                return;
+            }
+            
             ProductCategoriesDAO cateDAO = new ProductCategoriesDAO();
             List<ProductCategories> categories = cateDAO.getAllCategories();
             request.setAttribute("products", list);
