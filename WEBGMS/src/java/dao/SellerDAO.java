@@ -70,6 +70,33 @@ public class SellerDAO {
                 Seller s = new Seller();
                 s.setSellerId(rs.getInt("seller_id"));
                 s.setUserId(rs.getInt("user_id"));
+                s.setFullName(rs.getString("full_name"));
+                s.setShopName(rs.getString("shop_name"));
+                s.setShopDescription(rs.getString("shop_description"));
+                s.setMainCategory(rs.getString("main_category"));
+                s.setBankName(rs.getString("bank_name"));
+                s.setBankAccount(rs.getString("bank_account"));
+                s.setAccountOwner(rs.getString("account_owner"));
+                return s;
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+
+    public Seller getSellerById(int sellerId) {
+    String sql = "SELECT * FROM sellers WHERE seller_id = ?";
+    try (Connection conn = DBConnection.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, sellerId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                Seller s = new Seller();
+                s.setSellerId(rs.getInt("seller_id"));
+                s.setUserId(rs.getInt("user_id"));
+                s.setFullName(rs.getString("full_name"));
                 s.setShopName(rs.getString("shop_name"));
                 s.setShopDescription(rs.getString("shop_description"));
                 s.setMainCategory(rs.getString("main_category"));

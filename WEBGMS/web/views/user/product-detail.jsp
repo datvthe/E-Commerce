@@ -369,74 +369,78 @@
                             <div class="seller-info mb-4 p-4 bg-light rounded-3 border">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <h6 class="mb-0"><i class="fas fa-store me-2 text-primary"></i>Thông tin người bán</h6>
-                                    <span class="badge bg-success">Đã xác thực</span>
                                 </div>
                                 
-                                <div class="row align-items-center">
-                                    <div class="col-auto">
-                                        <div class="seller-avatar">
-                                            <img src="<%= request.getContextPath() %>/views/assets/user/img/avatar.jpg" 
-                                                 class="rounded-circle border border-3 border-primary" width="60" height="60" alt="Seller Avatar">
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="seller-details">
-                                            <h6 class="mb-1 fw-bold">Nguyễn Văn Minh</h6>
-                                            <p class="mb-1 text-muted small">
-                                                <i class="fas fa-envelope me-1"></i>minh.nguyen@example.com
-                                            </p>
-                                            <div class="seller-stats d-flex gap-3">
-                                                <div class="stat-item">
-                                                    <span class="text-primary fw-bold">4.8</span>
-                                                    <div class="stars">
-                                                        <i class="fas fa-star text-warning"></i>
-                                                        <i class="fas fa-star text-warning"></i>
-                                                        <i class="fas fa-star text-warning"></i>
-                                                        <i class="fas fa-star text-warning"></i>
-                                                        <i class="fas fa-star text-warning"></i>
-                                                    </div>
-                                                    <small class="text-muted">(1,250 đánh giá)</small>
-                                                </div>
-                                                <div class="stat-item">
-                                                    <span class="text-success fw-bold">98%</span>
-                                                    <small class="text-muted d-block">Tỷ lệ hài lòng</small>
-                                                </div>
-                                                <div class="stat-item">
-                                                    <span class="text-info fw-bold">2,500+</span>
-                                                    <small class="text-muted d-block">Sản phẩm đã bán</small>
-                                                </div>
+                                <div class="row">
+                                    <div class="col-12 mb-3">
+                                        <div class="d-flex align-items-start">
+                                            <div class="me-3">
+                                                <i class="fas fa-store-alt text-primary fs-4"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <small class="text-muted d-block mb-1">🏪 Tên cửa hàng</small>
+                                                <h5 class="mb-0 fw-bold">${not empty productSeller ? productSeller.shopName : 'Chưa có thông tin'}</h5>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-auto">
-                                        <div class="seller-actions">
-                                            <button class="btn btn-outline-primary btn-sm" onclick="viewSellerProfile('seller001')">
-                                                <i class="fas fa-user me-1"></i>Xem shop
-                                            </button>
-                                            <button class="btn btn-outline-success btn-sm" onclick="contactSeller('seller001')">
-                                                <i class="fas fa-comments me-1"></i>Liên hệ
-                                            </button>
+                                    
+                                    <div class="col-12 mb-3">
+                                        <div class="d-flex align-items-start">
+                                            <div class="me-3">
+                                                <i class="fas fa-user text-primary fs-4"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <small class="text-muted d-block mb-1">👤 Tên người bán</small>
+                                                <p class="mb-0 fw-semibold">${not empty productSeller ? productSeller.fullName : 'Chưa có thông tin'}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12 mb-3">
+                                        <div class="d-flex align-items-start">
+                                            <div class="me-3">
+                                                <i class="fas fa-tags text-primary fs-4"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <small class="text-muted d-block mb-1">🏷️ Loại sản phẩm chính</small>
+                                                <p class="mb-0">
+                                                    <c:if test="${not empty productSeller and not empty productSeller.mainCategory}">
+                                                        <c:forTokens var="category" items="${productSeller.mainCategory}" delims=",">
+                                                            <span class="badge bg-primary">${category.trim()}</span>
+                                                        </c:forTokens>
+                                                    </c:if>
+                                                    <c:if test="${empty productSeller or empty productSeller.mainCategory}">
+                                                        <span class="badge bg-secondary">Chưa có thông tin</span>
+                                                    </c:if>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <div class="d-flex align-items-start">
+                                            <div class="me-3">
+                                                <i class="fas fa-comment-dots text-primary fs-4"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <small class="text-muted d-block mb-1">💬 Mô tả ngắn shop</small>
+                                                <p class="mb-0 text-muted small">${not empty productSeller ? productSeller.shopDescription : 'Chưa có mô tả'}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 
-                                <!-- Seller Description -->
-                                <div class="seller-description mt-3 pt-3 border-top">
-                                    <p class="mb-2 text-muted small">
-                                        <i class="fas fa-quote-left me-1"></i>
-                                        "Chuyên cung cấp điện thoại và phụ kiện chính hãng với giá cả hợp lý. 
-                                        Cam kết giao hàng nhanh chóng và hỗ trợ khách hàng 24/7."
-                                    </p>
-                                    <div class="d-flex gap-2">
-                                        <span class="badge bg-light text-dark">
-                                            <i class="fas fa-clock me-1"></i>Phản hồi trong 1h
-                                        </span>
-                                        <span class="badge bg-light text-dark">
-                                            <i class="fas fa-shipping-fast me-1"></i>Giao hàng nhanh
-                                        </span>
-                                        <span class="badge bg-light text-dark">
-                                            <i class="fas fa-shield-alt me-1"></i>Bảo hành 12 tháng
-                                        </span>
+                                <!-- Action Buttons -->
+                                <div class="row mt-3 pt-3 border-top">
+                                    <div class="col-6">
+                                        <button class="btn btn-outline-primary btn-sm w-100" onclick="viewSellerProfile('${productSeller != null ? productSeller.sellerId : 0}')">
+                                            <i class="fas fa-user me-1"></i>Xem shop
+                                        </button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button class="btn btn-outline-success btn-sm w-100" onclick="contactSeller('${productSeller != null ? productSeller.sellerId : 0}')">
+                                            <i class="fas fa-comments me-1"></i>Liên hệ
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -1276,7 +1280,7 @@
 
             // Seller interaction functions
             function viewSellerProfile(sellerId) {
-                window.location.href = '<%= request.getContextPath() %>/seller/' + sellerId;
+                window.location.href = '<%= request.getContextPath() %>/shop-storefront?sellerId=' + sellerId;
             }
 
             function contactSeller(sellerId) {

@@ -6,11 +6,13 @@ import dao.InventoryDAO;
 import dao.DigitalGoodsCodeDAO;
 import dao.ReviewDAO;
 import dao.WishlistDAO;
+import dao.SellerDAO;
 import model.product.Products;
 import model.product.ProductImages;
 import model.product.Inventory;
 import model.feedback.Reviews;
 import model.user.Users;
+import model.seller.Seller;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -33,6 +35,7 @@ public class ProductDetailController extends HttpServlet {
     private DigitalGoodsCodeDAO digitalGoodsDAO = new DigitalGoodsCodeDAO();
     private ReviewDAO reviewDAO = new ReviewDAO();
     private WishlistDAO wishlistDAO = new WishlistDAO();
+    private SellerDAO sellerDAO = new SellerDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -61,6 +64,13 @@ public class ProductDetailController extends HttpServlet {
         if (product == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Product not found");
             return;
+        }
+
+        // Get seller information
+        Seller productSeller = null;
+        if (product.getSeller_id() != null) {
+            int sellerId = (int) product.getSeller_id().getUser_id();
+            productSeller = sellerDAO.getSellerById(sellerId);
         }
 
         // Get product images
@@ -121,6 +131,7 @@ public class ProductDetailController extends HttpServlet {
 
         // Set attributes
         request.setAttribute("product", product);
+        request.setAttribute("productSeller", productSeller);
         request.setAttribute("images", images);
         request.setAttribute("inventory", inventory);
         request.setAttribute("availableStock", availableStock);
