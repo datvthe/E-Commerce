@@ -45,23 +45,15 @@ public class InstantCheckoutController extends HttpServlet {
         try {
             // 1. Lấy parameters
             String productIdStr = request.getParameter("productId");
-            String quantityStr = request.getParameter("quantity");
             
-            if (productIdStr == null || quantityStr == null) {
+            if (productIdStr == null) {
                 request.setAttribute("error", "❌ Thiếu thông tin sản phẩm!");
                 request.getRequestDispatcher("/views/common/error.jsp").forward(request, response);
                 return;
             }
             
             long productId = Long.parseLong(productIdStr);
-            int quantity = Integer.parseInt(quantityStr);
-            
-            // Validate quantity
-            if (quantity <= 0 || quantity > 100) {
-                request.setAttribute("error", "❌ Số lượng không hợp lệ (1-100)!");
-                request.getRequestDispatcher("/views/common/error.jsp").forward(request, response);
-                return;
-            }
+            int quantity = 1; // ✅ Fixed: Always 1 product per purchase
             
             // 2. Lấy thông tin sản phẩm
             Products product = productDAO.getProductById(productId);
@@ -81,15 +73,15 @@ public class InstantCheckoutController extends HttpServlet {
             
             System.out.println("🔍 Checking stock for product " + productId + ": " + availableStock + " codes available");
             
-            if (availableStock < quantity) {
-                request.setAttribute("error", "❌ Sản phẩm đã hết hàng! Còn lại: " + availableStock);
+            if (availableStock < 1) {
+                request.setAttribute("error", "❌ Sản phẩm đã hết hàng!");
                 request.getRequestDispatcher("/views/common/error.jsp").forward(request, response);
                 return;
             }
             
-            // 4. Tính tổng tiền
+            // 4. Tính tổng tiền (quantity = 1)
             BigDecimal unitPrice = product.getPrice();
-            BigDecimal totalAmount = unitPrice.multiply(BigDecimal.valueOf(quantity));
+            BigDecimal totalAmount = unitPrice; // ✅ No need to multiply, quantity is always 1
             
             // 5. Lấy số dư ví
             double walletBalance = walletDAO.getBalance(user.getUser_id());

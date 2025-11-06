@@ -445,24 +445,8 @@
                                 </div>
                             </div>
                                     
-                                    <!-- Quantity Selector -->
-                                    <div class="quantity-section mb-4">
-                                        <label class="form-label fw-bold">Số lượng:</label>
-                                        <div class="input-group quantity" style="width: 150px;">
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-sm btn-minus rounded-circle bg-light border" type="button">
-                                                    <i class="fa fa-minus"></i>
-                                                </button>
-                                            </div>
-                                            <input type="number" class="form-control form-control-sm text-center border-0" 
-                                                   value="1" min="1" max="${not empty availableStock ? availableStock : 1}" id="quantity">
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-sm btn-plus rounded-circle bg-light border" type="button">
-                                                    <i class="fa fa-plus"></i>
-                                                </button>
-                        </div>
-                    </div>
-                </div>
+                                    <!-- Hidden quantity input - always 1 -->
+                                    <input type="hidden" id="quantity" value="1">
 
                                     <!-- Action Buttons -->
                                     <div class="action-buttons mb-4">
@@ -1057,31 +1041,9 @@
             let selectedRating = 0;
             let isInWishlist = false;
 
-            // Quantity controls
-            document.querySelector('.btn-minus').addEventListener('click', function() {
-                const quantityInput = document.getElementById('quantity');
-                let value = parseInt(quantityInput.value);
-                if (value > 1) {
-                    quantityInput.value = value - 1;
-                }
-            });
+            // Quantity is now fixed to 1 - no controls needed
 
-            document.querySelector('.btn-plus').addEventListener('click', function() {
-                const quantityInput = document.getElementById('quantity');
-                let value = parseInt(quantityInput.value);
-                if (value < maxQuantity) {
-                    quantityInput.value = value + 1;
-                }
-            });
-
-            // Quantity input validation
-            document.getElementById('quantity').addEventListener('change', function() {
-                let value = parseInt(this.value);
-                if (value < 1) this.value = 1;
-                if (value > maxQuantity) this.value = maxQuantity;
-            });
-
-            // Buy Now function - Instant checkout for digital goods
+            // Buy Now function - Instant checkout for digital goods (quantity = 1)
             function buyNow() {
                 // Check if product is in stock
                 if (maxQuantity <= 0) {
@@ -1089,28 +1051,15 @@
                     return;
                 }
                 
-                const quantity = document.getElementById('quantity').value || 1;
-                if (quantity > maxQuantity) {
-                    alert('Số lượng vượt quá tồn kho! Còn lại: ' + maxQuantity + ' sản phẩm');
-                    return;
-                }
-                
-                if (quantity <= 0) {
-                    alert('Vui lòng chọn số lượng!');
-                    return;
-                }
+                const quantity = 1; // Fixed quantity = 1
                 
                 // Redirect to instant checkout (digital goods)
                 window.location.href = '<%= request.getContextPath() %>/checkout/instant?productId=' + productId + '&quantity=' + quantity;
             }
 
-            // Buy Digital Goods function
+            // Buy Digital Goods function (quantity = 1)
             function buyDigitalGoods() {
-                const quantity = document.getElementById('quantity').value;
-                if (quantity > maxQuantity) {
-                    alert('Số lượng vượt quá tồn kho!');
-                    return;
-                }
+                const quantity = 1; // Fixed quantity = 1
                 
                 // Show confirmation for digital goods
                 if (confirm('Bạn có chắc chắn muốn mua tài nguyên số này? Sau khi thanh toán, bạn sẽ nhận được mã kích hoạt/tài khoản ngay lập tức.')) {
@@ -1119,13 +1068,9 @@
                 }
             }
 
-            // Add to cart function
+            // Add to cart function (quantity = 1)
             function addToCart() {
-                const quantity = document.getElementById('quantity').value;
-                if (quantity > maxQuantity) {
-                    alert('Số lượng vượt quá tồn kho!');
-                    return;
-                }
+                const quantity = 1; // Fixed quantity = 1
 
                 // Show loading state
                 const btn = event.target;

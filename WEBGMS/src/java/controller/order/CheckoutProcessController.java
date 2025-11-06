@@ -67,7 +67,7 @@ public class CheckoutProcessController extends HttpServlet {
             
             JsonObject requestData = new Gson().fromJson(sb.toString(), JsonObject.class);
             long productId = requestData.get("productId").getAsLong();
-            int quantity = requestData.get("quantity").getAsInt();
+            int quantity = 1; // ✅ Fixed: Always 1 product per purchase
             
             // 2. Get product info
             Products product = productDAO.getProductById(productId);
@@ -78,9 +78,9 @@ public class CheckoutProcessController extends HttpServlet {
                 return;
             }
             
-            // 3. Calculate total
+            // 3. Calculate total (quantity = 1)
             BigDecimal unitPrice = product.getPrice();
-            BigDecimal totalAmount = unitPrice.multiply(BigDecimal.valueOf(quantity));
+            BigDecimal totalAmount = unitPrice; // ✅ No need to multiply
             Long sellerId = Long.valueOf(product.getSeller_id().getUser_id());
             
             // 4. Start TRANSACTION
@@ -88,47 +88,41 @@ public class CheckoutProcessController extends HttpServlet {
             conn.setAutoCommit(false);
             
             System.out.println("═══════════════════════════════════════════════");
-            System.out.println("🛒 NEW FLOW CHECKOUT:");
-            System.out.println("   1. Tạo PENDING orders");
+            System.out.println("🛒 CHECKOUT FLOW:");
+            System.out.println("   1. Tạo PENDING order");
             System.out.println("   2. Trừ tiền ví");
             System.out.println("   3. Update sang PAID");
             System.out.println("   4. Background job sẽ giao code");
-            System.out.println("   User muốn: " + quantity + " codes");
+            System.out.println("   Quantity: 1 (fixed)");
             System.out.println("═══════════════════════════════════════════════");
             
-            // 5. ✨ BƯỚC 1: TẠO PENDING ORDERS TRƯỚC (chưa kiểm tra code)
-            //    Tạo nhiều orders nếu quantity > 1
-            List<Long> createdOrderIds = new ArrayList<>();
+            // 5. ✨ BƯỚC 1: TẠO 1 PENDING ORDER (quantity = 1)
+            Long pendingOrderId = orderDAO.createPendingOrder(
+                Long.valueOf(user.getUser_id()), 
+                sellerId, 
+                productId,
+                1, // Always 1 code per order
+                unitPrice, // Price for 1 code
+                conn
+            );
             
-            for (int i = 0; i < quantity; i++) {
-                Long pendingOrderId = orderDAO.createPendingOrder(
-                    Long.valueOf(user.getUser_id()), 
-                    sellerId, 
-                    productId,
-                    1, // Mỗi order = 1 code
-                    unitPrice, // Giá 1 code
-                    conn
-                );
-                
-                if (pendingOrderId == null) {
-                    conn.rollback();
-                    jsonResponse.addProperty("status", "ERROR");
-                    jsonResponse.addProperty("message", "Không thể tạo đơn hàng!");
-                    response.getWriter().write(new Gson().toJson(jsonResponse));
-                    return;
-                }
-                
-                // Insert order_item
-                orderDAO.insertOrderItem(pendingOrderId, null, productId, unitPrice, conn);
-                
-                createdOrderIds.add(pendingOrderId);
-                System.out.println("  ✓ Created PENDING order " + (i+1) + "/" + quantity + ": ID=" + pendingOrderId);
+            if (pendingOrderId == null) {
+                conn.rollback();
+                jsonResponse.addProperty("status", "ERROR");
+                jsonResponse.addProperty("message", "Không thể tạo đơn hàng!");
+                response.getWriter().write(new Gson().toJson(jsonResponse));
+                return;
             }
+            
+            // Insert order_item
+            orderDAO.insertOrderItem(pendingOrderId, null, productId, unitPrice, conn);
+            
+            System.out.println("  ✓ Created PENDING order ID: " + pendingOrderId);
             
             // 6. Tạo transaction ID
             long transactionId = System.currentTimeMillis();
             
-            // 7. ✨ BƯỚC 2: TRỪ TIỀN VÍ (TỔNG TIỀN cho tất cả codes)
+            // 7. ✨ BƯỚC 2: TRỪ TIỀN VÍ
             boolean walletUpdated = withdrawFromWallet(conn, user.getUser_id(), totalAmount.doubleValue(), transactionId, product.getName());
             
             if (!walletUpdated) {
@@ -141,20 +135,18 @@ public class CheckoutProcessController extends HttpServlet {
             
             System.out.println("  ✓ Wallet deducted: " + totalAmount + " VND");
             
-            // 8. ✨ BƯỚC 3: UPDATE TẤT CẢ ORDERS SANG PAID
-            for (Long orderId : createdOrderIds) {
-                boolean updated = orderDAO.updateOrderToPaid(orderId, String.valueOf(transactionId), conn);
-                
-                if (!updated) {
-                    conn.rollback();
-                    jsonResponse.addProperty("status", "ERROR");
-                    jsonResponse.addProperty("message", "Không thể cập nhật trạng thái đơn hàng!");
-                    response.getWriter().write(new Gson().toJson(jsonResponse));
-                    return;
-                }
-                
-                System.out.println("  ✓ Updated order to PAID: " + orderId);
+            // 8. ✨ BƯỚC 3: UPDATE ORDER SANG PAID
+            boolean updated = orderDAO.updateOrderToPaid(pendingOrderId, String.valueOf(transactionId), conn);
+            
+            if (!updated) {
+                conn.rollback();
+                jsonResponse.addProperty("status", "ERROR");
+                jsonResponse.addProperty("message", "Không thể cập nhật trạng thái đơn hàng!");
+                response.getWriter().write(new Gson().toJson(jsonResponse));
+                return;
             }
+            
+            System.out.println("  ✓ Updated order to PAID: " + pendingOrderId);
             
             // 9. ✨ NOTE: KHÔNG gán code ở đây nữa
             //    Background job (OrderQueueProcessor) sẽ tự động:
@@ -163,10 +155,10 @@ public class CheckoutProcessController extends HttpServlet {
             //    - Update status = 'delivered'
             //    - Hoặc refund nếu hết code
             
-            // 10. Tạo PENDING TRANSACTION (cho tổng tiền)
+            // 10. Tạo PENDING TRANSACTION
             int holdDays = 7;
             Long pendingId = pendingTransactionDAO.createPendingTransaction(
-                conn, createdOrderIds.get(0), // Dùng order đầu tiên làm reference
+                conn, pendingOrderId, // Use created order ID
                 user.getUser_id(), 
                 product.getSeller_id().getUser_id(),
                 totalAmount, holdDays, transactionId
@@ -183,8 +175,9 @@ public class CheckoutProcessController extends HttpServlet {
             // 11. COMMIT transaction
             conn.commit();
             
-            System.out.println("✅ NEW FLOW: Committed " + createdOrderIds.size() + " PAID orders!");
-            System.out.println("   → Orders sẽ được xử lý bởi background job");
+            System.out.println("✅ CHECKOUT FLOW: Committed 1 PAID order!");
+            System.out.println("   → Order ID: " + pendingOrderId);
+            System.out.println("   → Order sẽ được xử lý bởi background job");
             System.out.println("   → User sẽ nhận code trong vài giây");
             
             // 12. ✨ Sync inventory SAU khi commit
@@ -194,11 +187,10 @@ public class CheckoutProcessController extends HttpServlet {
                 System.err.println("⚠️ Failed to sync inventory: " + e.getMessage());
             }
             
-            // 13. ✨ Trả về success - Lưu ý message khác
+            // 13. ✨ Trả về success
             jsonResponse.addProperty("status", "SUCCESS");
             jsonResponse.addProperty("message", "Thanh toán thành công! Đơn hàng đang được xử lý...");
-            jsonResponse.addProperty("orderId", createdOrderIds.get(0)); // Order đầu tiên
-            jsonResponse.addProperty("totalOrders", createdOrderIds.size());
+            jsonResponse.addProperty("orderId", pendingOrderId);
             jsonResponse.addProperty("processing", true); // Flag để UI biết đơn đang xử lý
             
             response.getWriter().write(new Gson().toJson(jsonResponse));
