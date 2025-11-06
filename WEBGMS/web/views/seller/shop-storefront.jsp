@@ -109,6 +109,40 @@
             font-size: 0.75rem;
             padding: 0.35rem 0.65rem;
         }
+        .product-img-wrapper {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+        .wishlist-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .wishlist-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .wishlist-btn.in-wishlist {
+            color: #dc3545;
+        }
+        .wishlist-btn.in-wishlist i {
+            color: #dc3545;
+        }
     </style>
 </head>
 <body>
@@ -231,9 +265,21 @@
                                             <c:set var="primaryImage" value="https://via.placeholder.com/300x200/667eea/ffffff?text=Product" />
                                         </c:if>
                                         
-                                        <a href="<%= request.getContextPath() %>/product/${product.product_id}">
-                                            <img src="${primaryImage}" class="product-img" alt="${product.name}">
-                                        </a>
+                                        <div class="product-img-wrapper">
+                                            <a href="<%= request.getContextPath() %>/product/${product.product_id}">
+                                                <img src="${primaryImage}" class="product-img" alt="${product.name}">
+                                            </a>
+                                            
+                                            <!-- Wishlist Button -->
+                                            <c:if test="${not empty sessionScope.user}">
+                                                <button class="wishlist-btn" 
+                                                        data-product-id="${product.product_id}"
+                                                        onclick="event.preventDefault(); toggleWishlist(${product.product_id}, this)"
+                                                        title="Thêm vào yêu thích">
+                                                    <i class="far fa-heart"></i>
+                                                </button>
+                                            </c:if>
+                                        </div>
                                         
                                         <div class="product-body">
                                             <a href="<%= request.getContextPath() %>/product/${product.product_id}" class="product-title">
@@ -297,6 +343,18 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Wishlist JavaScript -->
+    <script>
+        // Set context path and user ID for wishlist.js
+        const contextPath = '<%= request.getContextPath() %>';
+        <c:if test="${not empty sessionScope.user}">
+        const currentUserId = ${sessionScope.user.user_id};
+        // Store in sessionStorage for wishlist.js
+        sessionStorage.setItem('userId', ${sessionScope.user.user_id});
+        </c:if>
+    </script>
+    <script src="<%= request.getContextPath() %>/assets/js/wishlist.js"></script>
 </body>
 </html>
 
